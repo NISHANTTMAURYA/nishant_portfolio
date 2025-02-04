@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ViridianVerse</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<style>
+:root {
+    --primary-color: #D6F32F;
+    --text-color: #151616;
+    --background-color: #FFFFF4;
+    --card-background: #FFFFFF;
+    --sidebar-width: 280px;
+    --shadow-sm: 4px 4px 0px 0px rgba(21, 22, 22, 1);
+    --shadow-hover: 6px 6px 0px 0px rgba(21, 22, 22, 1);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    background-color: var(--background-color);
+    color: var(--text-color);
+    line-height: 1.5;
+}
+
+.dashboard-container {
+    display: flex;
+    min-height: 100vh;
+    background-color: var(--background-color);
+}
+
+/* Blended Sidebar & Navbar Styles */
+.sidebar {
+    width: var(--sidebar-width);
+    background-color: var(--card-background);
+    padding: 2rem 1.5rem;
+    border-right: 2px solid rgba(21, 22, 22, 0.1);
+    position: fixed;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    gap: 3rem;
+    z-index: 50;
+}
+
+.sidebar-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-right: 0.5rem;
+}
+
+.logo-container {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.logo {
+    width: 42px;
+    height: 42px;
+    background-color: var(--primary-color);
+    border-radius: 12px;
+    border: 2px solid var(--text-color);
+    box-shadow: var(--shadow-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.logo i {
+    font-size: 24px;
+    color: var(--text-color);
+}
+
+.logo-container h1 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-color);
+}
+
+.nav-menu {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.nav-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.875rem 1rem;
+    text-decoration: none;
+    color: var(--text-color);
+    border-radius: 12px;
+    transition: all 0.2s ease;
+    font-weight: 500;
+    font-size: 0.9375rem;
+}
+
+.nav-item i {
+    font-size: 1.5rem;
+    opacity: 0.9;
+}
+
+.nav-item:hover {
+    background-color: var(--primary-color);
+    transform: translateY(-2px);
+}
+
+.nav-item.active {
+    background-color: var(--primary-color);
+    border: 2px solid var(--text-color);
+    box-shadow: var(--shadow-sm);
+    font-weight: 600;
+}
+
+/* Updated Main Content Area */
+.main-content {
+    margin-left: var(--sidebar-width);
+    flex: 1;
+    padding: 2rem 2.5rem;
+    background-color: var(--background-color);
+}
+
+.top-nav {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.search-bar {
+    flex: 1;
+    max-width: 360px;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    background-color: var(--card-background);
+    padding: 0.75rem 1rem;
+    border-radius: 12px;
+    border: 2px solid var(--text-color);
+    transition: all 0.2s ease;
+}
+
+.search-bar:focus-within {
+    box-shadow: var(--shadow-sm);
+    transform: translateY(-2px);
+}
+
+.search-bar input {
+    border: none;
+    outline: none;
+    background: none;
+    width: 100%;
+    font-size: 0.9375rem;
+    font-family: 'Inter', sans-serif;
+    color: var(--text-color);
+}
+
+.user-menu {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.notifications {
+    position: relative;
+    cursor: pointer;
+    padding: 0.75rem;
+    border-radius: 12px;
+    transition: all 0.2s ease;
+}
+
+.notifications:hover {
+    background-color: var(--primary-color);
+    transform: translateY(-2px);
+}
+
+.notifications i {
+    font-size: 1.5rem;
+    color: var(--text-color);
+}
+
+.user-profile {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.5rem 0.75rem;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.user-profile:hover {
+    background-color: var(--primary-color);
+    transform: translateY(-2px);
+}
+
+.user-profile img {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    border: 2px solid var(--text-color);
+    object-fit: cover;
+}
+
+.user-profile span {
+    font-weight: 500;
+    font-size: 0.9375rem;
+    color: var(--text-color);
+}
+
+@media (max-width: 1024px) {
+    :root {
+        --sidebar-width: 240px;
+    }
+}
+
+/* Mobile Menu Button */
+.mobile-menu-btn {
+    display: none;
+    padding: 0.75rem;
+    border-radius: 12px;
+    border: 2px solid var(--text-color);
+    background-color: var(--primary-color);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.mobile-menu-btn i {
+    font-size: 1.5rem;
+    color: var(--text-color);
+}
+
+.mobile-menu-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-sm);
+}
+
+/* Mobile Styles */
+@media (max-width: 768px) {
+    .mobile-menu-btn {
+        display: block;
+    }
+
+    .sidebar {
+        position: fixed;
+        left: -100%;
+        top: 0;
+        bottom: 0;
+        transition: left 0.3s ease;
+        background-color: var(--card-background);
+        width: 85%;
+        max-width: 320px;
+        z-index: 1000;
+    }
+
+    .sidebar.active {
+        left: 0;
+        box-shadow: 4px 0 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 999;
+    }
+
+    .overlay.active {
+        display: block;
+    }
+
+    .main-content {
+        margin-left: 0;
+        padding: 1rem;
+        width: 100%;
+    }
+
+    .top-nav {
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .search-bar {
+        order: 1;
+        min-width: 40%;
+    }
+
+    .user-menu {
+        margin-left: auto;
+    }
+
+    .user-profile span {
+        display: none;
+    }
+}
+
+/* Small Phone Styles */
+@media (max-width: 480px) {
+    .quick-actions-grid,
+    .stats-grid,
+    .activity-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .top-nav {
+        padding: 1rem 0;
+    }
+
+    .notifications {
+        padding: 0.5rem;
+    }
+
+    .user-profile img {
+        width: 32px;
+        height: 32px;
+    }
+}
+
+.sidebar {
+    display: flex;
+    flex-direction: column;
+}
+
+.bottom-menu {
+    margin-top: auto;
+    border-top: 2px solid rgba(21, 22, 22, 0.1);
+    padding-top: 1rem;
+}
+
+.bottom-menu .nav-item {
+    opacity: 0.8;
+}
+
+.bottom-menu .nav-item:hover {
+    opacity: 1;
+}
+
+.nav-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    padding: 0.5rem 0;
+    border-left: 2px solid rgba(21, 22, 22, 0.1);
+    margin-left: 0.5rem;
+}
+
+.nav-group .nav-item {
+    margin-left: 0.5rem;
+}
+</style>
+<body>
+    <div class="dashboard-container">
+        <!-- Overlay for mobile menu -->
+        <div class="overlay" id="overlay"></div>
+
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo-container">
+                    <div class="logo">
+                        <i class="material-icons">psychology</i>
+                    </div>
+                    <h1>ViridianVerse</h1>
+                </div>
+            </div>
+            
+            <nav class="nav-menu">
+                <a href="{% url 'users:user_home' %}" class="nav-item {% if request.path == '/user/dashboard/' %}active{% endif %}">
+                    <i class="material-icons">dashboard</i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="{% url 'story:story_map' %}" class="nav-item {% if '/story/' in request.path %}active{% endif %}">
+                    <i class="material-icons">public</i>
+                    <span>Echo</span>
+                </a>
+                
+                        <a href="/org/events/list/" class="nav-item {% if '/org/events/' in request.path %}active{% endif %}">
+                            <i class="material-icons">event</i>
+                            <span>Organization Events</span>
+                        </a>
+                    <a href="/ai-scarp/projects/" class="nav-item {% if '/ai-scarp/projects/' in request.path %}active{% endif %}">
+                        <i class="material-icons">support_agent</i>
+                        <span>AI Projects</span>
+                    </a>
+                
+                <a href="{% url 'users:user_tasks' %}" class="nav-item {% if '/tasks/' in request.path %}active{% endif %}">
+                    <i class="material-icons">task_alt</i>
+                    <span>My Tasks</span>
+                </a>
+                {% comment %} <a href="{% url 'users:user_activities' %}" class="nav-item {% if '/user/activities/' in request.path %}active{% endif %}">
+                    <i class="material-icons">eco</i>
+                    <span>My Activities</span>
+                </a> {% endcomment %}
+                
+                <!-- Add Product Health Score link -->
+                <a href="{% url 'phs:search_products' %}" class="nav-item {% if '/phs/' in request.path %}active{% endif %}">
+                    <i class="material-icons">eco</i>
+                    <span>Product Health Score</span>
+                </a>
+                
+                <!-- Marketplace link -->
+                <a href="{% url 'marketplace:product_list' %}" class="nav-item {% if '/marketplace/' in request.path %}active{% endif %}">
+                    <i class="material-icons">shopping_cart</i>
+                    <span>Marketplace</span>
+                </a>
+            </nav>
+
+            <nav class="nav-menu bottom-menu" style="margin-top: auto;">
+                <a href="{% url 'users:user_profile' %}" class="nav-item {% if '/profile/' in request.path %}active{% endif %}">
+                    <i class="material-icons">account_circle</i>
+                    <span>Profile</span>
+               
+                <a href="/logout" class="nav-item">
+                    <i class="material-icons">logout</i>
+                    <span>Logout</span>
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+           
+
+            <!-- Replace the div with block content -->
+            {% block content %}{% endblock %}
+            
+            <!-- Add block for styles -->
+            {% block styles %}{% endblock %}
+        </main>
+    </div>
+
+    <script>
+        // Mobile Menu Functionality
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('overlay');
+
+        function toggleMobileMenu() {
+            sidebar.classList.toggle('active');
+            overlay.classList.toggle('active');
+            document.body.style.overflow = sidebar.classList.contains('active') ? 'hidden' : '';
+        }
+
+        mobileMenuBtn.addEventListener('click', toggleMobileMenu);
+        overlay.addEventListener('click', toggleMobileMenu);
+
+        // Close menu on window resize (if desktop size)
+        window.addEventListener('resize', () => {
+            if (window.innerWidth > 768 && sidebar.classList.contains('active')) {
+                toggleMobileMenu();
+            }
+        });
+
+        // Handle swipe gestures for mobile
+        let touchStartX = 0;
+        let touchEndX = 0;
+
+        document.addEventListener('touchstart', e => {
+            touchStartX = e.changedTouches[0].screenX;
+        }, false);
+
+        document.addEventListener('touchend', e => {
+            touchEndX = e.changedTouches[0].screenX;
+            handleSwipe();
+        }, false);
+
+        function handleSwipe() {
+            const swipeThreshold = 50;
+            const swipeLength = touchEndX - touchStartX;
+
+            if (Math.abs(swipeLength) < swipeThreshold) return;
+
+            if (swipeLength > 0 && !sidebar.classList.contains('active')) {
+                // Swipe right, open menu
+                toggleMobileMenu();
+            } else if (swipeLength < 0 && sidebar.classList.contains('active')) {
+                // Swipe left, close menu
+                toggleMobileMenu();
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Change Text Example</title>
+</head>
+<body>
+    <h1 id="title">Original Title</h1>
+    <button id="changeTextBtn">Change Title</button>
+
+    <script>
+        let isChanged = true;
+        document.getElementById("changeTextBtn").addEventListener("click", function () {
+    document.getElementById("title").textContent = isChanged ? "trauma" : "Original Title";
+    document.getElementById("title").style.color = isChanged ? "red" : "black";
+    isChanged = !isChanged;
+});
+
+    </script>
+
+</body>
+</html>
