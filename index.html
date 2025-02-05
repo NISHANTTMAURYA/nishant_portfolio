@@ -1059,35 +1059,10 @@ body {
             const heroBackground = document.querySelector('.hero-background');
             let isPhone = false;
 
-            // Detect if device has gyroscope
-            if (window.DeviceOrientationEvent) {
-                window.addEventListener('deviceorientation', function(event) {
-                    if (event.beta && event.gamma) {
-                        isPhone = true;
-                        handleGyroscope(event);
-                    }
-                });
-            }
-
             // Mouse movement for desktop
             addEventListener('mousemove', e => {
-                if (!isPhone) {
-                    heroBackground.style = `--x: ${e.clientX}px; --y: ${e.clientY}px;`;
-                }
+                heroBackground.style = `--x: ${e.clientX}px; --y: ${e.clientY}px;`;
             });
-
-            // Gyroscope handler for mobile
-            function handleGyroscope(event) {
-                // Convert gyroscope data to coordinates
-                const beta = Math.floor(event.beta); // -180 to 180
-                const gamma = Math.floor(event.gamma); // -90 to 90
-                
-                // Calculate x and y positions based on device orientation
-                const x = (gamma + 90) * (window.innerWidth / 180);
-                const y = (beta + 180) * (window.innerHeight / 360);
-                
-                heroBackground.style = `--x: ${x}px; --y: ${y}px;`;
-            }
 
             // Smooth scroll for anchor links
             document.querySelectorAll('a[href^="#"]').forEach(anchor => {
@@ -1217,28 +1192,38 @@ body {
             // Run loading animation on page load
             addLoadingAnimation();
 
-            // Intersection Observer for scroll animations
-            const observerOptions = {
-                threshold: 0.1,
-                rootMargin: '50px'
-            };
+            // Intersection Observer for scroll animations - Mobile only
+            const isMobile = window.innerWidth <= 768; // Define mobile breakpoint
+            
+            if (isMobile) {
+                const observerOptions = {
+                    threshold: 0.1,
+                    rootMargin: '50px'
+                };
 
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.style.opacity = '1';
-                        entry.target.style.transform = 'translateY(0)';
-                        observer.unobserve(entry.target);
-                    }
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            entry.target.style.opacity = '1';
+                            entry.target.style.transform = 'translateY(0)';
+                            observer.unobserve(entry.target);
+                        }
+                    });
+                }, observerOptions);
+
+                // Observe all cards and sections
+                document.querySelectorAll('.project-card, .stat-card, .timeline-item, .section').forEach(element => {
+                    element.style.opacity = '0';
+                    element.style.transform = 'translateY(20px)';
+                    observer.observe(element);
                 });
-            }, observerOptions);
-
-            // Observe all cards and sections
-            document.querySelectorAll('.project-card, .stat-card, .timeline-item, .section').forEach(element => {
-                element.style.opacity = '0';
-                element.style.transform = 'translateY(20px)';
-                observer.observe(element);
-            });
+            } else {
+                // For desktop, show elements without animation
+                document.querySelectorAll('.project-card, .stat-card, .timeline-item, .section').forEach(element => {
+                    element.style.opacity = '1';
+                    element.style.transform = 'translateY(0)';
+                });
+            }
 
         } catch (error) {
             console.error('Error in script:', error);
