@@ -75,8 +75,8 @@ body {
     left: 0;
     right: 0;
     bottom: 0;
-    --pattern: radial-gradient(closest-side, var(--primary-color), #fff) 0/ 1.5em 1.5em space;
-    --map: radial-gradient(circle farthest-corner at var(--x) var(--y), var(--primary-color), transparent 100%);
+    --pattern: radial-gradient(closest-side, var(--primary-color), #fff) 0/ 1em 1em space;
+    --map: radial-gradient(circle farthest-corner at var(--x) var(--y), var(--primary-color), transparent 90%);
     background: var(--pattern), var(--map);
     background-blend-mode: multiply;
     filter: contrast(10);
@@ -263,7 +263,7 @@ body {
 /* Responsive Design */
 @media (max-width: 768px) {
     .hero-background {
-        --pattern: radial-gradient(closest-side, var(--primary-color), #fff) 0/ 0.8em 0.8em space;
+        --pattern: radial-gradient(closest-side, var(--primary-color), #fff) 0/ 0.4em 0.4em space;
         --map: radial-gradient(circle farthest-corner at var(--x) var(--y), var(--primary-color), transparent 120%);
         filter: contrast(8);
     }
