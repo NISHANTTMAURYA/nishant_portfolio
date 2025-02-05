@@ -811,6 +811,58 @@ body {
         right: -20px;
     }
 }
+
+/* Add to your existing styles */
+.contact-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2rem;
+    text-align: center;
+}
+
+.contact-links {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+.contact-link {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 1rem 2rem;
+    background: var(--card-background);
+    border: 2px solid var(--border-color);
+    border-radius: 12px;
+    text-decoration: none;
+    color: var(--text-color);
+    font-weight: 600;
+    transition: var(--transition);
+    box-shadow: var(--shadow-sm);
+}
+
+.contact-link:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-hover);
+}
+
+.contact-link i {
+    font-size: 24px;
+}
+
+@media (max-width: 768px) {
+    .contact-links {
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
+    }
+    
+    .contact-link {
+        width: 100%;
+        justify-content: center;
+    }
+}
 </style>
 <body>
     <!-- Navbar -->
@@ -830,6 +882,7 @@ body {
             <a href="#gallery" class="nav-link">Gallery</a>
             <a href="#projects" class="nav-link">Projects</a>
             <a href="#resume" class="nav-link">Resume</a>
+            <a href="#contact" class="nav-link">Contact</a>
         </div>
         <button class="mobile-menu-btn">
             <i class="material-icons">menu</i>
@@ -979,6 +1032,23 @@ body {
                     <i class="material-icons">download</i>
                     Download Resume
                 </a>
+            </div>
+        </section>
+
+        <!-- Contact Section -->
+        <section id="contact" class="section">
+            <h2 class="section-title">Contact Me</h2>
+            <div class="contact-container">
+                <div class="contact-links">
+                    <a href="https://www.linkedin.com/in/nishant-maurya-45bb86276/" target="_blank" class="contact-link">
+                        <i class="material-icons">business</i>
+                        LinkedIn
+                    </a>
+                    <a href="https://github.com/NISHANTTMAURYA" target="_blank" class="contact-link">
+                        <i class="material-icons">code</i>
+                        GitHub
+                    </a>
+                </div>
             </div>
         </section>
     </div>
