@@ -68,21 +68,21 @@ body {
     overflow: hidden;
 }
 
-/* New background wrapper */
+/* Updated hero-background styles */
 .hero-background {
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    --pattern: radial-gradient(closest-side, var(--primary-color), #fff) 0/ 1em 1em space;
-    --map: radial-gradient(circle farthest-corner at var(--x) var(--y), var(--primary-color), #fff);
+    --pattern: radial-gradient(closest-side, var(--primary-color), #fff) 0/ 1.5em 1.5em space;
+    --map: radial-gradient(circle farthest-corner at var(--x) var(--y), var(--primary-color), transparent 100%);
     background: var(--pattern), var(--map);
     background-blend-mode: multiply;
-    filter: contrast(8);
+    filter: contrast(10);
     transition: .35s cubic-bezier(.1,0,.5,1.5);
     transition-property: --x, --y;
-    pointer-events: none; /* Allows clicking through to content */
+    pointer-events: none;
 }
 
 .hero-background::before {
@@ -262,12 +262,24 @@ body {
 
 /* Responsive Design */
 @media (max-width: 768px) {
+    .hero-background {
+        --pattern: radial-gradient(closest-side, var(--primary-color), #fff) 0/ 0.8em 0.8em space;
+        --map: radial-gradient(circle farthest-corner at var(--x) var(--y), var(--primary-color), transparent 120%);
+        filter: contrast(8);
+    }
+    
+    .hero-content {
+        padding: 1.5rem;
+        margin: 1rem;
+        background: rgba(255, 255, 255, 0.95); /* Increased background opacity */
+    }
+    
     .hero h1 {
-        font-size: 2.5rem;
+        font-size: 2.5rem; /* Smaller font size for mobile */
     }
     
     .hero p {
-        font-size: 1.125rem;
+        font-size: 1rem; /* Smaller font size for mobile */
     }
     
     .projects {
@@ -862,12 +874,12 @@ body {
             <h2 class="section-title">Experience</h2>
             <div class="experience-timeline">
                 <div class="timeline-item">
-                    <div class="timeline-date">2023 - Present</div>
+                    <div class="timeline-date">2024</div>
                     <h3>Project Manager - SIH 2024</h3>
                     <p>Leading development of Samvidhan Setu gaming platform</p>
                 </div>
                 <div class="timeline-item">
-                    <div class="timeline-date">2023</div>
+                    <div class="timeline-date">2024-25</div>
                     <h3>Backend Developer - MentorConnect</h3>
                     <p>Developed digitized mentoring platform for computer branch</p>
                 </div>
