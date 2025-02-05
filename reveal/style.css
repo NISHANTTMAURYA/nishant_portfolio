@@ -1,7 +1,7 @@
 :root{
   --clr-bg: black;
   --clr-txt: white;
-  --clr-cta: rgb(2, 132, 199);
+  --clr-cta: #a78bfa;
   --width: 40px;
 }
 html{
@@ -18,6 +18,9 @@ body{
   display: grid;
   place-content: center;
   */
+}
+.number-text span.highlight {
+  color: #a78bfa;  /* Uses the same purple as 'm' */
 }
 
 /* Default message styling (visible initially) */
@@ -42,7 +45,7 @@ body{
   inset: 0;
   margin: auto;
   width: 520px;
-  height: 250px;
+  height: 150px;
   /*outline: 1px dashed red;*/
   /*background: #444;*/
 }
@@ -158,5 +161,29 @@ p:nth-child(1) span:nth-child(4)::after{
 @keyframes reveal{
   to{
     translate: 0 0;
+  }
+}
+
+.team-text {
+  --y: 0px;
+  animation: fadeOut linear both;
+  animation-timeline: scroll();
+}
+
+.number-text {
+  opacity: 0;
+  animation: fadeIn linear both;
+  animation-timeline: scroll();
+}
+
+@keyframes fadeOut {
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes fadeIn {
+  to {
+    opacity: 1;
   }
 }
