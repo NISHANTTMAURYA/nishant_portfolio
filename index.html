@@ -17,11 +17,11 @@
     --shadow-sm: 4px 4px 0px 0px rgba(21, 22, 22, 1); /* Solid black shadow */
     --shadow-hover: 6px 6px 0px 0px rgba(21, 22, 22, 1); /* Solid black shadow on hover */
     --border-color: rgba(21, 22, 22, 1); /* Solid black border */
-    --transition: all 0.3s ease;
+    --transition: all 0.1s animate-on-scroll;
     --x: 50vw;
     --y: 50vh;
     --pattern: radial-gradient(closest-side, #302951, transparent) 0/ 1em 1em space;
-    --map: radial-gradient(circle farthest-corner at var(--x) var(--y), black, transparent 70%);
+    --map: radial-gradient(circle farthest-corner at var(--x) var(--y), black, transparent 90%);
 }
 
 @property --x {
@@ -177,6 +177,7 @@ body {
     display: flex;
     flex-direction: column;
     gap: 2rem;
+    padding: 0.5rem 1rem; /* Add padding to prevent shadow clipping */
 }
 
 .project-card {
@@ -188,10 +189,12 @@ body {
     animation: fadeIn 1s ease;
     border: 2px solid var(--border-color);
     transform-origin: center;
-    margin-bottom: 1rem;
+    margin: 0.5rem; /* Add margin to prevent shadow clipping */
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    position: relative; /* Add position relative */
+    z-index: 1; /* Ensure card is above background */
 }
 
 .project-card:hover {
@@ -284,6 +287,29 @@ body {
     
     .projects {
         grid-template-columns: 1fr;
+    }
+
+    /* Override hover animations for mobile */
+    .project-card:hover,
+    .stat-card:hover,
+    .timeline-item:hover,
+    .gallery-item:hover,
+    .resume-container:hover {
+        transform: none;
+        box-shadow: var(--shadow-sm);
+    }
+
+    /* Add scroll-triggered animation classes */
+    .animate-on-scroll {
+        opacity: 0;
+        transform: translateY(20px);
+        transition: var(--transition);
+    }
+
+    .animate-on-scroll.visible {
+        opacity: 1;
+        transform: translateY(0);
+        box-shadow: var(--shadow-hover);
     }
 }
 
@@ -863,6 +889,58 @@ body {
         justify-content: center;
     }
 }
+
+/* Add this new class for sections that need the animated background */
+.animated-background-section {
+    position: relative;
+    overflow: hidden;
+}
+
+/* Create a new background element class */
+.animated-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    --pattern: radial-gradient(closest-side, var(--primary-color), #fff) 0/ 1em 1em space;
+    --map: radial-gradient(circle farthest-corner at var(--x) var(--y), var(--primary-color), transparent 90%);
+    background: var(--pattern), var(--map);
+    background-blend-mode: multiply;
+    filter: contrast(10);
+    transition: .35s cubic-bezier(.1,0,.5,1.5);
+    transition-property: --x, --y;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.animated-background::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: var(--pattern), var(--map);
+    background-blend-mode: multiply;
+    filter: contrast(8) opacity(0.1);
+    pointer-events: none;
+}
+
+/* Update the content within animated sections to be above background */
+.animated-background-section > * {
+    position: relative;
+    z-index: 1;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .animated-background {
+        --pattern: radial-gradient(closest-side, var(--primary-color), #fff) 0/ 0.4em 0.4em space;
+        --map: radial-gradient(circle farthest-corner at var(--x) var(--y), var(--primary-color), transparent 120%);
+        filter: contrast(8);
+    }
+}
 </style>
 <body>
     <!-- Navbar -->
@@ -940,50 +1018,52 @@ body {
             </div>
         </section>
 
-        <div class="projects" id="projects">
+        <section id="projects" class="section animated-background-section">
             <h2 class="section-title">Projects</h2>
-            <div class="project-card">
-                <h3>SIH 2024 Gaming Platform</h3>
-                <p>Designed and developed a comprehensive web gaming platform including Samvidhan Setu with unified leaderboard system.</p>
-                <div class="tech-stack">
-                    <span class="tech-tag">Python</span>
-                    <span class="tech-tag">Django</span>
-                    <span class="tech-tag">JavaScript</span>
+            <div class="projects">
+                <div class="project-card">
+                    <h3>SIH 2024 Gaming Platform</h3>
+                    <p>Designed and developed a comprehensive web gaming platform including Samvidhan Setu with unified leaderboard system.</p>
+                    <div class="tech-stack">
+                        <span class="tech-tag">Python</span>
+                        <span class="tech-tag">Django</span>
+                        <span class="tech-tag">JavaScript</span>
+                    </div>
                 </div>
-            </div>
 
-            <div class="project-card">
-                <h3>MentorConnect</h3>
-                <p>Digitized mentoring platform eliminating paperwork burden, currently in testing phase for computer branch.</p>
-                <div class="tech-stack">
-                    <span class="tech-tag">Django</span>
-                    <span class="tech-tag">PostgreSQL</span>
+                <div class="project-card">
+                    <h3>MentorConnect</h3>
+                    <p>Digitized mentoring platform eliminating paperwork burden, currently in testing phase for computer branch.</p>
+                    <div class="tech-stack">
+                        <span class="tech-tag">Django</span>
+                        <span class="tech-tag">PostgreSQL</span>
+                    </div>
                 </div>
-            </div>
-            <div class="project-card">
-                <h3>Spring Boot Route Optimizer</h3>
-                <p>Developed a Spring Boot project utilizing three APIs for real-time route optimization and visual insights. Implemented features like smart routing with traffic updates, interactive visual mapping, and time-saving route comparisons. Integrated OpenCage for geocoding, OpenRoute Service for traffic data, and Leaflet.js with OSRM for map visualization.</p>
-                <div class="tech-stack">
-                    <span class="tech-tag">Spring Boot</span>
-                    <span class="tech-tag">OpenCage</span>
-                    <span class="tech-tag">OpenRoute Service</span>
-                    <span class="tech-tag">Leaflet.js</span>
-                    <span class="tech-tag">OSRM</span>
+                <div class="project-card">
+                    <h3>Spring Boot Route Optimizer</h3>
+                    <p>Developed a Spring Boot project utilizing three APIs for real-time route optimization and visual insights. Implemented features like smart routing with traffic updates, interactive visual mapping, and time-saving route comparisons. Integrated OpenCage for geocoding, OpenRoute Service for traffic data, and Leaflet.js with OSRM for map visualization.</p>
+                    <div class="tech-stack">
+                        <span class="tech-tag">Spring Boot</span>
+                        <span class="tech-tag">OpenCage</span>
+                        <span class="tech-tag">OpenRoute Service</span>
+                        <span class="tech-tag">Leaflet.js</span>
+                        <span class="tech-tag">OSRM</span>
+                    </div>
                 </div>
-            </div>
 
-            <div class="project-card">
-                <h3>MedSafe</h3>
-                <p>Unified health platform connecting hospitals, doctors, and patients. Successfully pitched to 100x.vc.</p>
-                <div class="tech-stack">
-                    <span class="tech-tag">Python</span>
-                    <span class="tech-tag">Django</span>
-                    <span class="tech-tag">HTML/CSS</span>
+                <div class="project-card">
+                    <h3>MedSafe</h3>
+                    <p>Unified health platform connecting hospitals, doctors, and patients. Successfully pitched to 100x.vc.</p>
+                    <div class="tech-stack">
+                        <span class="tech-tag">Python</span>
+                        <span class="tech-tag">Django</span>
+                        <span class="tech-tag">HTML/CSS</span>
+                    </div>
                 </div>
             </div>
-        </div>
+        </section>
 
-        <section id="gallery" class="section">
+        <section id="gallery" class="section animated-background-section">
             <h2 class="section-title">Gallery</h2>
             <div class="carousel-container">
                 <div class="carousel">
@@ -1224,6 +1304,132 @@ body {
                     element.style.transform = 'translateY(0)';
                 });
             }
+
+            // Function for mobile scroll animations with background effect
+            const addMobileScrollAnimations = () => {
+                const elements = document.querySelectorAll('.project-card, .stat-card, .timeline-item, .gallery-item, .resume-container');
+                const heroBackground = document.querySelector('.hero-background');
+                
+                // Update background pattern based on scroll position
+                const updateBackgroundPattern = () => {
+                    const scrollPosition = window.scrollY;
+                    const viewportHeight = window.innerHeight;
+                    const scrollPercentage = (scrollPosition / viewportHeight) * 100;
+                    
+                    // Update the background position based on scroll
+                    if (heroBackground) {
+                        heroBackground.style.setProperty('--x', `${50 + (scrollPercentage / 2)}vw`);
+                        heroBackground.style.setProperty('--y', `${scrollPosition}px`);
+                    }
+                };
+
+                // Add scroll event listener for background effect
+                window.addEventListener('scroll', updateBackgroundPattern, { passive: true });
+                
+                // Intersection Observer for card animations
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add('visible');
+                            // Add ripple effect to nearby background dots
+                            const rect = entry.target.getBoundingClientRect();
+                            const centerX = rect.left + rect.width / 2;
+                            const centerY = rect.top + rect.height / 2;
+                            if (heroBackground) {
+                                heroBackground.style.setProperty('--x', `${centerX}px`);
+                                heroBackground.style.setProperty('--y', `${centerY}px`);
+                            }
+                        }
+                    });
+                }, {
+                    threshold: 0.1,
+                    rootMargin: '0px'
+                });
+
+                elements.forEach(element => {
+                    element.classList.add('animate-on-scroll');
+                    observer.observe(element);
+                });
+            };
+
+            // Function for desktop hover animations
+            const addDesktopHoverAnimations = () => {
+                const elements = document.querySelectorAll('.project-card, .stat-card, .timeline-item, .gallery-item, .resume-container');
+                
+                elements.forEach(element => {
+                    // Remove mobile-specific classes if they exist
+                    element.classList.remove('animate-on-scroll', 'visible');
+                    
+                    // Reset any inline styles that might have been applied
+                    element.style.opacity = '1';
+                    element.style.transform = 'none';
+                });
+            };
+
+            // Function to handle animations based on device width
+            const handleAnimations = () => {
+                const isMobile = window.innerWidth <= 768;
+                
+                if (isMobile) {
+                    addMobileScrollAnimations();
+                } else {
+                    addDesktopHoverAnimations();
+                }
+            };
+
+            // Initial setup
+            handleAnimations();
+
+            // Handle window resize
+            window.addEventListener('resize', () => {
+                handleAnimations();
+            });
+
+            // Add this to your script section
+            const initAnimatedBackgrounds = () => {
+                // Create background elements for each section
+                document.querySelectorAll('.animated-background-section').forEach(section => {
+                    // Create background element if it doesn't exist
+                    if (!section.querySelector('.animated-background')) {
+                        const background = document.createElement('div');
+                        background.className = 'animated-background';
+                        section.insertBefore(background, section.firstChild);
+                    }
+                });
+
+                // Handle mouse movement for all animated backgrounds
+                document.addEventListener('mousemove', e => {
+                    document.querySelectorAll('.animated-background').forEach(background => {
+                        const rect = background.parentElement.getBoundingClientRect();
+                        const x = e.clientX - rect.left;
+                        const y = e.clientY - rect.top;
+                        
+                        // Only update if mouse is within or near the section
+                        const buffer = 100; // pixels
+                        if (y > -buffer && y < rect.height + buffer) {
+                            background.style.setProperty('--x', `${x}px`);
+                            background.style.setProperty('--y', `${y}px`);
+                        }
+                    });
+                });
+
+                // Handle scroll animation
+                window.addEventListener('scroll', () => {
+                    document.querySelectorAll('.animated-background').forEach(background => {
+                        const rect = background.parentElement.getBoundingClientRect();
+                        const viewportHeight = window.innerHeight;
+                        
+                        // Only animate if section is in viewport
+                        if (rect.top < viewportHeight && rect.bottom > 0) {
+                            const scrollProgress = (viewportHeight - rect.top) / (viewportHeight + rect.height);
+                            background.style.setProperty('--y', `${scrollProgress * 100}%`);
+                        }
+                    });
+                }, { passive: true });
+            };
+
+            // Call this after your existing script
+            initAnimatedBackgrounds();
 
         } catch (error) {
             console.error('Error in script:', error);
