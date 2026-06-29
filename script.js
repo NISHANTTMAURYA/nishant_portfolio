@@ -568,20 +568,25 @@ try {
             hasMounted = true;
         };
 
-        // Defer gallery init until the section is actually scrolled into view.
-        // This avoids preloading 200+ MB of images on page load.
-        const gallerySection = containerRef.closest('section') || containerRef.parentElement;
-        let galleryStarted = false;
-        const sectionObserver = new IntersectionObserver((entries) => {
-            if (entries[0].isIntersecting && !galleryStarted) {
-                galleryStarted = true;
-                sectionObserver.disconnect();
-                preloadImages(GALLERY_ITEMS).then(() => {
+        // Render grid immediately so gallery items exist in the DOM right away
+        renderGrid();
+
+        // Load image aspect ratios asynchronously in parallel without blocking rendering
+        GALLERY_ITEMS.forEach(item => {
+            const img = new Image();
+            img.src = item.img;
+            const onDone = () => {
+                if (img.naturalWidth && img.naturalHeight) {
+                    item.aspectRatio = img.naturalHeight / img.naturalWidth;
                     renderGrid();
-                });
+                }
+            };
+            if (img.decode) {
+                img.decode().then(onDone).catch(onDone);
+            } else {
+                img.onload = img.onerror = onDone;
             }
-        }, { rootMargin: '200px' });
-        sectionObserver.observe(gallerySection);
+        });
 
         let resizeTimer;
         window.addEventListener('resize', () => {
@@ -986,7 +991,7 @@ try {
                 faceDiv.style.border = `1.5px solid ${colors.border}`;
                 const img = document.createElement('img');
                 img.className = 'cube-icon';
-                const origSrc = tech.iconUrl ? tech.iconUrl : (tech.slug ? `https://cdn.simpleicons.org/${tech.slug}/fff` : '');
+                const origSrc = tech.iconUrl ? tech.iconUrl : (tech.slug ? `./icons/${tech.slug}.svg` : '');
                 img.dataset.origSrc = origSrc;
                 img.onerror = () => {
                     img.style.display = 'none';
@@ -1007,76 +1012,82 @@ try {
         let raf = null;
         let idleTimer = null;
         let userActive = false;
-        // Start simPos at first cube center so auto-animation begins there, not a random spot
+        let cubes = [];
+        const initCubeReferences = () => {
+            cubes = Array.from(scene.querySelectorAll('.cube')).map(cube => ({
+                el: cube,
+                row: +cube.dataset.row,
+                col: +cube.dataset.col,
+                setX: gsap.quickSetter(cube, 'rotateX', 'deg'),
+                setY: gsap.quickSetter(cube, 'rotateY', 'deg'),
+                faces: Array.from(cube.querySelectorAll('.cube-face'))
+            }));
+        };
+        initCubeReferences();
+
         let simPos = { x: 0.5, y: 0.5 };
         let simTarget = { x: 0.5, y: 0.5 };
         let simRAF = null;
 
         const tiltAt = (rowCenter, colCenter) => {
-            scene.querySelectorAll('.cube').forEach(cube => {
-                const r = +cube.dataset.row;
-                const c = +cube.dataset.col;
-                const dist = Math.hypot(r - rowCenter, c - colCenter);
+            cubes.forEach(c => {
+                const dist = Math.hypot(c.row - rowCenter, c.col - colCenter);
                 if (dist <= radius) {
                     const pct = 1 - dist / radius;
                     const angle = pct * maxAngle;
-                    gsap.to(cube, { duration: enterDur, ease: easing, overwrite: true, rotateX: -angle, rotateY: angle });
+                    c.setX(-angle);
+                    c.setY(angle);
                 } else {
-                    gsap.to(cube, { duration: leaveDur, ease: 'power3.out', overwrite: true, rotateX: 0, rotateY: 0 });
+                    c.setX(0);
+                    c.setY(0);
                 }
             });
         };
 
         const resetAll = () => {
-            scene.querySelectorAll('.cube').forEach(cube => {
-                gsap.to(cube, { duration: leaveDur, rotateX: 0, rotateY: 0, ease: 'power3.out', overwrite: true });
+            cubes.forEach(c => {
+                gsap.to(c.el, { duration: leaveDur, rotateX: 0, rotateY: 0, ease: 'power3.out', overwrite: true });
             });
         };
 
         const marquee = document.getElementById('skills-marquee');
-        let itemPositions = [];
+        let allMarqueeItems = [];
+        let techToMarqueeItems = {};
         let oneSetWidth = 0;
 
         const cacheItemPositions = () => {
             if (!marquee) return;
-            itemPositions = [];
-            // Only cache items in the middle set (second set of 3)
-            const allItems = marquee.querySelectorAll('.marquee-item');
-            const setSize = allItems.length / 3;
-            const midStart = Math.floor(setSize);
-            const midEnd = midStart + setSize;
-            allItems.forEach((item, i) => {
-                if (i >= midStart && i < midEnd) {
-                    itemPositions.push({ el: item, left: item.offsetLeft, width: item.offsetWidth });
-                }
-            });
+            allMarqueeItems = Array.from(marquee.querySelectorAll('.marquee-item')).map(el => ({
+                el,
+                tech: el.dataset.tech,
+                left: el.offsetLeft,
+                width: el.offsetWidth
+            }));
         };
 
         const updateLayout = () => {
-            if (!marquee) return;
+            if (!marquee || !allMarqueeItems.length) return;
             const containerWidth = marquee.clientWidth;
             const scrollLeft = marquee.scrollLeft;
             const containerCenterX = scrollLeft + containerWidth / 2;
             let closestEl = null;
             let minDistance = Infinity;
 
-            // check all visible items across all 3 sets
-            marquee.querySelectorAll('.marquee-item').forEach(el => {
-                const dx = (el.offsetLeft + el.offsetWidth / 2) - containerCenterX;
+            allMarqueeItems.forEach(item => {
+                const dx = (item.left + item.width / 2) - containerCenterX;
                 const dist = Math.abs(dx);
-                el.style.opacity = Math.max(0.35, 1 - dist / (containerWidth * 0.4));
+                item.el.style.opacity = Math.max(0.35, 1 - dist / (containerWidth * 0.4));
                 if (dist < minDistance) {
                     minDistance = dist;
-                    closestEl = el;
+                    closestEl = item.el;
                 }
             });
 
-            marquee.querySelectorAll('.marquee-item').forEach(el => {
-                if (el === closestEl) el.classList.add('active-highlight');
-                else el.classList.remove('active-highlight');
+            allMarqueeItems.forEach(item => {
+                if (item.el === closestEl) item.el.classList.add('active-highlight');
+                else item.el.classList.remove('active-highlight');
             });
 
-            // Infinite loop: teleport when near the edges
             if (oneSetWidth > 0) {
                 if (scrollLeft < oneSetWidth * 0.5) {
                     marquee.scrollLeft += oneSetWidth;
@@ -1093,7 +1104,6 @@ try {
 
             const techsWithSlug = TECH_ITEMS.filter(t => t.slug && t.name);
 
-            // Build 3 copies for infinite illusion
             [0, 1, 2].forEach(copyIdx => {
                 techsWithSlug.forEach(tech => {
                     const item = document.createElement('div');
@@ -1101,18 +1111,10 @@ try {
                     item.dataset.tech = tech.name;
                     item.dataset.copy = copyIdx;
                     item.textContent = tech.name;
-                    // Only middle copy items trigger ripple to avoid confusion
-                    if (copyIdx === 1) {
-                        item.addEventListener('click', () => {
-                            const idx = TECH_ITEMS.findIndex(t => t.name === tech.name);
-                            if (idx !== -1) triggerRippleAt(Math.floor(idx / gridCols), idx % gridCols);
-                        });
-                    } else {
-                        item.addEventListener('click', () => {
-                            const idx = TECH_ITEMS.findIndex(t => t.name === tech.name);
-                            if (idx !== -1) triggerRippleAt(Math.floor(idx / gridCols), idx % gridCols);
-                        });
-                    }
+                    item.addEventListener('click', () => {
+                        const idx = TECH_ITEMS.findIndex(t => t.name === tech.name);
+                        if (idx !== -1) triggerRippleAt(Math.floor(idx / gridCols), idx % gridCols);
+                    });
                     track.appendChild(item);
                 });
             });
@@ -1120,26 +1122,30 @@ try {
             marquee.appendChild(track);
 
             requestAnimationFrame(() => {
-                // Measure one set width (first set of items)
-                const allItems = marquee.querySelectorAll('.marquee-item');
-                const setSize = allItems.length / 3;
+                const items = marquee.querySelectorAll('.marquee-item');
+                const setSize = items.length / 3;
                 if (setSize > 0) {
-                    const firstItem = allItems[0];
-                    const lastFirstSetItem = allItems[setSize - 1];
+                    const firstItem = items[0];
+                    const lastFirstSetItem = items[setSize - 1];
                     oneSetWidth = (lastFirstSetItem.offsetLeft + lastFirstSetItem.offsetWidth) - firstItem.offsetLeft;
-                    // Start scrolled to the middle set
                     marquee.scrollLeft = oneSetWidth;
                 }
                 cacheItemPositions();
+                
+                techToMarqueeItems = {};
+                allMarqueeItems.forEach(item => {
+                    if (!techToMarqueeItems[item.tech]) techToMarqueeItems[item.tech] = [];
+                    techToMarqueeItems[item.tech].push(item);
+                });
                 updateLayout();
             });
 
             window.addEventListener('resize', () => {
-                const allItems = marquee.querySelectorAll('.marquee-item');
-                const setSize = allItems.length / 3;
+                const items = marquee.querySelectorAll('.marquee-item');
+                const setSize = items.length / 3;
                 if (setSize > 0) {
-                    const firstItem = allItems[0];
-                    const lastFirstSetItem = allItems[setSize - 1];
+                    const firstItem = items[0];
+                    const lastFirstSetItem = items[setSize - 1];
                     oneSetWidth = (lastFirstSetItem.offsetLeft + lastFirstSetItem.offsetWidth) - firstItem.offsetLeft;
                 }
                 cacheItemPositions();
@@ -1148,23 +1154,25 @@ try {
             marquee.addEventListener('scroll', updateLayout, { passive: true });
         }
 
-
+        let lastTargetTech = null;
         const scrollMarqueeTo = (rowHit, colHit) => {
             if (!marquee) return;
             const idx = Math.floor(rowHit) * gridCols + Math.floor(colHit);
             const tech = TECH_ITEMS[Math.min(idx, TECH_ITEMS.length - 1)];
-            if (!tech || !tech.slug || !tech.name) return;
-            const allCopies = Array.from(marquee.querySelectorAll(`.marquee-item[data-tech="${tech.name}"]`));
+            if (!tech || !tech.slug || !tech.name || lastTargetTech === tech.name) return;
+            lastTargetTech = tech.name;
+
+            const allCopies = techToMarqueeItems[tech.name] || [];
             if (allCopies.length === 0) return;
             const currentCenter = marquee.scrollLeft + marquee.clientWidth / 2;
             let bestItem = allCopies[0];
             let bestDist = Infinity;
             allCopies.forEach(item => {
-                const itemCenter = item.offsetLeft + item.offsetWidth / 2;
+                const itemCenter = item.left + item.width / 2;
                 const d = Math.abs(itemCenter - currentCenter);
                 if (d < bestDist) { bestDist = d; bestItem = item; }
             });
-            const targetScroll = bestItem.offsetLeft + bestItem.offsetWidth / 2 - marquee.clientWidth / 2;
+            const targetScroll = bestItem.left + bestItem.width / 2 - marquee.clientWidth / 2;
             gsap.to(marquee, { scrollLeft: targetScroll, duration: 0.4, ease: 'power2.out', overwrite: true, onUpdate: updateLayout });
         };
 
@@ -1175,9 +1183,10 @@ try {
             const colCenter = (e.clientX - rect.left) / (rect.width / gridCols);
             const rowCenter = (e.clientY - rect.top) / (rect.height / gridRows);
             if (raf) cancelAnimationFrame(raf);
-            raf = requestAnimationFrame(() => tiltAt(rowCenter, colCenter));
-            // Smoothly scroll marquee to match the hovered cube
-            scrollMarqueeTo(rowCenter, colCenter);
+            raf = requestAnimationFrame(() => {
+                tiltAt(rowCenter, colCenter);
+                scrollMarqueeTo(rowCenter, colCenter);
+            });
             idleTimer = setTimeout(() => { userActive = false; }, 3000);
         };
 
@@ -1197,29 +1206,28 @@ try {
             const idx = rowHit * gridCols + colHit;
             const clickedTech = TECH_ITEMS[idx];
             if (!clickedTech) return;
-            // Marquee already follows hover; on click just snap it crisply
             if (marquee && clickedTech.slug) {
                 scrollMarqueeTo(rowHit, colHit);
             }
             const rippleColor = CATEGORY_COLORS[clickedTech.category]?.ripple || '#ffffff';
-            const clickedIconUrl = clickedTech.slug ? `https://cdn.simpleicons.org/${clickedTech.slug}/fff` : '';
+            const clickedIconUrl = clickedTech.slug ? `./icons/${clickedTech.slug}.svg` : '';
             const rings = {};
-            scene.querySelectorAll('.cube').forEach(cube => {
-                const ring = Math.round(Math.hypot(+cube.dataset.row - rowHit, +cube.dataset.col - colHit));
+            cubes.forEach(c => {
+                const ring = Math.round(Math.hypot(c.row - rowHit, c.col - colHit));
                 if (!rings[ring]) rings[ring] = [];
-                rings[ring].push(cube);
+                rings[ring].push(c);
             });
             Object.keys(rings).map(Number).sort((a, b) => a - b).forEach(ring => {
                 const delay = ring * (0.15 / rippleSpeed);
-                const faces = rings[ring].flatMap(cube => Array.from(cube.querySelectorAll('.cube-face')));
+                const faces = rings[ring].flatMap(c => c.faces);
                 gsap.to(faces, {
                     backgroundColor: rippleColor, duration: 0.3 / rippleSpeed, delay, ease: 'power3.out', overwrite: true, onStart: () => {
-                        if (clickedIconUrl) rings[ring].forEach(c => c.querySelectorAll('.cube-icon').forEach(img => { img.src = clickedIconUrl; img.style.opacity = '0.9'; }));
+                        if (clickedIconUrl) rings[ring].forEach(c => c.el.querySelectorAll('.cube-icon').forEach(img => { img.src = clickedIconUrl; img.style.opacity = '0.9'; }));
                     }
                 });
                 gsap.to(faces, {
                     backgroundColor: (i, el) => el.dataset.bg, duration: 0.3 / rippleSpeed, delay: delay + (0.3 / rippleSpeed) + (0.6 / rippleSpeed), ease: 'power3.out', overwrite: false, onStart: () => {
-                        rings[ring].forEach(c => c.querySelectorAll('.cube-icon').forEach(img => { img.src = img.dataset.origSrc || ''; img.style.opacity = img.dataset.origSrc ? '0.85' : '0'; }));
+                        rings[ring].forEach(c => c.el.querySelectorAll('.cube-icon').forEach(img => { img.src = img.dataset.origSrc || ''; img.style.opacity = img.dataset.origSrc ? '0.85' : '0'; }));
                     }
                 });
             });
@@ -1246,7 +1254,6 @@ try {
         scene.addEventListener('touchstart', () => { userActive = true; }, { passive: true });
         scene.addEventListener('touchend', resetAll, { passive: true });
 
-        // Auto-animation: step linearly through each cube in order (first → last → repeat)
         const simSpeed = 0.025;
         const totalCubes = gridCols * gridRows;
         let simIndex = 0;
@@ -1261,16 +1268,26 @@ try {
                 simPos.x += (simTarget.x - simPos.x) * simSpeed;
                 simPos.y += (simTarget.y - simPos.y) * simSpeed;
                 tiltAt(simPos.y, simPos.x);
-                scrollMarqueeTo(simPos.y, simPos.x);
-                // Move to the next cube once close enough to the current target
                 if (Math.hypot(simPos.x - simTarget.x, simPos.y - simTarget.y) < 0.12) {
                     simIndex = (simIndex + 1) % totalCubes;
                     simTarget = getSimTarget(simIndex);
+                    scrollMarqueeTo(simTarget.y, simTarget.x);
                 }
             }
             simRAF = requestAnimationFrame(loop);
         };
-        simRAF = requestAnimationFrame(loop);
+
+        const skillsSection = document.getElementById('skills') || scene;
+        const observer = new IntersectionObserver(entries => {
+            const isVisible = entries[0].isIntersecting;
+            if (isVisible && !simRAF) {
+                simRAF = requestAnimationFrame(loop);
+            } else if (!isVisible && simRAF) {
+                cancelAnimationFrame(simRAF);
+                simRAF = null;
+            }
+        }, { threshold: 0.05 });
+        observer.observe(skillsSection);
 
     };
 
