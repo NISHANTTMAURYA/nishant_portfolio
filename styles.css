@@ -3071,11 +3071,12 @@ body.intro-loading .loader-bar-wrapper {
     visibility: visible;
 }
 
-/* Lock page scroll while loading */
-body.intro-loading,
-html:has(body.intro-loading) {
+/* Lock page scroll while loading (using fixed body for reliable mobile scroll freeze) */
+body.intro-loading {
     overflow: hidden !important;
-    height: 100dvh !important;
+    position: fixed;
+    width: 100%;
+    height: 100%;
 }
 
 /* Never clip the loader bar inside the panel or window body */

@@ -87,8 +87,12 @@ try {
         const drawGrid = () => {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            const cols = Math.ceil(canvas.width / gridSpacing) + 1;
-            const rows = Math.ceil(canvas.height / gridSpacing) + 1;
+            const dpr = window.devicePixelRatio || 1;
+            const logicalWidth = canvas.width / dpr;
+            const logicalHeight = canvas.height / dpr;
+
+            const cols = Math.ceil(logicalWidth / gridSpacing) + 1;
+            const rows = Math.ceil(logicalHeight / gridSpacing) + 1;
 
             let nodes = [];
 
@@ -445,10 +449,10 @@ try {
         const blurToFocus = false;
 
         const getColumns = () => {
-            const queries = ['(min-width:1500px)', '(min-width:1000px)', '(min-width:600px)', '(min-width:400px)'];
-            const values = [5, 4, 3, 2];
+            const queries = ['(min-width:1500px)', '(min-width:1000px)', '(min-width:600px)'];
+            const values = [5, 4, 3];
             const idx = queries.findIndex(q => window.matchMedia(q).matches);
-            return idx !== -1 ? values[idx] : 1;
+            return idx !== -1 ? values[idx] : 2;
         };
 
         // Batch preload: fetch BATCH_SIZE images at a time so the browser network
@@ -1408,7 +1412,8 @@ try {
 
         const lerpFactor = 0.14;
         const loop = () => {
-            if (!userActive) {
+            const isMobileViewport = window.innerWidth <= 768;
+            if (!userActive && !isMobileViewport) {
                 simPos.x += (simTarget.x - simPos.x) * simSpeed;
                 simPos.y += (simTarget.y - simPos.y) * simSpeed;
                 tiltAt(simPos.y, simPos.x);
@@ -1432,10 +1437,9 @@ try {
         const skillsSection = document.getElementById('skills') || scene;
         const observer = new IntersectionObserver(entries => {
             const isVisible = entries[0].isIntersecting;
-            const isMobileViewport = window.innerWidth <= 768;
-            if (isVisible && !simRAF && !isMobileViewport) {
+            if (isVisible && !simRAF) {
                 simRAF = requestAnimationFrame(loop);
-            } else if ((!isVisible || isMobileViewport) && simRAF) {
+            } else if (!isVisible && simRAF) {
                 cancelAnimationFrame(simRAF);
                 simRAF = null;
             }
@@ -1706,6 +1710,7 @@ try {
 
         if (!loaderBar || !loaderPct) {
             bodyEl.classList.remove('intro-loading');
+            window.dispatchEvent(new Event('resize'));
             return;
         }
 
@@ -1778,6 +1783,8 @@ try {
                 onComplete: () => {
                     setTimeout(() => {
                         bodyEl.classList.remove('intro-loading');
+                        // Dispatch resize event to trigger layout calculations (like Masonry)
+                        window.dispatchEvent(new Event('resize'));
                         setTimeout(() => { if (nameAnim) nameAnim.update(); }, 600);
                     }, 350);
                 }
