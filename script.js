@@ -355,65 +355,248 @@ try {
     revealElements();
 
     /* -----------------------------------------------
-       CAROUSEL
+       GSAP MASONRY GALLERY & LIGHTBOX
     ----------------------------------------------- */
-    const track = document.querySelector('.carousel-track');
-    const slides = track ? Array.from(track.children) : [];
-    const nextBtn = document.querySelector('.carousel-button.next');
-    const prevBtn = document.querySelector('.carousel-button.prev');
-    const dotsNav = document.querySelector('.carousel-nav');
-    let current = 0;
-    let autoInterval;
+    const lightbox = document.getElementById('gallery-lightbox');
+    const lightboxImg = document.getElementById('lightbox-img');
+    const lightboxCaption = document.getElementById('lightbox-caption');
+    const lightboxClose = document.querySelector('.lightbox-close');
 
-    if (track && slides.length && nextBtn && prevBtn && dotsNav) {
-        dotsNav.innerHTML = '';
-        const dots = [];
-        slides.forEach((slide, i) => {
-            slide.style.left = `${i * 100}%`;
-            const dot = document.createElement('div');
-            dot.className = i === 0 ? 'carousel-indicator active' : 'carousel-indicator';
-            dotsNav.appendChild(dot);
-            dots.push(dot);
+    const openLightbox = (imgSrc, title) => {
+        if (!lightbox || !lightboxImg) return;
+        lightboxImg.src = imgSrc;
+        lightboxCaption.textContent = title || '';
+        lightbox.classList.add('active');
+        lightbox.setAttribute('aria-hidden', 'false');
+    };
+
+    const closeLightbox = () => {
+        if (!lightbox) return;
+        lightbox.classList.remove('active');
+        lightbox.setAttribute('aria-hidden', 'true');
+    };
+
+    if (lightboxClose) lightboxClose.addEventListener('click', closeLightbox);
+    if (lightbox) {
+        lightbox.addEventListener('click', (e) => {
+            if (e.target === lightbox) closeLightbox();
         });
+    }
+    window.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && lightbox?.classList.contains('active')) {
+            closeLightbox();
+        }
+    });
 
-        const goTo = (index) => {
-            track.style.transform = `translateX(-${index * 100}%)`;
-            current = index;
-            dots.forEach(d => d.classList.remove('active'));
-            if (dots[index]) dots[index].classList.add('active');
-            prevBtn.style.opacity = index === 0 ? '0.45' : '1';
-            nextBtn.style.opacity = index === slides.length - 1 ? '0.45' : '1';
+    const initMasonryGallery = () => {
+        const containerRef = document.getElementById('masonry-list');
+        if (!containerRef) return;
+
+        const GALLERY_ITEMS = [
+            { id: "1", img: "./images/nishant_sih.jpg", title: "Smart India Hackathon Spotlight", height: 550 },
+            { id: "2", img: "./images/14.jpg", title: "Hackathon Event", height: 420 },
+            { id: "3", img: "./images/3.jpeg", title: "Project Presentation", height: 600 },
+            { id: "4", img: "./images/20.jpg", title: "Team Moment", height: 480 },
+            { id: "5", img: "./images/7.jpeg", title: "Development Hackathon", height: 520 },
+            { id: "6", img: "./images/18.jpg", title: "Competition Showcase", height: 450 },
+            { id: "7", img: "./images/1.jpeg", title: "Team Photo", height: 580 },
+            { id: "8", img: "./images/24.jpg", title: "Award Presentation", height: 400 },
+            { id: "9", img: "./images/11.jpg", title: "Technical Demo", height: 500 },
+            { id: "10", img: "./images/16.jpg", title: "Engineering Team", height: 460 },
+            { id: "11", img: "./images/2.jpeg", title: "Award Ceremony", height: 540 },
+            { id: "12", img: "./images/22.jpg", title: "Project Pitch", height: 430 },
+            { id: "13", img: "./images/9.jpeg", title: "Team Achievement", height: 510 },
+            { id: "14", img: "./images/15.jpg", title: "Coding Session", height: 470 },
+            { id: "15", img: "./images/26.jpg", title: "Hackathon Celebration", height: 560 },
+            { id: "16", img: "./images/10.jpg", title: "Team Collaboration", height: 440 },
+            { id: "17", img: "./images/112.jpg", title: "Event Highlights", height: 490 },
+            { id: "18", img: "./images/19.jpg", title: "Project Demo", height: 530 },
+            { id: "19", img: "./images/23.jpg", title: "Tech Showcase", height: 410 },
+            { id: "20", img: "./images/13.jpg", title: "Team Snapshot", height: 480 },
+            { id: "22", img: "./images/21.jpg", title: "Team Discussion", height: 450 },
+            { id: "24", img: "./images/17.jpg", title: "Competition Finale", height: 520 }
+        ];
+
+        const ease = 'power3.out';
+        const duration = 0.6;
+        const stagger = 0.05;
+        const animateFrom = 'bottom';
+        const scaleOnHover = true;
+        const hoverScale = 0.95;
+        const blurToFocus = true;
+
+        const getColumns = () => {
+            const queries = ['(min-width:1500px)', '(min-width:1000px)', '(min-width:600px)', '(min-width:400px)'];
+            const values = [5, 4, 3, 2];
+            const idx = queries.findIndex(q => window.matchMedia(q).matches);
+            return idx !== -1 ? values[idx] : 1;
         };
 
-        goTo(0);
+        const preloadImages = async items => {
+            await Promise.all(
+                items.map(
+                    item =>
+                        new Promise(resolve => {
+                            const img = new Image();
+                            img.src = item.img;
+                            const onDone = () => {
+                                if (img.naturalWidth && img.naturalHeight) {
+                                    item.aspectRatio = img.naturalHeight / img.naturalWidth;
+                                }
+                                resolve();
+                            };
+                            if (img.decode) {
+                                img.decode().then(onDone).catch(onDone);
+                            } else {
+                                img.onload = img.onerror = onDone;
+                            }
+                        })
+                )
+            );
+        };
 
-        nextBtn.addEventListener('click', () => { goTo((current + 1) % slides.length); resetAuto(); });
-        prevBtn.addEventListener('click', () => { goTo((current - 1 + slides.length) % slides.length); resetAuto(); });
+        const calculateGrid = (width, columns) => {
+            if (!width) return { grid: [], maxContainerHeight: 0 };
+            const colHeights = new Array(columns).fill(0);
+            const columnWidth = width / columns;
 
-        dotsNav.addEventListener('click', e => {
-            const dot = e.target.closest('.carousel-indicator');
-            if (!dot) return;
-            const idx = dots.indexOf(dot);
-            if (idx !== -1) goTo(idx);
-            resetAuto();
-        });
+            const grid = GALLERY_ITEMS.map(child => {
+                const col = colHeights.indexOf(Math.min(...colHeights));
+                const x = columnWidth * col;
+                const height = child.aspectRatio
+                    ? columnWidth * child.aspectRatio
+                    : (child.height ? child.height / 2 : columnWidth * 0.75);
+                const y = colHeights[col];
 
-        // Touch swipe support
-        let touchStartX = 0;
-        track.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; }, { passive: true });
-        track.addEventListener('touchend', e => {
-            const diff = touchStartX - e.changedTouches[0].clientX;
-            if (Math.abs(diff) > 40) {
-                if (diff > 0) goTo((current + 1) % slides.length);
-                else goTo((current - 1 + slides.length) % slides.length);
-                resetAuto();
+                colHeights[col] += height;
+
+                return { ...child, x, y, w: columnWidth, h: height };
+            });
+
+            return { grid, maxContainerHeight: Math.max(...colHeights) };
+        };
+
+        const getInitialPosition = item => {
+            const containerRect = containerRef.getBoundingClientRect();
+            let direction = animateFrom;
+
+            if (animateFrom === 'random') {
+                const directions = ['top', 'bottom', 'left', 'right'];
+                direction = directions[Math.floor(Math.random() * directions.length)];
             }
+
+            switch (direction) {
+                case 'top':
+                    return { x: item.x, y: -200 };
+                case 'bottom':
+                    return { x: item.x, y: window.innerHeight + 200 };
+                case 'left':
+                    return { x: -200, y: item.y };
+                case 'right':
+                    return { x: window.innerWidth + 200, y: item.y };
+                case 'center':
+                    return {
+                        x: containerRect.width / 2 - item.w / 2,
+                        y: containerRect.height / 2 - item.h / 2
+                    };
+                default:
+                    return { x: item.x, y: item.y + 100 };
+            }
+        };
+
+        let hasMounted = false;
+
+        const renderGrid = () => {
+            const width = containerRef.offsetWidth;
+            const columns = getColumns();
+            const { grid, maxContainerHeight } = calculateGrid(width, columns);
+
+            containerRef.style.height = `${maxContainerHeight}px`;
+
+            grid.forEach((item, index) => {
+                let el = containerRef.querySelector(`[data-key="${item.id}"]`);
+                if (!el) {
+                    el = document.createElement('div');
+                    el.className = 'item-wrapper cursor-target';
+                    el.setAttribute('data-key', item.id);
+
+                    const imgDiv = document.createElement('div');
+                    imgDiv.className = 'item-img';
+                    imgDiv.style.backgroundImage = `url(${item.img})`;
+
+                    const overlay = document.createElement('div');
+                    overlay.className = 'item-caption-overlay';
+                    overlay.innerHTML = `<span class="item-title">${item.title}</span>`;
+                    imgDiv.appendChild(overlay);
+
+                    el.appendChild(imgDiv);
+                    containerRef.appendChild(el);
+
+                    if (scaleOnHover) {
+                        el.addEventListener('mouseenter', () => {
+                            gsap.to(el, { scale: hoverScale, duration: 0.3, ease: 'power2.out' });
+                        });
+                        el.addEventListener('mouseleave', () => {
+                            gsap.to(el, { scale: 1, duration: 0.3, ease: 'power2.out' });
+                        });
+                    }
+
+                    el.addEventListener('click', () => openLightbox(item.img, item.title));
+                }
+
+                const animationProps = {
+                    x: item.x,
+                    y: item.y,
+                    width: item.w,
+                    height: item.h
+                };
+
+                if (!hasMounted) {
+                    const initialPos = getInitialPosition(item);
+                    const initialState = {
+                        opacity: 0,
+                        x: initialPos.x,
+                        y: initialPos.y,
+                        width: item.w,
+                        height: item.h,
+                        ...(blurToFocus && { filter: 'blur(10px)' })
+                    };
+
+                    gsap.fromTo(el, initialState, {
+                        opacity: 1,
+                        ...animationProps,
+                        ...(blurToFocus && { filter: 'blur(0px)' }),
+                        duration: 0.8,
+                        ease: 'power3.out',
+                        delay: index * stagger
+                    });
+                } else {
+                    gsap.to(el, {
+                        ...animationProps,
+                        duration: duration,
+                        ease: ease,
+                        overwrite: 'auto'
+                    });
+                }
+            });
+
+            hasMounted = true;
+        };
+
+        preloadImages(GALLERY_ITEMS).then(() => {
+            renderGrid();
         });
 
-        const startAuto = () => { autoInterval = setInterval(() => goTo((current + 1) % slides.length), 5000); };
-        const resetAuto = () => { clearInterval(autoInterval); startAuto(); };
-        startAuto();
-    }
+        let resizeTimer;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(() => {
+                if (hasMounted) renderGrid();
+            }, 100);
+        });
+    };
+
+    initMasonryGallery();
 
     /* -----------------------------------------------
        TARGET CURSOR (ReactBits)
@@ -432,8 +615,8 @@ try {
             return;
         }
 
-        // Add target class dynamically to links, buttons, cards, and cubes grid
-        document.querySelectorAll('a, button, [role="button"], .project-card, .contact-link, .api-btn, .carousel-indicator, #cubes-wrapper').forEach(el => {
+        // Add target class dynamically to links, buttons, cards, gallery items, and cubes grid
+        document.querySelectorAll('a, button, [role="button"], .project-card, .contact-link, .api-btn, .item-wrapper, .lightbox-close, #cubes-wrapper').forEach(el => {
             el.classList.add('cursor-target');
         });
 
@@ -596,10 +779,11 @@ try {
             if (spinTl) spinTl.pause();
             gsap.set(cursor, { rotation: 0 });
 
-            const targetDotColor = (target.id === 'cubes-wrapper' || target.closest('#cubes-wrapper')) ? '#ffffff' : '#8b5cf6';
+            if (dot) dot.classList.add('cursor-dot--expanded');
+            const targetDotColor = '#ffffff';
             if (cursorColorOnTarget) {
                 gsap.to(cornersArr, {
-                    borderColor: cursorColorOnTarget,
+                    borderColor: '#ffffff',
                     duration: 0.15,
                     ease: 'power2.out'
                 });
@@ -646,6 +830,7 @@ try {
                 targetCornerPositions = null;
                 gsap.set(activeStrength, { current: 0, overwrite: true });
                 activeTarget = null;
+                if (dot) dot.classList.remove('cursor-dot--expanded');
 
                 if (cursorColorOnTarget && corners.length) {
                     gsap.to(cornersArr, {
@@ -655,7 +840,7 @@ try {
                     });
                     if (dot) {
                         gsap.to(dot, {
-                            backgroundColor: '#8b5cf6',
+                            backgroundColor: '#ffffff',
                             duration: 0.15,
                             ease: 'power2.out'
                         });

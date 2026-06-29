@@ -8,6 +8,30 @@
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <!-- Gallery Image Preloads to prevent loading lag -->
+    <link rel="preload" as="image" href="./images/nishant_sih.jpg">
+    <link rel="preload" as="image" href="./images/14.jpg">
+    <link rel="preload" as="image" href="./images/3.jpeg">
+    <link rel="preload" as="image" href="./images/20.jpg">
+    <link rel="preload" as="image" href="./images/7.jpeg">
+    <link rel="preload" as="image" href="./images/18.jpg">
+    <link rel="preload" as="image" href="./images/1.jpeg">
+    <link rel="preload" as="image" href="./images/24.jpg">
+    <link rel="preload" as="image" href="./images/11.jpg">
+    <link rel="preload" as="image" href="./images/16.jpg">
+    <link rel="preload" as="image" href="./images/2.jpeg">
+    <link rel="preload" as="image" href="./images/22.jpg">
+    <link rel="preload" as="image" href="./images/9.jpeg">
+    <link rel="preload" as="image" href="./images/15.jpg">
+    <link rel="preload" as="image" href="./images/26.jpg">
+    <link rel="preload" as="image" href="./images/10.jpg">
+    <link rel="preload" as="image" href="./images/112.jpg">
+    <link rel="preload" as="image" href="./images/19.jpg">
+    <link rel="preload" as="image" href="./images/23.jpg">
+    <link rel="preload" as="image" href="./images/13.jpg">
+    <link rel="preload" as="image" href="./images/25.jpg">
+    <link rel="preload" as="image" href="./images/21.jpg">
+    <link rel="preload" as="image" href="./images/17.jpg">
 </head>
 <link rel="stylesheet" href="styles.css">
 <body>
@@ -302,46 +326,8 @@
         <!-- Gallery -->
         <section id="gallery" class="section animated-background-section">
             <h2 class="section-title">Gallery</h2>
-            <div class="carousel-container">
-                <div class="carousel">
-                    <button class="carousel-button prev" aria-label="Previous slide">
-                        <i class="material-icons">chevron_left</i>
-                    </button>
-                    <div class="carousel-track-container">
-                        <div class="carousel-track">
-                            <div class="carousel-slide"><img src="./images/nishant_sih.jpg" alt="Smart India Hackathon Spotlight" loading="lazy"></div>
-                            <div class="carousel-slide"><img src="./images/14.jpg" alt="Hackathon Event" loading="lazy"></div>
-                            <div class="carousel-slide"><img src="./images/3.jpeg" alt="Project Presentation" loading="lazy"></div>
-                            <div class="carousel-slide"><img src="./images/20.jpg" alt="Team Moment" loading="lazy"></div>
-                            <div class="carousel-slide"><img src="./images/7.jpeg" alt="Development Hackathon" loading="lazy"></div>
-                            <div class="carousel-slide"><img src="./images/18.jpg" alt="Competition Showcase" loading="lazy"></div>
-                            <div class="carousel-slide"><img src="./images/1.jpeg" alt="Team Photo" loading="lazy"></div>
-                            <div class="carousel-slide"><img src="./images/24.jpg" alt="Award Presentation" loading="lazy"></div>
-                            <div class="carousel-slide"><img src="./images/11.jpg" alt="Technical Demo" loading="lazy"></div>
-                            <div class="carousel-slide"><img src="./images/16.jpg" alt="Engineering Team" loading="lazy"></div>
-                            <div class="carousel-slide"><img src="./images/2.jpeg" alt="Award Ceremony" loading="lazy"></div>
-                            <div class="carousel-slide"><img src="./images/22.jpg" alt="Project Pitch" loading="lazy"></div>
-                            <div class="carousel-slide"><img src="./images/9.jpeg" alt="Team Achievement" loading="lazy"></div>
-                            <div class="carousel-slide"><img src="./images/15.jpg" alt="Coding Session" loading="lazy"></div>
-                            <div class="carousel-slide"><img src="./images/26.jpg" alt="Hackathon Celebration" loading="lazy"></div>
-                            <div class="carousel-slide"><img src="./images/10.jpg" alt="Team Collaboration" loading="lazy"></div>
-                            <div class="carousel-slide"><img src="./images/112.jpg" alt="Event Highlights" loading="lazy"></div>
-                            <div class="carousel-slide"><img src="./images/19.jpg" alt="Project Demo" loading="lazy"></div>
-                            <div class="carousel-slide"><img src="./images/23.jpg" alt="Tech Showcase" loading="lazy"></div>
-                            <div class="carousel-slide"><img src="./images/13.jpg" alt="Team Snapshot" loading="lazy"></div>
-                            <div class="carousel-slide"><img src="./images/25.jpg" alt="Victory Moment" loading="lazy"></div>
-                            <div class="carousel-slide"><img src="./images/21.jpg" alt="Team Discussion" loading="lazy"></div>
-                            <div class="carousel-slide"><img src="./images/image.png" alt="Developer Snapshot" loading="lazy"></div>
-                            <div class="carousel-slide"><img src="./images/17.jpg" alt="Competition Finale" loading="lazy"></div>
-                        </div>
-                    </div>
-                    <button class="carousel-button next" aria-label="Next slide">
-                        <i class="material-icons">chevron_right</i>
-                    </button>
-                </div>
-                <div class="carousel-nav">
-                    <!-- Dynamic indicators generated by JS -->
-                </div>
+            <div class="masonry-container">
+                <div id="masonry-list" class="list"></div>
             </div>
         </section>
 
@@ -562,7 +548,12 @@
                 </a>
             </div>
         </div>
-    </footer>
+    <!-- Lightbox Modal -->
+    <div id="gallery-lightbox" class="lightbox" aria-hidden="true">
+        <span class="lightbox-close" aria-label="Close lightbox">&times;</span>
+        <img class="lightbox-content" id="lightbox-img" alt="Gallery preview">
+        <div class="lightbox-caption" id="lightbox-caption"></div>
+    </div>
 
     <script src="script.js"></script>
 </body>
