@@ -662,13 +662,18 @@ a:hover {
 }
 
 /* Skills section layout: cubes + legend side by side */
+.section-subtitle,
 .skills-subtitle {
-    font-size: 0.85rem;
-    color: var(--text-color);
-    opacity: 0.6;
+    font-size: 0.88rem;
+    color: var(--text-secondary);
     text-align: center;
-    margin-bottom: 2rem;
-    letter-spacing: 0.3px;
+    margin-top: -1.25rem;
+    margin-bottom: 2.25rem;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+    line-height: 1.5;
+    letter-spacing: 0.2px;
 }
 
 .skills-cubes-layout {
@@ -2143,6 +2148,8 @@ a:hover {
 
     /* About */
     .about-meta { flex-direction: column; gap: 0.6rem; }
+    .about-card { padding: 1.25rem; }
+    .about-text { font-size: 0.95rem; margin-bottom: 0.85rem; line-height: 1.6; }
 
     /* Timeline */
     .timeline-header { flex-direction: column; gap: 0.75rem; }
@@ -2624,4 +2631,172 @@ a:hover {
   body, a, button, [role="button"], .project-card, .cursor-target, .nav-link, .contact-link, .api-btn, .item-wrapper, .item-img, .item-caption-overlay, #gallery, .lightbox, .vibe-tab, .browser-link-btn {
     cursor: none !important;
   }
+}
+
+/* =============================================
+   GLITCH TEXT ANIMATION
+   ============================================= */
+.glitch {
+    position: relative;
+    user-select: none;
+    cursor: pointer;
+    display: inline-block;
+    color: var(--secondary-color);
+}
+
+.glitch::after,
+.glitch::before {
+    content: attr(data-text);
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    color: var(--secondary-color);
+    background-color: var(--card-background);
+    overflow: hidden;
+    clip-path: inset(0 0 0 0);
+}
+
+.glitch:not(.enable-on-hover)::after {
+    left: 3px;
+    text-shadow: var(--after-shadow, -3px 0 var(--accent));
+    animation: animate-glitch var(--after-duration, 3s) infinite linear alternate-reverse;
+}
+
+.glitch:not(.enable-on-hover)::before {
+    left: -3px;
+    text-shadow: var(--before-shadow, 3px 0 #27c93f);
+    animation: animate-glitch var(--before-duration, 2s) infinite linear alternate-reverse;
+}
+
+.glitch.enable-on-hover::after,
+.glitch.enable-on-hover::before {
+    content: '';
+    opacity: 0;
+    animation: none;
+}
+
+.glitch.enable-on-hover:hover::after {
+    content: attr(data-text);
+    opacity: 1;
+    left: 3px;
+    text-shadow: var(--after-shadow, -3px 0 var(--accent));
+    animation: animate-glitch var(--after-duration, 3s) infinite linear alternate-reverse;
+}
+
+.glitch.enable-on-hover:hover::before {
+    content: attr(data-text);
+    opacity: 1;
+    left: -3px;
+    text-shadow: var(--before-shadow, 3px 0 #27c93f);
+    animation: animate-glitch var(--before-duration, 2s) infinite linear alternate-reverse;
+}
+
+@keyframes animate-glitch {
+    0% { clip-path: inset(20% 0 50% 0); }
+    5% { clip-path: inset(10% 0 60% 0); }
+    10% { clip-path: inset(15% 0 55% 0); }
+    15% { clip-path: inset(25% 0 35% 0); }
+    20% { clip-path: inset(30% 0 40% 0); }
+    25% { clip-path: inset(40% 0 20% 0); }
+    30% { clip-path: inset(10% 0 60% 0); }
+    35% { clip-path: inset(15% 0 55% 0); }
+    40% { clip-path: inset(25% 0 35% 0); }
+    45% { clip-path: inset(30% 0 40% 0); }
+    50% { clip-path: inset(20% 0 50% 0); }
+    55% { clip-path: inset(10% 0 60% 0); }
+    60% { clip-path: inset(15% 0 55% 0); }
+    65% { clip-path: inset(25% 0 35% 0); }
+    70% { clip-path: inset(30% 0 40% 0); }
+    75% { clip-path: inset(40% 0 20% 0); }
+    80% { clip-path: inset(20% 0 50% 0); }
+    85% { clip-path: inset(10% 0 60% 0); }
+    90% { clip-path: inset(15% 0 55% 0); }
+    95% { clip-path: inset(25% 0 35% 0); }
+    100% { clip-path: inset(30% 0 40% 0); }
+}
+
+/* =============================================
+   TRUE FOCUS ANIMATION
+   ============================================= */
+.focus-container {
+    position: relative;
+    display: flex;
+    gap: 0.22em;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    outline: none;
+    user-select: none;
+    margin: 0.5rem 0 1rem; /* Inherits original hero h1 margin layout */
+}
+
+/* Override .hero h1 margins so they don't double up */
+.hero h1.focus-container {
+    margin: 0.5rem 0 1rem;
+    font-size: clamp(2rem, 6vw, 3.5rem);
+    font-weight: 900;
+}
+
+.focus-word {
+    position: relative;
+    cursor: pointer;
+    transition: filter 0.5s ease, color 0.5s ease;
+    outline: none;
+    user-select: none;
+}
+
+.focus-word.active {
+    filter: blur(0);
+}
+
+.focus-frame {
+    position: absolute;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+    box-sizing: border-box;
+    border: none;
+    opacity: 0;
+    --border-color: var(--accent);
+    --glow-color: rgba(139, 92, 246, 0.45);
+}
+
+.corner {
+    position: absolute;
+    width: 0.75rem;
+    height: 0.75rem;
+    border: 3px solid var(--border-color, var(--accent));
+    filter: drop-shadow(0px 0px 4px var(--glow-color, rgba(139, 92, 246, 0.4)));
+    border-radius: 2px;
+    transition: border-color 0.3s ease;
+}
+
+.top-left {
+    top: -10px;
+    left: -10px;
+    border-right: none;
+    border-bottom: none;
+}
+
+.top-right {
+    top: -10px;
+    right: -10px;
+    border-left: none;
+    border-bottom: none;
+}
+
+.bottom-left {
+    bottom: -10px;
+    left: -10px;
+    border-right: none;
+    border-top: none;
+}
+
+.bottom-right {
+    bottom: -10px;
+    right: -10px;
+    border-left: none;
+    border-top: none;
 }

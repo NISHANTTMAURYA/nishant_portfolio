@@ -1553,9 +1553,100 @@ try {
         lazyObserver.observe(section);
     };
 
+    // Name Glitch & Focus Combo Controller
+    const initNameFocus = () => {
+        const container = document.getElementById('hero-name');
+        if (!container) return;
+
+        const words = container.querySelectorAll('.focus-word');
+        const focusFrame = container.querySelector('#name-focus-frame');
+        if (words.length === 0 || !focusFrame) return;
+
+        let currentIndex = 0;
+        let loopInterval = null;
+        let isHovered = false;
+
+        const updateFocus = (index) => {
+            currentIndex = index;
+            words.forEach((word, idx) => {
+                if (idx === index) {
+                    word.classList.add('active');
+                    word.style.filter = 'blur(0px)';
+                } else {
+                    word.classList.remove('active');
+                    word.style.filter = 'blur(4px)';
+                }
+            });
+
+            // Calculate active rect coordinates relative to container
+            const parentRect = container.getBoundingClientRect();
+            const activeRect = words[index].getBoundingClientRect();
+
+            const x = activeRect.left - parentRect.left;
+            const y = activeRect.top - parentRect.top;
+            const width = activeRect.width;
+            const height = activeRect.height;
+
+            gsap.to(focusFrame, {
+                x: x,
+                y: y,
+                width: width,
+                height: height,
+                opacity: 1,
+                duration: 0.45,
+                ease: 'power2.out'
+            });
+        };
+
+        const startLoop = () => {
+            if (loopInterval) clearInterval(loopInterval);
+            loopInterval = setInterval(() => {
+                if (!isHovered) {
+                    const nextIndex = (currentIndex + 1) % words.length;
+                    updateFocus(nextIndex);
+                }
+            }, 2000);
+        };
+
+        const stopLoop = () => {
+            if (loopInterval) {
+                clearInterval(loopInterval);
+                loopInterval = null;
+            }
+        };
+
+        // Add hover listeners to words
+        words.forEach((word, idx) => {
+            word.addEventListener('mouseenter', () => {
+                isHovered = true;
+                stopLoop();
+                updateFocus(idx);
+            });
+
+            word.addEventListener('mouseleave', () => {
+                isHovered = false;
+                // Add a slight delay before restarting the loop
+                setTimeout(() => {
+                    if (!isHovered && !loopInterval) {
+                        startLoop();
+                    }
+                }, 1000);
+            });
+        });
+
+        // Initialize focus positioning after web fonts paint
+        setTimeout(() => {
+            updateFocus(0);
+            startLoop();
+        }, 500);
+
+        window.addEventListener('resize', () => {
+            updateFocus(currentIndex);
+        });
+    };
+
+    initNameFocus();
     initVibeLabs();
-
-
 
 } catch (err) {
     console.error('Portfolio script error:', err);

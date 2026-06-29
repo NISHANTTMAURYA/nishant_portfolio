@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nishant Maurya | Backend Developer</title>
     <meta name="description"
-        content="Nishant Maurya — Backend Developer specializing in Django, PostgreSQL, Celery & Redis. 8 hackathon wins. Building production-grade systems.">
+        content="Nishant Maurya, Backend Developer specializing in Django, PostgreSQL, Celery & Redis. 8 hackathon wins. Building production-grade systems.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
@@ -83,7 +83,16 @@
                     <!-- Tab 1: Profile -->
                     <div class="api-tab-content active" id="tab-profile">
                         <div class="role-badge">&lt; Backend Developer /&gt;</div>
-                        <h1>Nishant Maurya</h1>
+                        <h1 class="focus-container" id="hero-name">
+                            <span class="focus-word glitch" data-text="Nishant" style="--after-duration: 3s; --before-duration: 2.2s; --after-shadow: -3px 0 var(--accent); --before-shadow: 3px 0 #27c93f;">Nishant</span>
+                            <span class="focus-word glitch" data-text="Maurya" style="--after-duration: 2.6s; --before-duration: 1.8s; --after-shadow: -3px 0 var(--accent); --before-shadow: 3px 0 #27c93f;">Maurya</span>
+                            <div class="focus-frame" id="name-focus-frame">
+                                <span class="corner top-left"></span>
+                                <span class="corner top-right"></span>
+                                <span class="corner bottom-left"></span>
+                                <span class="corner bottom-right"></span>
+                            </div>
+                        </h1>
                         <p class="hero-tagline">I build backend systems that actually ship.</p>
                         <p class="hero-sub">3rd-year CS @ Fr. CRCE &nbsp;·&nbsp; Django · PostgreSQL · Celery
                             &nbsp;·&nbsp; 8 Hackathon Wins &nbsp;·&nbsp; Live at <a href="https://atttc.cloud"
@@ -117,7 +126,7 @@
   <span class="json-key">"finalist_positions"</span>: <span class="json-num">21</span>,
   <span class="json-key">"academic_sgpa"</span>: <span class="json-num">9.0</span>,
   <span class="json-key">"production_apps"</span>: <span class="json-num">2</span>,
-  <span class="json-key">"team"</span>: <span class="json-val">"Team4i"</span>
+  <span class="json-key">"team"</span>: <span class="json-val">"tea4i"</span>
 <span class="json-brace">}</span></code></pre>
                         </div>
                     </div>
@@ -151,15 +160,17 @@
         <!-- About Me -->
         <section id="about" class="section">
             <h2 class="section-title">About Me</h2>
+            <p class="section-subtitle">A brief look into my background, my philosophy on building systems, and what drives my engineering decisions.</p>
             <div class="about-grid">
                 <div class="about-card">
                     <p class="about-text">
-                        Backend-focused Computer Engineering student (3rd year, Fr. CRCE · SGPA 9.0) with hands-on
-                        client consultancy experience under <strong>Team4i</strong>. I specialize in building scalable
-                        APIs with <strong>Django</strong>, optimizing database schemas with <strong>PostgreSQL</strong>,
-                        and orchestrating background task queues with <strong>Celery/Redis</strong>. My work has shipped
-                        to real institutions — from a live candidate assessment portal to a mentoring platform used by
-                        my own department.
+                        I am a backend-focused Computer Engineering student (3rd year at Fr. CRCE · SGPA 9.0) with hands-on consultancy experience building production-ready software systems under my company, <strong>4iStudios</strong>.
+                    </p>
+                    <p class="about-text">
+                        I specialize in designing and shipping scalable APIs with <strong>Django</strong>, optimizing database schemas and indexing structures in <strong>PostgreSQL</strong>, and orchestrating distributed background task queues with <strong>Celery &amp; Redis</strong>.
+                    </p>
+                    <p class="about-text">
+                        My solutions are built for real-world reliability. I've designed and shipped everything from a live assessment portal used by major organizations to a departmental mentoring platform that replaced manual legacy workflows.
                     </p>
                     <div class="about-meta">
                         <span class="about-meta-item"><i class="material-icons">school</i> Fr. Conceicao Rodrigues
@@ -180,6 +191,7 @@
         <!-- Experience -->
         <section id="experience" class="section">
             <h2 class="section-title">Experience</h2>
+            <p class="section-subtitle">A record of my professional history, freelance engineering, and collaborative projects.</p>
             <div class="experience-timeline">
                 <div class="timeline-item">
                     <div class="timeline-header">
@@ -187,7 +199,7 @@
                             <div class="timeline-date">2025</div>
                             <h3>Backend Developer &amp; Consultant</h3>
                             <div class="timeline-company"><a href="http://4istudios.in/" target="_blank">4iStudios</a>
-                                &nbsp;·&nbsp; Student-led Consultancy</div>
+                                &nbsp;·&nbsp; Founder &amp; Lead Backend Developer</div>
                         </div>
                         <div class="timeline-tags">
                             <span class="tech-tag">Django</span>
@@ -196,11 +208,7 @@
                             <span class="tech-tag">Redis</span>
                         </div>
                     </div>
-                    <p>Built and deployed the <strong><a href="https://atttc.cloud/" target="_blank">Agnel Trade Test
-                                &amp; Training Portal</a></strong> for the Agnel Trade Test Center. Delivered a secure
-                        role-based workflow (Office, Assessor, Validator) with AES-256 signature encryption, dynamic PDF
-                        certificate generation, automated SQL/Excel backups to Cloudflare R2 via Celery, and
-                        CAPTCHA-protected portals with rate-limiting.</p>
+                    <p>4iStudios is a company I co-founded with 3 teammates from <strong>team4i</strong>. We took up consultancy work for the Computer Science Department at Fr. CRCE, building production-ready software delivered as client projects. Our first engagement was the <strong><a href="https://atttc.cloud/" target="_blank">Agnel Trade Test &amp; Training Portal</a></strong>, now live and in active use.</p>
                 </div>
                 <div class="timeline-item">
                     <div class="timeline-header">
@@ -214,8 +222,8 @@
                             <span class="tech-tag">PostgreSQL</span>
                         </div>
                     </div>
-                    <p>Built the backend for Fr. CRCE's official mentoring platform — digitizing the entire mentoring
-                        process, eliminating offline paperwork, and providing in-depth student analytics for the
+                    <p>Built the backend for Fr. CRCE's official mentoring platform, which digitizes the entire mentoring
+                        process, eliminates offline paperwork, and provides in-depth student analytics for the
                         Computer Engineering department.</p>
                 </div>
             </div>
@@ -224,6 +232,7 @@
         <!-- Projects -->
         <section id="projects" class="section">
             <h2 class="section-title">Projects</h2>
+            <p class="section-subtitle">A curated collection of production-grade systems, utilities, and applications built to solve real-world problems.</p>
             <div class="projects">
 
                 <div class="timeline-item project-card cursor-target">
@@ -240,10 +249,7 @@
                                     class="material-icons">business</i> 4iStudios</a>
                         </div>
                     </div>
-                    <p>Production candidate assessment portal for the Agnel Trade Test Center. Built a secure role-based
-                        workflow (Office, Assessor, Validator) with AES-256 signature encryption, dynamic PDF
-                        certificate generation, automated SQL/Excel backups to Cloudflare R2, and CAPTCHA-protected
-                        portals with rate-limiting and custom 429 handlers.</p>
+                    <p>Built a candidate assessment portal live at <a href="https://atttc.cloud/" target="_blank">atttc.cloud</a> for the Agnel Trade Test Center. Implemented a secure role-based workflow (Office, Assessor, Validator) with AES-256 signature encryption, dynamic PDF certificate generation, and automated SQL/Excel backups to Cloudflare R2 via Celery. Protected candidate portals with rate-limiting, custom 429 handlers, and CAPTCHA validation.</p>
                     <div class="tech-stack">
                         <span class="tech-tag">Django</span>
                         <span class="tech-tag">PostgreSQL</span>
@@ -264,13 +270,11 @@
                             <a href="https://mitrai.social/" target="_blank" class="project-link"><i
                                     class="material-icons">open_in_new</i> Live</a>
                             <a href="https://docs.google.com/presentation/d/1oUYzCvxEDUANjj_x1ySZQb_4EXVojhCn-rn3ca71h50/edit?usp=sharing"
-                                target="_blank" class="project-link"><i class="material-icons">slideshow</i> Pitch
-                                Deck</a>
+                                  target="_blank" class="project-link"><i class="material-icons">slideshow</i> Pitch
+                                  Deck</a>
                         </div>
                     </div>
-                    <p>AI-driven chat platform with JWT/OAuth-secured REST APIs and Google GenAI integration to generate
-                        persona-based responses from conversation data. Engineered scalable background task pipelines
-                        using Celery workers and Redis to handle data importing and chat analysis at scale.</p>
+                    <p>Developed an AI-driven chat platform featuring JWT/OAuth-secured REST APIs and Google GenAI integration to generate persona-based responses from conversation data. Engineered scalable background task pipelines using Celery workers and Redis to handle data importing and chat analysis.</p>
                     <div class="tech-stack">
                         <span class="tech-tag">Django</span>
                         <span class="tech-tag">PostgreSQL</span>
@@ -290,9 +294,7 @@
                                 target="_blank" class="project-link"><i class="material-icons">code</i> GitHub</a>
                         </div>
                     </div>
-                    <p>Full-stack expense management app for group expense tracking. Designed scalable REST APIs with
-                        Django, implemented Google Authentication, and built friend/group management features with a
-                        modern, youth-focused Flutter UI.</p>
+                    <p>Developed a full-stack expense management application for group expense tracking. Designed scalable REST APIs using Django, and implemented Google Authentication and group management features.</p>
                     <div class="tech-stack">
                         <span class="tech-tag">Flutter</span>
                         <span class="tech-tag">Django</span>
@@ -311,9 +313,7 @@
                                 Presentation</a>
                         </div>
                     </div>
-                    <p>Built the backend for Fr. CRCE's official mentoring platform — used by the Computer Engineering
-                        Department. Digitized the entire mentoring workflow, eliminated offline paperwork, and delivered
-                        robust analytics to track student performance across semesters.</p>
+                    <p>Digitized the mentoring process to eliminate offline paperwork, building robust database models and analytics features to track student performance. Currently used by the Computer Engineering Department at Fr. CRCE.</p>
                     <div class="tech-stack">
                         <span class="tech-tag">Django</span>
                         <span class="tech-tag">PostgreSQL</span>
@@ -331,9 +331,7 @@
                                 target="_blank" class="project-link"><i class="material-icons">play_circle</i> Demo</a>
                         </div>
                     </div>
-                    <p>Led database design and integrated 6 mini-games from multiple contributors into a unified
-                        leaderboard for Smart India Hackathon 2024. Personally developed <strong>Samvidhan Setu</strong>
-                        (Snake &amp; Ladder variant) and Hangman mini-games as part of the platform.</p>
+                    <p>Designed the database architecture for a web gaming platform, integrating 6 mini-games from multiple contributors into a unified leaderboard system. Personally developed <strong>Samvidhan Setu</strong> and Hangman mini-games as part of the platform.</p>
                     <div class="tech-stack">
                         <span class="tech-tag">Django</span>
                         <span class="tech-tag">JavaScript</span>
@@ -348,7 +346,7 @@
         <!-- Vibe Coding Labs -->
         <section id="vibe-labs" class="section">
             <h2 class="section-title">Pure Vibe Coding Labs</h2>
-            <p class="skills-subtitle">Challenging the stereotype that backend engineers can't build premium user interfaces. These interactive frontends—including this very portfolio—built using AI and vibe coding, prove that AI-assisted development is not lazy prototyping, but a production-ready, highly polished craft.</p>
+            <p class="section-subtitle">Challenging the stereotype that backend engineers can't build premium user interfaces. These interactive frontends, including this very portfolio, built using AI and vibe coding, prove that AI-assisted development is not lazy prototyping, but a production-ready, highly polished craft.</p>
 
             <div class="vibe-container">
                 <!-- Left Tabs Column -->
@@ -492,6 +490,7 @@
         <!-- Gallery -->
         <section id="gallery" class="section animated-background-section">
             <h2 class="section-title">Gallery</h2>
+            <p class="section-subtitle">Moments from hackathons, developer meetups, and engineering snapshots.</p>
             <div class="masonry-container">
                 <div id="masonry-list" class="list"></div>
             </div>
@@ -500,7 +499,7 @@
         <!-- Tech Stack -->
         <section id="skills" class="section">
             <h2 class="section-title">Tech Stack</h2>
-            <p class="skills-subtitle">Hover to explore · Click to ripple · Each cube is a technology I use</p>
+            <p class="section-subtitle">The languages, frameworks, databases, and infrastructure tools I use to bring ideas to life. <br><small style="opacity: 0.75; font-size: 0.8em;">Hover to explore · Click to ripple · Each cube is a technology I use</small></p>
             <div class="skills-cubes-layout">
                 <div class="default-animation" id="cubes-wrapper">
                     <div class="default-animation--scene" id="cubes-scene">
@@ -540,6 +539,7 @@
         <!-- Achievements -->
         <section id="achievements" class="section">
             <h2 class="section-title">Achievements</h2>
+            <p class="section-subtitle">A timeline of hackathon wins, recognitions, and personal accomplishments.</p>
             <div class="achievements-grid">
                 <div class="achievement-card">
                     <span class="achievement-rank">🥇</span>
@@ -611,6 +611,7 @@
         <!-- Education -->
         <section id="education" class="section">
             <h2 class="section-title">Education &amp; Academic Milestones</h2>
+            <p class="section-subtitle">Academic path, course studies, and foundational learning.</p>
             <div class="edu-roadmap">
 
                 <div class="edu-item">
@@ -695,6 +696,7 @@
         <!-- Resume -->
         <section id="resume" class="resume-section section">
             <h2 class="section-title">My Resume</h2>
+            <p class="section-subtitle">A summary of my qualifications, experiences, and technical skill set available for download.</p>
             <div class="resume-container">
                 <img src="images/res.jpeg" alt="Nishant Maurya's Resume" class="resume-image">
                 <a href="images/nishant_resume.pdf" download class="download-button">
@@ -707,6 +709,7 @@
         <!-- Contact -->
         <section id="contact" class="section">
             <h2 class="section-title">Contact Me</h2>
+            <p class="section-subtitle">Have an interesting project or opportunities? Let's connect and build something solid.</p>
             <div class="contact-container">
                 <div class="contact-links">
                     <a href="https://www.linkedin.com/in/nishant-maurya-45bb86276?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app"
