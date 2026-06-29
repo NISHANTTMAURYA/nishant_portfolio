@@ -1315,6 +1315,8 @@ try {
             idleTimer = setTimeout(() => { userActive = false; }, 3000);
         };
 
+        let activeRippleTimeline = null;
+
         const triggerRippleAt = (rowHit, colHit) => {
             const idx = rowHit * gridCols + colHit;
             const clickedTech = TECH_ITEMS[idx];
@@ -1336,6 +1338,17 @@ try {
                 scene.style.setProperty('--ripple-icon-url', `url("${clickedIconUrl}")`);
             }
 
+            // Cleanly kill previous ripple animations and reset all cubes immediately
+            if (activeRippleTimeline) {
+                activeRippleTimeline.kill();
+            }
+            cubes.forEach(c => {
+                gsap.killTweensOf([c.overlays, c.icons, c.rippleIcons]);
+                gsap.set(c.overlays, { opacity: 0 });
+                gsap.set(c.icons, { opacity: (i, el) => el.dataset.origSrc ? 0.85 : 0 });
+                gsap.set(c.rippleIcons, { opacity: 0 });
+            });
+
             const rings = {};
             cubes.forEach(c => {
                 const ring = Math.round(Math.hypot(c.row - rowHit, c.col - colHit));
@@ -1345,6 +1358,8 @@ try {
 
             const isMobile = window.innerWidth <= 768;
             const speed = isMobile ? 1.6 : 1.0;
+
+            activeRippleTimeline = gsap.timeline();
 
             Object.keys(rings).map(Number).sort((a, b) => a - b).forEach(ring => {
                 const delay = ring * (0.08 / speed);
@@ -1357,29 +1372,28 @@ try {
                 const fadeOutDur = 0.45 / speed;
 
                 // Wave start: animate overlay opacity + cross-fade icon
-                gsap.to(overlays, {
+                activeRippleTimeline.to(overlays, {
                     opacity: 1,
                     duration: fadeInDur,
-                    delay: delay,
-                    ease: 'power2.out',
-                    overwrite: 'auto'
-                });
+                    ease: 'power2.out'
+                }, delay);
+
                 if (clickedIconUrl) {
-                    gsap.to(origIcons, { opacity: 0, duration: fadeInDur, delay, ease: 'power2.out', overwrite: 'auto' });
-                    gsap.to(rippleIcons, { opacity: 0.9, duration: fadeInDur, delay, ease: 'power2.out', overwrite: 'auto' });
+                    activeRippleTimeline.to(origIcons, { opacity: 0, duration: fadeInDur, ease: 'power2.out' }, delay);
+                    activeRippleTimeline.to(rippleIcons, { opacity: 0.9, duration: fadeInDur, ease: 'power2.out' }, delay);
                 }
 
                 // Wave end: restore overlay opacity to 0 + cross-fade back to original tech icons
-                gsap.to(overlays, {
+                const fadeOutTime = delay + fadeInDur + holdDur;
+                activeRippleTimeline.to(overlays, {
                     opacity: 0,
                     duration: fadeOutDur,
-                    delay: delay + fadeInDur + holdDur,
-                    ease: 'power2.out',
-                    overwrite: false
-                });
+                    ease: 'power2.out'
+                }, fadeOutTime);
+
                 if (clickedIconUrl) {
-                    gsap.to(origIcons, { opacity: (i, el) => el.dataset.origSrc ? 0.85 : 0, duration: fadeOutDur, delay: delay + fadeInDur + holdDur, ease: 'power2.out', overwrite: false });
-                    gsap.to(rippleIcons, { opacity: 0, duration: fadeOutDur, delay: delay + fadeInDur + holdDur, ease: 'power2.out', overwrite: false });
+                    activeRippleTimeline.to(origIcons, { opacity: (i, el) => el.dataset.origSrc ? 0.85 : 0, duration: fadeOutDur, ease: 'power2.out' }, fadeOutTime);
+                    activeRippleTimeline.to(rippleIcons, { opacity: 0, duration: fadeOutDur, ease: 'power2.out' }, fadeOutTime);
                 }
             });
         };
