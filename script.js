@@ -1168,6 +1168,17 @@ try {
                     item.el.classList.remove('active-highlight');
                 }
             });
+
+            // Two-way binding: Tilt cubes toward the manually active marquee technology
+            if (userActive && closestEl) {
+                const techName = closestEl.dataset.tech;
+                const idx = TECH_ITEMS.findIndex(t => t.name === techName);
+                if (idx !== -1) {
+                    const r = Math.floor(idx / gridCols) + 0.5;
+                    const c = (idx % gridCols) + 0.5;
+                    tiltAt(r, c);
+                }
+            }
         };
 
         if (marquee) {
