@@ -1030,6 +1030,11 @@ try {
                 };
                 if (origSrc) { img.src = origSrc; img.style.opacity = '0.85'; } else { img.style.opacity = '0'; }
                 faceDiv.appendChild(img);
+
+                const rippleImg = document.createElement('div');
+                rippleImg.className = 'ripple-icon';
+                faceDiv.appendChild(rippleImg);
+
                 cube.appendChild(faceDiv);
             });
             scene.appendChild(cube);
@@ -1050,8 +1055,9 @@ try {
                 targetY: 0,
                 currX: 0,
                 currY: 0,
-                faces: Array.from(cube.querySelectorAll('.cube-face')),
-                icons: Array.from(cube.querySelectorAll('.cube-icon'))
+                frontFace: cube.querySelector('.cube-face--front'),
+                frontIcon: cube.querySelector('.cube-face--front .cube-icon'),
+                frontRippleIcon: cube.querySelector('.cube-face--front .ripple-icon')
             }));
         };
         initCubeReferences();
@@ -1249,6 +1255,12 @@ try {
             }
 
             const rippleColor = CATEGORY_COLORS[clickedTech.category]?.ripple || '#ffffff';
+            const clickedIconUrl = clickedTech.slug ? `./icons/${clickedTech.slug}.svg` : (clickedTech.iconUrl || '');
+
+            if (clickedIconUrl) {
+                scene.style.setProperty('--ripple-icon-url', `url("${clickedIconUrl}")`);
+            }
+
             const rings = {};
             cubes.forEach(c => {
                 const ring = Math.round(Math.hypot(c.row - rowHit, c.col - colHit));
@@ -1261,8 +1273,11 @@ try {
 
             Object.keys(rings).map(Number).sort((a, b) => a - b).forEach(ring => {
                 const delay = ring * (0.1 / speed);
-                const faces = rings[ring].flatMap(c => c.faces);
+                const faces = rings[ring].map(c => c.frontFace).filter(Boolean);
+                const origIcons = rings[ring].map(c => c.frontIcon).filter(Boolean);
+                const rippleIcons = rings[ring].map(c => c.frontRippleIcon).filter(Boolean);
 
+                // Wave start: animate face background + cross-fade icon to clicked ripple icon
                 gsap.to(faces, {
                     backgroundColor: rippleColor,
                     duration: 0.2 / speed,
@@ -1270,6 +1285,12 @@ try {
                     ease: 'power2.out',
                     overwrite: 'auto'
                 });
+                if (clickedIconUrl) {
+                    gsap.to(origIcons, { opacity: 0, duration: 0.15 / speed, delay, ease: 'power2.out', overwrite: 'auto' });
+                    gsap.to(rippleIcons, { opacity: 0.9, duration: 0.15 / speed, delay, ease: 'power2.out', overwrite: 'auto' });
+                }
+
+                // Wave end: restore face background + cross-fade back to original tech icons
                 gsap.to(faces, {
                     backgroundColor: (i, el) => el.dataset.bg,
                     duration: 0.3 / speed,
@@ -1277,6 +1298,10 @@ try {
                     ease: 'power2.out',
                     overwrite: false
                 });
+                if (clickedIconUrl) {
+                    gsap.to(origIcons, { opacity: (i, el) => el.dataset.origSrc ? 0.85 : 0, duration: 0.25 / speed, delay: delay + (0.2 / speed) + 0.05, ease: 'power2.out', overwrite: false });
+                    gsap.to(rippleIcons, { opacity: 0, duration: 0.25 / speed, delay: delay + (0.2 / speed) + 0.05, ease: 'power2.out', overwrite: false });
+                }
             });
         };
 
