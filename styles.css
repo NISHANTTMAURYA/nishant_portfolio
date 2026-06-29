@@ -767,11 +767,7 @@ a:hover {
 }
 
 .skills-cubes-layout {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 2rem;
+    display: block;
     width: 100%;
     max-width: 520px;
     margin: 0 auto;
@@ -2281,7 +2277,7 @@ a:hover {
 
     /* Skills */
     .skills-grid { grid-template-columns: 1fr; }
-    .skills-cubes-layout { flex-direction: column; gap: 2rem; }
+    .skills-cubes-layout { display: block; }
     #skills .default-animation { max-width: 340px; }
     .skills-legend { flex-direction: row; flex-wrap: wrap; justify-content: center; gap: 0.6rem 1.2rem; }
     .about-stats-visual { max-width: 100%; }
