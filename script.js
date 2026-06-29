@@ -404,28 +404,29 @@ try {
         if (!containerRef) return;
 
         const GALLERY_ITEMS = [
-            { id: "1", img: "./images/nishant_sih.jpg", title: "Smart India Hackathon Spotlight", height: 550 },
-            { id: "2", img: "./images/14.jpg", title: "Hackathon Event", height: 420 },
-            { id: "3", img: "./images/3.jpeg", title: "Project Presentation", height: 600 },
-            { id: "4", img: "./images/20.jpg", title: "Team Moment", height: 480 },
-            { id: "5", img: "./images/7.jpeg", title: "Development Hackathon", height: 520 },
-            { id: "6", img: "./images/18.jpg", title: "Competition Showcase", height: 450 },
-            { id: "7", img: "./images/1.jpeg", title: "Team Photo", height: 580 },
-            { id: "8", img: "./images/24.jpg", title: "Award Presentation", height: 400 },
-            { id: "9", img: "./images/11.jpg", title: "Technical Demo", height: 500 },
-            { id: "10", img: "./images/16.jpg", title: "Engineering Team", height: 460 },
-            { id: "11", img: "./images/2.jpeg", title: "Award Ceremony", height: 540 },
-            { id: "12", img: "./images/22.jpg", title: "Project Pitch", height: 430 },
-            { id: "13", img: "./images/9.jpeg", title: "Team Achievement", height: 510 },
-            { id: "14", img: "./images/15.jpg", title: "Coding Session", height: 470 },
-            { id: "15", img: "./images/26.jpg", title: "Hackathon Celebration", height: 560 },
-            { id: "16", img: "./images/10.jpg", title: "Team Collaboration", height: 440 },
-            { id: "17", img: "./images/112.jpg", title: "Event Highlights", height: 490 },
-            { id: "18", img: "./images/19.jpg", title: "Project Demo", height: 530 },
-            { id: "19", img: "./images/23.jpg", title: "Tech Showcase", height: 410 },
-            { id: "20", img: "./images/13.jpg", title: "Team Snapshot", height: 480 },
-            { id: "22", img: "./images/21.jpg", title: "Team Discussion", height: 450 },
-            { id: "24", img: "./images/17.jpg", title: "Competition Finale", height: 520 }
+            { id: "1", img: "./images/nishant_sih.jpg", title: "team4i — SIH 2025 Winners", height: 550 },
+            { id: "2", img: "./images/14.jpg", title: "SIH 2025 — Winner Placard & Trophies", height: 420 },
+            { id: "3", img: "./images/3.jpeg", title: "Code Odyssey 3.0 — 2nd Runner Up, ₹8,000", height: 600 },
+            { id: "4", img: "./images/20.jpg", title: "Codeutsava 8.0 — NIT Raipur Winners ₹40,000", height: 480 },
+            { id: "5", img: "./images/7.jpeg", title: "WEBATHON — Award Ceremony, Saboo Siddik", height: 520 },
+            { id: "6", img: "./images/18.jpg", title: "Featured in Dainik Bhaskar, Nov 2024", height: 450 },
+            { id: "7", img: "./images/1.jpeg", title: "Hackathon Hall — team4i Ready to Compete", height: 580 },
+            { id: "8", img: "./images/24.jpg", title: "Sunhacks 2025 — First Prize ₹50,000", height: 400 },
+            { id: "9", img: "./images/11.jpg", title: "Arriving at Ramaiah University for SIH 2025", height: 500 },
+            { id: "10", img: "./images/16.jpg", title: "QUASAR 3.0 — 2nd Runner Up, ₹20,000", height: 460 },
+            { id: "11", img: "./images/2.jpeg", title: "WEBATHON — Winners, Team4i, ₹15,000", height: 540 },
+            { id: "12", img: "./images/22.jpg", title: "Code Odyssey 3.0 — Runner Up Cheque", height: 430 },
+            { id: "13", img: "./images/9.jpeg", title: "WEBATHON — Solo Winner, ₹15,000", height: 510 },
+            { id: "14", img: "./images/15.jpg", title: "On Stage — Certificate Handover", height: 470 },
+            { id: "15", img: "./images/26.jpg", title: "Wadhwani Foundation — Participation Certs", height: 560 },
+            { id: "16", img: "./images/10.jpg", title: "SIH 2025 — Team4i with Faculty & Mentors", height: 440 },
+            { id: "17", img: "./images/112.jpg", title: "Prakalp-IKS — Trophy Receiving Ceremony", height: 490 },
+            { id: "18", img: "./images/19.jpg", title: "Codeutsava 8.0 — Team4i Winners, ₹40,000", height: 530 },
+            { id: "19", img: "./images/23.jpg", title: "Code Odyssey 3.0 — On Stage, KJ Somaiya", height: 410 },
+            { id: "20", img: "./images/13.jpg", title: "SIH 2025 — Grand Finale Winners, ₹75,000", height: 480 },
+            { id: "21", img: "./images/25.jpg", title: "Sunhacks 2025 — Outdoor Victory at Sandip", height: 450 },
+            { id: "22", img: "./images/21.jpg", title: "Codeutsava 8.0 — Status 200 Winners", height: 450 },
+            { id: "24", img: "./images/17.jpg", title: "SIH 2024 — Grand Finale, Team4i at Work", height: 520 }
         ];
 
         const ease = 'power3.out';
@@ -1177,7 +1178,7 @@ try {
                     item.dataset.tech = tech.name;
                     item.dataset.copy = copyIdx;
                     item.textContent = tech.name;
-                    
+
                     const tl = document.createElement('div'); tl.className = 'target-corner corner-tl'; item.appendChild(tl);
                     const tr = document.createElement('div'); tr.className = 'target-corner corner-tr'; item.appendChild(tr);
                     const br = document.createElement('div'); br.className = 'target-corner corner-br'; item.appendChild(br);
@@ -1198,7 +1199,7 @@ try {
                 if (oneSetWidth > 0) {
                     marquee.scrollLeft = oneSetWidth;
                 }
-                
+
                 techToMarqueeItems = {};
                 allMarqueeItems.forEach(item => {
                     if (!techToMarqueeItems[item.tech]) techToMarqueeItems[item.tech] = [];
@@ -1247,7 +1248,7 @@ try {
                 if (d < bestDist) { bestDist = d; bestItem = item; }
             });
             const targetScroll = bestItem.left + bestItem.width / 2 - containerWidth / 2;
-            
+
             scrollObj.value = marquee.scrollLeft;
             if (scrollTween) scrollTween.kill();
             scrollTween = gsap.to(scrollObj, {
@@ -1474,7 +1475,7 @@ try {
             const virtualHeight = 800; // 16:10 aspect ratio height
 
             const scale = wrapperWidth / virtualWidth;
-            
+
             iframe.style.width = `${virtualWidth}px`;
             iframe.style.height = `${virtualHeight}px`;
             iframe.style.transform = `scale(${scale})`;
