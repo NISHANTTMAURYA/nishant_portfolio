@@ -958,6 +958,7 @@ try {
     const initCubes = () => {
         const scene = document.getElementById('cubes-scene');
         if (!scene) return;
+        const wrapper = document.getElementById('cubes-wrapper') || scene;
 
         const TECH_ITEMS = [
             { slug: 'python', name: 'Python', category: 'language' },
@@ -1275,14 +1276,22 @@ try {
         const onPointerMove = e => {
             userActive = true;
             if (idleTimer) clearTimeout(idleTimer);
-            const rect = scene.getBoundingClientRect();
+            
+            // 1. Smooth Tilt Math (Stable bounding rect)
+            const rect = wrapper.getBoundingClientRect();
             const colCenter = (e.clientX - rect.left) / (rect.width / gridCols);
             const rowCenter = (e.clientY - rect.top) / (rect.height / gridRows);
             if (raf) cancelAnimationFrame(raf);
-            raf = requestAnimationFrame(() => {
-                tiltAt(rowCenter, colCenter);
-                scrollMarqueeTo(rowCenter, colCenter);
-            });
+            raf = requestAnimationFrame(() => tiltAt(rowCenter, colCenter));
+
+            // 2. Accurate Tech Highlight (Exact DOM target)
+            const cubeEl = e.target.closest('.cube');
+            if (cubeEl) {
+                const r = +cubeEl.dataset.row;
+                const c = +cubeEl.dataset.col;
+                scrollMarqueeTo(r, c);
+            }
+
             idleTimer = setTimeout(() => { userActive = false; }, 3000);
         };
 
@@ -1290,7 +1299,7 @@ try {
             e.preventDefault();
             userActive = true;
             if (idleTimer) clearTimeout(idleTimer);
-            const rect = scene.getBoundingClientRect();
+            const rect = wrapper.getBoundingClientRect();
             const colCenter = (e.touches[0].clientX - rect.left) / (rect.width / gridCols);
             const rowCenter = (e.touches[0].clientY - rect.top) / (rect.height / gridRows);
             if (raf) cancelAnimationFrame(raf);
@@ -1326,7 +1335,9 @@ try {
                 activeRippleTimeline.kill();
             }
             cubes.forEach(c => {
-                gsap.killTweensOf([c.overlays, c.icons, c.rippleIcons]);
+                gsap.killTweensOf(c.overlays);
+                gsap.killTweensOf(c.icons);
+                gsap.killTweensOf(c.rippleIcons);
                 gsap.set(c.overlays, { opacity: 0 });
                 gsap.set(c.icons, { opacity: (i, el) => el.dataset.origSrc ? 0.85 : 0 });
                 gsap.set(c.rippleIcons, { opacity: 0 });
@@ -1396,16 +1407,16 @@ try {
 
         const cursorDot = document.querySelector('.target-cursor-dot');
 
-        scene.addEventListener('pointermove', onPointerMove);
-        scene.addEventListener('pointerenter', () => { if (cursorDot) cursorDot.classList.add('cursor-dot--expanded'); });
-        scene.addEventListener('pointerleave', () => {
+        wrapper.addEventListener('pointermove', onPointerMove);
+        wrapper.addEventListener('pointerenter', () => { if (cursorDot) cursorDot.classList.add('cursor-dot--expanded'); });
+        wrapper.addEventListener('pointerleave', () => {
             resetAll();
             if (cursorDot) cursorDot.classList.remove('cursor-dot--expanded');
         });
-        scene.addEventListener('click', onClick);
-        scene.addEventListener('touchmove', onTouchMove, { passive: false });
-        scene.addEventListener('touchstart', () => { userActive = true; }, { passive: true });
-        scene.addEventListener('touchend', resetAll, { passive: true });
+        wrapper.addEventListener('click', onClick);
+        wrapper.addEventListener('touchmove', onTouchMove, { passive: false });
+        wrapper.addEventListener('touchstart', () => { userActive = true; }, { passive: true });
+        wrapper.addEventListener('touchend', resetAll, { passive: true });
 
         const simSpeed = 0.025;
         const totalCubes = gridCols * gridRows;
