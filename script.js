@@ -1046,7 +1046,8 @@ try {
                 col: +cube.dataset.col,
                 setX: gsap.quickSetter(cube, 'rotateX', 'deg'),
                 setY: gsap.quickSetter(cube, 'rotateY', 'deg'),
-                faces: Array.from(cube.querySelectorAll('.cube-face'))
+                faces: Array.from(cube.querySelectorAll('.cube-face')),
+                icons: Array.from(cube.querySelectorAll('.cube-icon'))
             }));
         };
         initCubeReferences();
@@ -1235,26 +1236,40 @@ try {
             if (marquee && clickedTech.slug) {
                 scrollMarqueeTo(rowHit, colHit);
             }
+
+            // Tactile scale pop on the clicked cube
+            if (cubes[idx]) {
+                gsap.to(cubes[idx].el, { scale: 1.12, duration: 0.15, yoyo: true, repeat: 1, ease: 'power2.out', overwrite: 'auto' });
+            }
+
             const rippleColor = CATEGORY_COLORS[clickedTech.category]?.ripple || '#ffffff';
-            const clickedIconUrl = clickedTech.slug ? `./icons/${clickedTech.slug}.svg` : '';
             const rings = {};
             cubes.forEach(c => {
                 const ring = Math.round(Math.hypot(c.row - rowHit, c.col - colHit));
                 if (!rings[ring]) rings[ring] = [];
                 rings[ring].push(c);
             });
+
+            const isMobile = window.innerWidth <= 768;
+            const speed = isMobile ? 2.2 : rippleSpeed;
+
             Object.keys(rings).map(Number).sort((a, b) => a - b).forEach(ring => {
-                const delay = ring * (0.15 / rippleSpeed);
+                const delay = ring * (0.1 / speed);
                 const faces = rings[ring].flatMap(c => c.faces);
+
                 gsap.to(faces, {
-                    backgroundColor: rippleColor, duration: 0.3 / rippleSpeed, delay, ease: 'power3.out', overwrite: true, onStart: () => {
-                        if (clickedIconUrl) rings[ring].forEach(c => c.el.querySelectorAll('.cube-icon').forEach(img => { img.src = clickedIconUrl; img.style.opacity = '0.9'; }));
-                    }
+                    backgroundColor: rippleColor,
+                    duration: 0.2 / speed,
+                    delay: delay,
+                    ease: 'power2.out',
+                    overwrite: 'auto'
                 });
                 gsap.to(faces, {
-                    backgroundColor: (i, el) => el.dataset.bg, duration: 0.3 / rippleSpeed, delay: delay + (0.3 / rippleSpeed) + (0.6 / rippleSpeed), ease: 'power3.out', overwrite: false, onStart: () => {
-                        rings[ring].forEach(c => c.el.querySelectorAll('.cube-icon').forEach(img => { img.src = img.dataset.origSrc || ''; img.style.opacity = img.dataset.origSrc ? '0.85' : '0'; }));
-                    }
+                    backgroundColor: (i, el) => el.dataset.bg,
+                    duration: 0.3 / speed,
+                    delay: delay + (0.2 / speed) + 0.05,
+                    ease: 'power2.out',
+                    overwrite: false
                 });
             });
         };
