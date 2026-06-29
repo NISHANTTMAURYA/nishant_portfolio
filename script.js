@@ -715,115 +715,92 @@ try {
         if (!scene) return;
 
         const TECH_ITEMS = [
-            // Languages (row 0)
-            { slug: 'python',          name: 'Python',            category: 'language' },
-            { slug: 'dart',            name: 'Dart',              category: 'language' },
-            { slug: 'c',               name: 'C',                 category: 'language' },
-            { slug: 'javascript',      name: 'JavaScript',        category: 'language' },
-            { slug: 'gnubash',         name: 'Bash',              category: 'language' },
-            { slug: 'markdown',        name: 'Markdown',          category: 'language' },
-            
-            // Backend (row 1)
-            { slug: 'django',          name: 'Django',            category: 'backend' },
-            { slug: 'postman',         name: 'Django REST (API)', category: 'backend' },
-            { slug: 'celery',          name: 'Celery',            category: 'backend' },
-            { slug: 'springboot',      name: 'Spring Boot',       category: 'backend' },
-            { slug: 'jsonwebtokens',   name: 'JWT',               category: 'backend' },
-            { slug: 'json',            name: 'JSON',              category: 'backend' },
-            
-            // Frontend (row 2)
-            { slug: 'flutter',         name: 'Flutter',           category: 'frontend' },
-            { slug: 'html5',           name: 'HTML5',             category: 'frontend' },
-            { slug: 'css',             name: 'CSS3',              category: 'frontend' },
-            { slug: 'firebase',        name: 'Firebase',          category: 'frontend' },
-            
-            // Databases (row 3)
-            { slug: 'postgresql',      name: 'PostgreSQL',        category: 'database' },
-            { slug: 'mysql',           name: 'MySQL',             category: 'database' },
-            { slug: 'redis',           name: 'Redis',             category: 'database' },
-            
-            // Tools & Infra (row 4-5)
-            { slug: 'docker',          name: 'Docker',            category: 'tools' },
-            { slug: 'cloudflare',      name: 'Cloudflare R2',     category: 'tools' },
-            { slug: 'opencv',          name: 'OpenCV',            category: 'tools' },
-            { slug: 'numpy',           name: 'NumPy',             category: 'tools' },
-            { slug: 'pandas',          name: 'Pandas',            category: 'tools' },
-            { slug: 'letsencrypt',     name: 'Cryptography',      category: 'tools' },
-            { slug: 'googlesheets',    name: 'Google Sheets',     category: 'tools' },
-            { slug: 'githubcopilot',   name: 'GitHub Copilot',    category: 'tools' },
-            { slug: 'ollama',          name: 'Ollama',            category: 'tools' },
-            { slug: 'git',             name: 'Git',               category: 'tools' },
-            { slug: 'github',          name: 'GitHub',            category: 'tools' },
-            { slug: 'linux',           name: 'Linux',             category: 'tools' },
-
-            // Empty filler cubes to fill the 6x6 grid (36 total)
+            { slug: 'python', name: 'Python', category: 'language' },
+            { slug: 'dart', name: 'Dart', category: 'language' },
+            { slug: 'c', name: 'C', category: 'language' },
+            { slug: 'javascript', name: 'JavaScript', category: 'language' },
+            { slug: 'gnubash', name: 'Bash', category: 'language' },
+            { slug: 'markdown', name: 'Markdown', category: 'language' },
+            { slug: 'django', name: 'Django', category: 'backend' },
+            { slug: 'postman', name: 'Django REST (API)', category: 'backend' },
+            { slug: 'celery', name: 'Celery', category: 'backend' },
+            { slug: 'springboot', name: 'Spring Boot', category: 'backend' },
+            { slug: 'jsonwebtokens', name: 'JWT', category: 'backend' },
+            { slug: 'json', name: 'JSON', category: 'backend' },
+            { slug: 'flutter', name: 'Flutter', category: 'frontend' },
+            { slug: 'html5', name: 'HTML5', category: 'frontend' },
+            { slug: 'css', name: 'CSS3', category: 'frontend' },
+            { slug: 'firebase', name: 'Firebase', category: 'frontend' },
+            { slug: 'postgresql', name: 'PostgreSQL', category: 'database' },
+            { slug: 'mysql', name: 'MySQL', category: 'database' },
+            { slug: 'redis', name: 'Redis', category: 'database' },
+            { slug: 'docker', name: 'Docker', category: 'tools' },
+            { slug: 'cloudflare', name: 'Cloudflare R2', category: 'tools' },
+            { slug: 'opencv', name: 'OpenCV', category: 'tools' },
+            { slug: 'numpy', name: 'NumPy', category: 'tools' },
+            { slug: 'pandas', name: 'Pandas', category: 'tools' },
+            { slug: 'letsencrypt', name: 'Cryptography', category: 'tools' },
+            { slug: 'microsoftexcel', name: 'Excel Sheets', category: 'tools' },
+            { slug: 'githubcopilot', name: 'GitHub Copilot', category: 'tools' },
+            { slug: 'ollama', name: 'Ollama', category: 'tools' },
+            { slug: 'git', name: 'Git', category: 'tools' },
+            { slug: 'github', name: 'GitHub', category: 'tools' },
+            { slug: 'linux', name: 'Linux', category: 'tools' },
+            { slug: '', name: '', category: 'filler' },
             { slug: '', name: '', category: 'filler' },
             { slug: '', name: '', category: 'filler' },
             { slug: '', name: '', category: 'filler' },
             { slug: '', name: '', category: 'filler' },
         ];
 
-        // Sleek premium colors: dark background, color border
         const CATEGORY_COLORS = {
-            language: { border: '#a78bfa', ripple: '#a78bfa', face: '#18112b' },
-            backend:  { border: '#c084fc', ripple: '#c084fc', face: '#20102b' },
-            frontend: { border: '#818cf8', ripple: '#818cf8', face: '#11132b' },
-            database: { border: '#f472b6', ripple: '#f472b6', face: '#251120' },
-            tools:    { border: '#94a3b8', ripple: '#94a3b8', face: '#1a1a20' },
-            filler:   { border: '#252131', ripple: '#8b5cf6', face: '#0e0b14' },
+            language: { border: '#a78bfa', ripple: '#c4b5fd', face: '#2b2244' },
+            backend:  { border: '#c084fc', ripple: '#e879f9', face: '#362146' },
+            frontend: { border: '#818cf8', ripple: '#a5b4fc', face: '#212646' },
+            database: { border: '#f472b6', ripple: '#fbcfe8', face: '#3c2132' },
+            tools:    { border: '#38bdf8', ripple: '#7dd3fc', face: '#1e2c3a' },
+            filler:   { border: '#3b334a', ripple: '#a78bfa', face: '#1c1827' },
         };
 
         const gridSize = 6;
-        const maxAngle = 180;
+        const maxAngle = 45;
         const radius = 3;
         const enterDur = 0.3;
         const leaveDur = 0.6;
         const easing = 'power3.out';
-        const autoAnimate = false;
+        const autoAnimate = true;
         const rippleOnClick = true;
         const rippleSpeed = 1.5;
 
-        // Set dimensions dynamically
         scene.style.gridTemplateColumns = `repeat(${gridSize}, 1fr)`;
         scene.style.gridTemplateRows = `repeat(${gridSize}, 1fr)`;
+        scene.innerHTML = '';
 
-        const tooltip = document.getElementById('cube-tooltip');
-
-        // Create the elements
         for (let i = 0; i < gridSize * gridSize; i++) {
             const tech = TECH_ITEMS[i] || { slug: '', name: '', category: 'filler' };
-            const colors = CATEGORY_COLORS[tech.category];
+            const colors = CATEGORY_COLORS[tech.category] || CATEGORY_COLORS.filler;
             const r = Math.floor(i / gridSize);
             const c = i % gridSize;
-
             const cube = document.createElement('div');
             cube.className = 'cube';
             cube.dataset.row = r;
             cube.dataset.col = c;
             cube.dataset.tech = tech.name;
             cube.dataset.category = tech.category;
-
-            const faces = ['top', 'bottom', 'left', 'right', 'front', 'back'];
-            faces.forEach(face => {
+            ['top', 'bottom', 'left', 'right', 'front', 'back'].forEach(face => {
                 const faceDiv = document.createElement('div');
                 faceDiv.className = `cube-face cube-face--${face}`;
                 faceDiv.style.background = colors.face;
-                faceDiv.style.borderColor = colors.border;
-                
-                // Add persistent img tag
+                faceDiv.dataset.bg = colors.face;
+                faceDiv.style.border = `1.5px solid ${colors.border}`;
                 const img = document.createElement('img');
                 img.className = 'cube-icon';
-                if (tech.slug) {
-                    img.src = `https://cdn.simpleicons.org/${tech.slug}/fff`;
-                    img.style.opacity = '0.85';
-                } else {
-                    img.src = '';
-                    img.style.opacity = '0';
-                }
+                const origSrc = tech.slug ? `https://cdn.simpleicons.org/${tech.slug}/fff` : '';
+                img.dataset.origSrc = origSrc;
+                if (origSrc) { img.src = origSrc; img.style.opacity = '0.85'; } else { img.style.opacity = '0'; }
                 faceDiv.appendChild(img);
                 cube.appendChild(faceDiv);
             });
-
             scene.appendChild(cube);
         }
 
@@ -842,232 +819,223 @@ try {
                 if (dist <= radius) {
                     const pct = 1 - dist / radius;
                     const angle = pct * maxAngle;
-                    // Scale factor: grows up to 1.15x when cursor is directly over the cube
-                    const scale = 1 + (pct * 0.18);
-                    gsap.to(cube, {
-                        duration: enterDur,
-                        ease: easing,
-                        overwrite: true,
-                        rotateX: -angle,
-                        rotateY: angle,
-                        scale: scale
-                    });
+                    gsap.to(cube, { duration: enterDur, ease: easing, overwrite: true, rotateX: -angle, rotateY: angle });
                 } else {
-                    gsap.to(cube, {
-                        duration: leaveDur,
-                        ease: 'power3.out',
-                        overwrite: true,
-                        rotateX: 0,
-                        rotateY: 0,
-                        scale: 1
-                    });
+                    gsap.to(cube, { duration: leaveDur, ease: 'power3.out', overwrite: true, rotateX: 0, rotateY: 0 });
                 }
             });
         };
 
-        // --- Build dynamic horizontal plain text list of skills ---
+        const resetAll = () => {
+            scene.querySelectorAll('.cube').forEach(cube => {
+                gsap.to(cube, { duration: leaveDur, rotateX: 0, rotateY: 0, ease: 'power3.out', overwrite: true });
+            });
+        };
+
         const marquee = document.getElementById('skills-marquee');
+        let itemPositions = [];
+        let oneSetWidth = 0;
+
+        const cacheItemPositions = () => {
+            if (!marquee) return;
+            itemPositions = [];
+            // Only cache items in the middle set (second set of 3)
+            const allItems = marquee.querySelectorAll('.marquee-item');
+            const setSize = allItems.length / 3;
+            const midStart = Math.floor(setSize);
+            const midEnd = midStart + setSize;
+            allItems.forEach((item, i) => {
+                if (i >= midStart && i < midEnd) {
+                    itemPositions.push({ el: item, left: item.offsetLeft, width: item.offsetWidth });
+                }
+            });
+        };
+
+        const updateLayout = () => {
+            if (!marquee) return;
+            const containerWidth = marquee.clientWidth;
+            const scrollLeft = marquee.scrollLeft;
+            const containerCenterX = scrollLeft + containerWidth / 2;
+            let closestEl = null;
+            let minDistance = Infinity;
+
+            // check all visible items across all 3 sets
+            marquee.querySelectorAll('.marquee-item').forEach(el => {
+                const dx = (el.offsetLeft + el.offsetWidth / 2) - containerCenterX;
+                const dist = Math.abs(dx);
+                el.style.opacity = Math.max(0.35, 1 - dist / (containerWidth * 0.4));
+                if (dist < minDistance) {
+                    minDistance = dist;
+                    closestEl = el;
+                }
+            });
+
+            marquee.querySelectorAll('.marquee-item').forEach(el => {
+                if (el === closestEl) el.classList.add('active-highlight');
+                else el.classList.remove('active-highlight');
+            });
+
+            // Infinite loop: teleport when near the edges
+            if (oneSetWidth > 0) {
+                if (scrollLeft < oneSetWidth * 0.5) {
+                    marquee.scrollLeft += oneSetWidth;
+                } else if (scrollLeft > oneSetWidth * 2.5) {
+                    marquee.scrollLeft -= oneSetWidth;
+                }
+            }
+        };
+
         if (marquee) {
+            marquee.innerHTML = '';
             const track = document.createElement('div');
             track.className = 'marquee-track';
-            
-            // Filter out fillers for the plain list
-            const activeTechs = TECH_ITEMS.filter(t => t.slug && t.name);
-            
-            activeTechs.forEach(tech => {
-                const item = document.createElement('div');
-                item.className = 'marquee-item';
-                item.dataset.tech = tech.name; // Tag each list item
-                item.innerHTML = `<span>${tech.name}</span>`;
-                
-                // Allow clicking a text item to trigger the ripple on the matching cube!
-                item.addEventListener('click', () => {
-                    const matchingCube = scene.querySelector(`.cube[data-tech="${tech.name}"]`);
-                    if (matchingCube) {
-                        const r = +matchingCube.dataset.row;
-                        const c = +matchingCube.dataset.col;
-                        triggerRippleAt(r, c);
+
+            const techsWithSlug = TECH_ITEMS.filter(t => t.slug && t.name);
+
+            // Build 3 copies for infinite illusion
+            [0, 1, 2].forEach(copyIdx => {
+                techsWithSlug.forEach(tech => {
+                    const item = document.createElement('div');
+                    item.className = 'marquee-item';
+                    item.dataset.tech = tech.name;
+                    item.dataset.copy = copyIdx;
+                    item.textContent = tech.name;
+                    // Only middle copy items trigger ripple to avoid confusion
+                    if (copyIdx === 1) {
+                        item.addEventListener('click', () => {
+                            const idx = TECH_ITEMS.findIndex(t => t.name === tech.name);
+                            if (idx !== -1) triggerRippleAt(Math.floor(idx / gridSize), idx % gridSize);
+                        });
+                    } else {
+                        item.addEventListener('click', () => {
+                            const idx = TECH_ITEMS.findIndex(t => t.name === tech.name);
+                            if (idx !== -1) triggerRippleAt(Math.floor(idx / gridSize), idx % gridSize);
+                        });
                     }
+                    track.appendChild(item);
                 });
-                
-                track.appendChild(item);
             });
+
             marquee.appendChild(track);
+
+            requestAnimationFrame(() => {
+                // Measure one set width (first set of items)
+                const allItems = marquee.querySelectorAll('.marquee-item');
+                const setSize = allItems.length / 3;
+                if (setSize > 0) {
+                    const firstItem = allItems[0];
+                    const lastFirstSetItem = allItems[setSize - 1];
+                    oneSetWidth = (lastFirstSetItem.offsetLeft + lastFirstSetItem.offsetWidth) - firstItem.offsetLeft;
+                    // Start scrolled to the middle set
+                    marquee.scrollLeft = oneSetWidth;
+                }
+                cacheItemPositions();
+                updateLayout();
+            });
+
+            window.addEventListener('resize', () => {
+                const allItems = marquee.querySelectorAll('.marquee-item');
+                const setSize = allItems.length / 3;
+                if (setSize > 0) {
+                    const firstItem = allItems[0];
+                    const lastFirstSetItem = allItems[setSize - 1];
+                    oneSetWidth = (lastFirstSetItem.offsetLeft + lastFirstSetItem.offsetWidth) - firstItem.offsetLeft;
+                }
+                cacheItemPositions();
+                updateLayout();
+            });
+            marquee.addEventListener('scroll', updateLayout, { passive: true });
         }
+
+
+        const scrollMarqueeTo = (rowHit, colHit) => {
+            if (!marquee) return;
+            const idx = Math.floor(rowHit) * gridSize + Math.floor(colHit);
+            const tech = TECH_ITEMS[Math.min(idx, TECH_ITEMS.length - 1)];
+            if (!tech || !tech.slug || !tech.name) return;
+            const allCopies = Array.from(marquee.querySelectorAll(`.marquee-item[data-tech="${tech.name}"]`));
+            if (allCopies.length === 0) return;
+            const currentCenter = marquee.scrollLeft + marquee.clientWidth / 2;
+            let bestItem = allCopies[0];
+            let bestDist = Infinity;
+            allCopies.forEach(item => {
+                const itemCenter = item.offsetLeft + item.offsetWidth / 2;
+                const d = Math.abs(itemCenter - currentCenter);
+                if (d < bestDist) { bestDist = d; bestItem = item; }
+            });
+            const targetScroll = bestItem.offsetLeft + bestItem.offsetWidth / 2 - marquee.clientWidth / 2;
+            gsap.to(marquee, { scrollLeft: targetScroll, duration: 0.4, ease: 'power2.out', overwrite: true, onUpdate: updateLayout });
+        };
 
         const onPointerMove = e => {
             userActive = true;
             if (idleTimer) clearTimeout(idleTimer);
-
             const rect = scene.getBoundingClientRect();
-            const cellW = rect.width / gridSize;
-            const cellH = rect.height / gridSize;
-            const colCenter = (e.clientX - rect.left) / cellW;
-            const rowCenter = (e.clientY - rect.top) / cellH;
-
+            const colCenter = (e.clientX - rect.left) / (rect.width / gridSize);
+            const rowCenter = (e.clientY - rect.top) / (rect.height / gridSize);
             if (raf) cancelAnimationFrame(raf);
             raf = requestAnimationFrame(() => tiltAt(rowCenter, colCenter));
-
-            idleTimer = setTimeout(() => {
-                userActive = false;
-            }, 3000);
-        };
-
-        const resetAll = () => {
-            scene.querySelectorAll('.cube').forEach(cube =>
-                gsap.to(cube, {
-                    duration: leaveDur,
-                    rotateX: 0,
-                    rotateY: 0,
-                    scale: 1,
-                    ease: 'power3.out'
-                })
-            );
+            // Smoothly scroll marquee to match the hovered cube
+            scrollMarqueeTo(rowCenter, colCenter);
+            idleTimer = setTimeout(() => { userActive = false; }, 3000);
         };
 
         const onTouchMove = e => {
             e.preventDefault();
             userActive = true;
             if (idleTimer) clearTimeout(idleTimer);
-
             const rect = scene.getBoundingClientRect();
-            const cellW = rect.width / gridSize;
-            const cellH = rect.height / gridSize;
-
-            const touch = e.touches[0];
-            const colCenter = (touch.clientX - rect.left) / cellW;
-            const rowCenter = (touch.clientY - rect.top) / cellH;
-
+            const colCenter = (e.touches[0].clientX - rect.left) / (rect.width / gridSize);
+            const rowCenter = (e.touches[0].clientY - rect.top) / (rect.height / gridSize);
             if (raf) cancelAnimationFrame(raf);
             raf = requestAnimationFrame(() => tiltAt(rowCenter, colCenter));
-
-            idleTimer = setTimeout(() => {
-                userActive = false;
-            }, 3000);
+            idleTimer = setTimeout(() => { userActive = false; }, 3000);
         };
 
-        const onTouchStart = () => { userActive = true; };
-        const onTouchEnd = () => { resetAll(); };
-
-        // Optimized lag-free ripple logic utilizing native CSS transition and property swaps
         const triggerRippleAt = (rowHit, colHit) => {
             const idx = rowHit * gridSize + colHit;
             const clickedTech = TECH_ITEMS[idx];
-            if (!clickedTech || !clickedTech.slug) return;
-
-            // Scroll the horizontal list to show/center the clicked technology tag
-            if (marquee) {
-                const listItem = marquee.querySelector(`.marquee-item[data-tech="${clickedTech.name}"]`);
-                if (listItem) {
-                    listItem.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
-                    
-                    // Highlight the active tag briefly
-                    listItem.classList.add('active-highlight');
-                    setTimeout(() => {
-                        listItem.classList.remove('active-highlight');
-                    }, 800);
-                }
+            if (!clickedTech) return;
+            // Marquee already follows hover; on click just snap it crisply
+            if (marquee && clickedTech.slug) {
+                scrollMarqueeTo(rowHit, colHit);
             }
-
-            const rippleColor = CATEGORY_COLORS[clickedTech.category].ripple;
-            const spreadDelay = 0.08 / rippleSpeed;
-            const animDuration = 0.25 / rippleSpeed;
-            const holdTime = 0.4 / rippleSpeed;
-
+            const rippleColor = CATEGORY_COLORS[clickedTech.category]?.ripple || '#ffffff';
+            const clickedIconUrl = clickedTech.slug ? `https://cdn.simpleicons.org/${clickedTech.slug}/fff` : '';
             const rings = {};
             scene.querySelectorAll('.cube').forEach(cube => {
-                const r = +cube.dataset.row;
-                const c = +cube.dataset.col;
-                const dist = Math.hypot(r - rowHit, c - colHit);
-                const ring = Math.round(dist);
+                const ring = Math.round(Math.hypot(+cube.dataset.row - rowHit, +cube.dataset.col - colHit));
                 if (!rings[ring]) rings[ring] = [];
                 rings[ring].push(cube);
             });
-
-            Object.keys(rings)
-                .map(Number)
-                .sort((a, b) => a - b)
-                .forEach(ring => {
-                    const delay = ring * spreadDelay * 1000; // ms
-                    rings[ring].forEach(cube => {
-                        const cubIdx = +cube.dataset.row * gridSize + +cube.dataset.col;
-                        const originalTech = TECH_ITEMS[cubIdx] || { slug: '', category: 'filler' };
-                        const originalColors = CATEGORY_COLORS[originalTech.category];
-                        const faces = Array.from(cube.querySelectorAll('.cube-face'));
-
-                        // Ripple Enter (Natively transitioned in CSS)
-                        setTimeout(() => {
-                            faces.forEach(faceDiv => {
-                                faceDiv.style.backgroundColor = rippleColor;
-                                const img = faceDiv.querySelector('.cube-icon');
-                                if (img && clickedTech.slug) {
-                                    img.src = `https://cdn.simpleicons.org/${clickedTech.slug}/fff`;
-                                    img.style.opacity = '0.95';
-                                }
-                            });
-                        }, delay);
-
-                        // Ripple Leave (Restore background & original icon)
-                        setTimeout(() => {
-                            faces.forEach(faceDiv => {
-                                faceDiv.style.backgroundColor = originalColors.face;
-                                const img = faceDiv.querySelector('.cube-icon');
-                                if (img) {
-                                    if (originalTech.slug) {
-                                        img.src = `https://cdn.simpleicons.org/${originalTech.slug}/fff`;
-                                        img.style.opacity = '0.85';
-                                    } else {
-                                        img.src = '';
-                                        img.style.opacity = '0';
-                                    }
-                                }
-                            });
-                        }, delay + (animDuration + holdTime) * 1000);
-                    });
-                });
+            Object.keys(rings).map(Number).sort((a, b) => a - b).forEach(ring => {
+                const delay = ring * (0.15 / rippleSpeed);
+                const faces = rings[ring].flatMap(cube => Array.from(cube.querySelectorAll('.cube-face')));
+                gsap.to(faces, { backgroundColor: rippleColor, duration: 0.3 / rippleSpeed, delay, ease: 'power3.out', overwrite: true, onStart: () => {
+                    if (clickedIconUrl) rings[ring].forEach(c => c.querySelectorAll('.cube-icon').forEach(img => { img.src = clickedIconUrl; img.style.opacity = '0.9'; }));
+                }});
+                gsap.to(faces, { backgroundColor: (i, el) => el.dataset.bg, duration: 0.3 / rippleSpeed, delay: delay + (0.3 / rippleSpeed) + (0.6 / rippleSpeed), ease: 'power3.out', overwrite: false, onStart: () => {
+                    rings[ring].forEach(c => c.querySelectorAll('.cube-icon').forEach(img => { img.src = img.dataset.origSrc || ''; img.style.opacity = img.dataset.origSrc ? '0.85' : '0'; }));
+                }});
+            });
         };
 
         const onClick = e => {
             if (!rippleOnClick) return;
             const rect = scene.getBoundingClientRect();
-            const cellW = rect.width / gridSize;
-            const cellH = rect.height / gridSize;
-
-            const clientX = e.clientX || (e.touches && e.touches[0].clientX);
-            const clientY = e.clientY || (e.touches && e.touches[0].clientY);
-
-            const colHit = Math.floor((clientX - rect.left) / cellW);
-            const rowHit = Math.floor((clientY - rect.top) / cellH);
-
-            if (colHit < 0 || colHit >= gridSize || rowHit < 0 || rowHit >= gridSize) return;
-
-            triggerRippleAt(rowHit, colHit);
+            const colHit = Math.floor((e.clientX - rect.left) / (rect.width / gridSize));
+            const rowHit = Math.floor((e.clientY - rect.top) / (rect.height / gridSize));
+            if (colHit >= 0 && colHit < gridSize && rowHit >= 0 && rowHit < gridSize) triggerRippleAt(rowHit, colHit);
         };
 
         scene.addEventListener('pointermove', onPointerMove);
         scene.addEventListener('pointerleave', resetAll);
         scene.addEventListener('click', onClick);
         scene.addEventListener('touchmove', onTouchMove, { passive: false });
-        scene.addEventListener('touchstart', onTouchStart, { passive: true });
-        scene.addEventListener('touchend', onTouchEnd, { passive: true });
+        scene.addEventListener('touchstart', () => { userActive = true; }, { passive: true });
+        scene.addEventListener('touchend', resetAll, { passive: true });
 
-        const simSpeed = 0.02;
-        const loop = () => {
-            if (!userActive) {
-                simPos.x += (simTarget.x - simPos.x) * simSpeed;
-                simPos.y += (simTarget.y - simPos.y) * simSpeed;
-                tiltAt(simPos.y, simPos.x);
-                if (Math.hypot(simPos.x - simTarget.x, simPos.y - simTarget.y) < 0.1) {
-                    simTarget = {
-                        x: Math.random() * gridSize,
-                        y: Math.random() * gridSize
-                    };
-                }
-            }
-            simRAF = requestAnimationFrame(loop);
-        };
 
-        if (autoAnimate) simRAF = requestAnimationFrame(loop);
     };
 
     initCubes();

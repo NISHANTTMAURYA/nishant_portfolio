@@ -556,19 +556,12 @@ a:hover {
    ABOUT ME & CUBES GRID
    ============================================= */
 .about-grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 2.5rem;
+    display: flex;
+    justify-content: center;
     align-items: center;
-    max-width: 1200px;
+    max-width: 850px;
     margin: 0 auto;
-}
-
-@media (min-width: 992px) {
-    .about-grid {
-        grid-template-columns: 1.1fr 0.9fr;
-        gap: 3.5rem;
-    }
+    width: 100%;
 }
 
 .about-card {
@@ -672,6 +665,8 @@ a:hover {
     width: 100%;
 }
 
+
+
 .default-animation {
   position: relative;
   width: 100%;
@@ -717,12 +712,11 @@ a:hover {
   align-items: center;
   justify-content: center;
   background: var(--cube-face-bg);
-  border: var(--cube-face-border);
+  border: 1.5px solid rgba(255, 255, 255, 0.15);
   border-radius: 4px;
-  box-shadow: inset 0 0 8px rgba(255, 255, 255, 0.02);
+  box-shadow: inset 0 0 8px rgba(255, 255, 255, 0.05);
   opacity: 1;
   overflow: hidden;
-  transition: background-color 0.25s ease;
 }
 
 .cube-label {
@@ -745,7 +739,23 @@ a:hover {
   filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.3));
   pointer-events: none;
   user-select: none;
-  transition: transform 0.2s ease, opacity 0.2s ease;
+  transition: transform 0.2s ease;
+  will-change: opacity;
+}
+
+.ripple-icon {
+  position: absolute;
+  width: 60%;
+  height: 60%;
+  background-image: var(--ripple-icon-url);
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+  filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.3));
+  opacity: 0;
+  pointer-events: none;
+  user-select: none;
+  will-change: opacity;
 }
 
 .default-animation .cube-face--top {
@@ -807,30 +817,64 @@ a:hover {
     letter-spacing: 0.2px;
 }
 
-/* Horizontal Scrollable Tech List (Faded Ends, Plain Text) */
+/* Horizontal Tech Marquee & Target Frame */
+.marquee-wrapper {
+    position: relative;
+    width: 100%;
+    max-width: 620px;
+    margin: 1.5rem auto 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.marquee-target-frame {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 180px;
+    height: 44px;
+    pointer-events: none;
+    z-index: 5;
+}
+
+.marquee-target-frame .target-corner {
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    border: 2.5px solid var(--accent, #8b5cf6);
+    box-shadow: 0 0 8px rgba(139, 92, 246, 0.5);
+}
+
+.marquee-target-frame .corner-tl { top: -2px; left: -2px; border-right: none; border-bottom: none; }
+.marquee-target-frame .corner-tr { top: -2px; right: -2px; border-left: none; border-bottom: none; }
+.marquee-target-frame .corner-br { bottom: -2px; right: -2px; border-left: none; border-top: none; }
+.marquee-target-frame .corner-bl { bottom: -2px; left: -2px; border-right: none; border-top: none; }
+
 .marquee-container {
     overflow-x: auto;
+    overflow-y: hidden;
     white-space: nowrap;
     width: 100%;
-    max-width: 600px;
-    margin: 1.5rem auto 0;
     position: relative;
-    padding: 0.75rem 0;
-    scrollbar-width: none; /* Hide scrollbar for Firefox */
-    -ms-overflow-style: none; /* Hide scrollbar for IE/Edge */
-    mask-image: linear-gradient(to right, transparent, #000 15%, #000 85%, transparent);
-    -webkit-mask-image: linear-gradient(to right, transparent, #000 15%, #000 85%, transparent);
+    padding: 1.5rem 0; /* Symmetrical padding for flat horizontal layout */
+    scrollbar-width: none;
+    -ms-overflow-style: none;
 }
 
 .marquee-container::-webkit-scrollbar {
-    display: none; /* Hide scrollbar for Chrome, Safari, Opera */
+    display: none;
 }
 
 .marquee-track {
     display: inline-flex;
-    gap: 1.8rem;
-    padding: 0 3rem;
+    gap: 2.2rem;
+    padding: 0 50%;
     width: max-content;
+    align-items: center;
+    will-change: transform;
+    backface-visibility: hidden;
 }
 
 .marquee-item {
@@ -838,24 +882,24 @@ a:hover {
     font-size: 0.95rem;
     font-weight: 700;
     color: var(--text-color);
-    opacity: 0.75;
     letter-spacing: 0.5px;
-    transition: color 0.2s ease, transform 0.2s ease, opacity 0.2s ease;
     cursor: pointer;
     text-transform: uppercase;
+    opacity: 0.75;
+    transform: scale(1);
+    transform-origin: center center;
+    transition: color 0.2s ease, text-shadow 0.2s ease; /* Exclude transform/opacity from transition so scroll layout calculation doesn't fight transitions */
+    will-change: transform, opacity;
+    backface-visibility: hidden;
 }
 
 .marquee-item:hover {
     color: var(--accent);
-    opacity: 1;
-    transform: scale(1.06);
 }
 
 .marquee-item.active-highlight {
     color: var(--accent);
-    opacity: 1;
-    transform: scale(1.15);
-    text-shadow: 0 0 10px rgba(139, 92, 246, 0.4);
+    text-shadow: 0 0 12px rgba(139, 92, 246, 0.5);
 }
 
 /* Position #skills section relatively so tooltip is anchored */
@@ -1837,8 +1881,16 @@ a:hover {
   height: 4px;
   background: #8b5cf6;
   border-radius: 50%;
-  transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%) scale(1);
   will-change: transform;
+  transition: width 0.3s ease, height 0.3s ease, background 0.3s ease, box-shadow 0.3s ease;
+}
+
+.target-cursor-dot.cursor-dot--expanded {
+  width: 18px;
+  height: 18px;
+  background: rgba(167, 139, 250, 0.25);
+  box-shadow: 0 0 0 2px #a78bfa, 0 0 16px rgba(167, 139, 250, 0.6);
 }
 
 .target-cursor-corner {
