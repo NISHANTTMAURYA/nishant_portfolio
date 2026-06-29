@@ -643,7 +643,7 @@ try {
         }
 
         // Add target class dynamically to links, buttons, cards, gallery items, and cubes grid
-        document.querySelectorAll('a, button, [role="button"], .project-card, .contact-link, .api-btn, .item-wrapper, .lightbox-close, #cubes-wrapper').forEach(el => {
+        document.querySelectorAll('a, button, [role="button"], .project-card, .contact-link, .api-btn, .item-wrapper, .lightbox-close, #cubes-wrapper, .vibe-tab').forEach(el => {
             el.classList.add('cursor-target');
         });
 
@@ -1440,6 +1440,120 @@ try {
     };
 
     initCubes();
+
+    // Vibe Coding Labs Controller
+    const initVibeLabs = () => {
+        const section = document.getElementById('vibe-labs');
+        if (!section) return;
+
+        const tabs = section.querySelectorAll('.vibe-tab');
+        const iframe = section.querySelector('#vibe-iframe');
+        const loader = section.querySelector('.vibe-loader');
+        const browser = section.querySelector('.vibe-browser');
+        const urlText = section.querySelector('#vibe-browser-url');
+        const linkBtn = section.querySelector('#vibe-browser-link');
+        const descTitle = section.querySelector('#vibe-desc-title');
+        const descText = section.querySelector('#vibe-desc-text');
+        const browserBody = section.querySelector('.vibe-browser-body');
+        const wrapper = section.querySelector('.vibe-iframe-wrapper');
+
+        const tabsColumn = section.querySelector('.vibe-tabs-column');
+        const browserColumn = section.querySelector('.vibe-browser-column');
+
+        let firstLoadTriggered = false;
+
+        const updateIframeScale = () => {
+            const H = browserBody.clientHeight;
+            const W = browserBody.clientWidth;
+            if (!H || !W) return;
+
+            const isMobileScreen = window.innerWidth <= 900;
+
+            const wrapperWidth = W;
+            const virtualWidth = 1280; // Standard desktop virtual resolution
+            const virtualHeight = 800; // 16:10 aspect ratio height
+
+            const scale = wrapperWidth / virtualWidth;
+            
+            iframe.style.width = `${virtualWidth}px`;
+            iframe.style.height = `${virtualHeight}px`;
+            iframe.style.transform = `scale(${scale})`;
+            iframe.style.transformOrigin = 'top left';
+
+            // Dynamically scale the left-sidebar maxHeight to match the right column's height
+            if (isMobileScreen) {
+                tabsColumn.style.maxHeight = 'none';
+            } else {
+                const rightHeight = browserColumn.clientHeight;
+                if (rightHeight > 0) {
+                    tabsColumn.style.maxHeight = `${rightHeight}px`;
+                }
+            }
+        };
+
+        const switchProject = (tab) => {
+            const url = tab.dataset.url;
+            const title = tab.dataset.title;
+            const desc = tab.dataset.desc;
+
+            // Remove active class from all tabs, add to clicked
+            tabs.forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+
+            // Highlight browser mockup border temporarily
+            browser.classList.add('active-highlight-browser');
+            setTimeout(() => browser.classList.remove('active-highlight-browser'), 1000);
+
+            // Show loader and hide old content
+            loader.style.opacity = '1';
+            loader.style.pointerEvents = 'auto';
+            iframe.classList.remove('loaded');
+
+            // Update iframe src & detail bindings
+            iframe.src = url;
+            urlText.textContent = url;
+            linkBtn.href = url;
+            descTitle.textContent = title;
+            descText.textContent = desc;
+
+            // Trigger scale recalculation after DOM update reflows
+            requestAnimationFrame(updateIframeScale);
+        };
+
+        // Tab click listeners
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                if (tab.classList.contains('active')) return;
+                switchProject(tab);
+            });
+        });
+
+        // Hide loader when iframe finishes loading
+        iframe.addEventListener('load', () => {
+            loader.style.opacity = '0';
+            loader.style.pointerEvents = 'none';
+            iframe.classList.add('loaded');
+        });
+
+        // Listen to window resizing to update scale proportions dynamically
+        window.addEventListener('resize', updateIframeScale);
+
+        // Lazy initialize first iframe once Vibe Labs section is visible
+        const lazyObserver = new IntersectionObserver(entries => {
+            if (entries[0].isIntersecting && !firstLoadTriggered) {
+                firstLoadTriggered = true;
+                const activeTab = section.querySelector('.vibe-tab.active') || tabs[0];
+                if (activeTab) {
+                    switchProject(activeTab);
+                    setTimeout(updateIframeScale, 100);
+                }
+                lazyObserver.disconnect();
+            }
+        }, { threshold: 0.1 });
+        lazyObserver.observe(section);
+    };
+
+    initVibeLabs();
 
 
 
