@@ -1068,6 +1068,11 @@ try {
         let raf = null;
         let idleTimer = null;
         let userActive = false;
+        const pauseAutoMoving = () => {
+            userActive = true;
+            if (idleTimer) clearTimeout(idleTimer);
+            idleTimer = setTimeout(() => { userActive = false; }, 3000);
+        };
         let cubes = [];
         const initCubeReferences = () => {
             cubes = Array.from(scene.querySelectorAll('.cube')).map(cube => ({
@@ -1186,6 +1191,7 @@ try {
                     const bl = document.createElement('div'); bl.className = 'target-corner corner-bl'; item.appendChild(bl);
 
                     item.addEventListener('click', () => {
+                        pauseAutoMoving();
                         const idx = TECH_ITEMS.findIndex(t => t.name === tech.name);
                         if (idx !== -1) triggerRippleAt(Math.floor(idx / gridCols), idx % gridCols);
                     });
@@ -1224,7 +1230,12 @@ try {
                 cacheItemPositions();
                 updateLayout();
             });
-            marquee.addEventListener('scroll', updateLayout, { passive: true });
+            marquee.addEventListener('scroll', () => {
+                pauseAutoMoving();
+                updateLayout();
+            }, { passive: true });
+            marquee.addEventListener('touchstart', pauseAutoMoving, { passive: true });
+            marquee.addEventListener('pointerdown', pauseAutoMoving, { passive: true });
         }
 
         let lastTargetTech = null;
@@ -1274,8 +1285,7 @@ try {
         };
 
         const onPointerMove = e => {
-            userActive = true;
-            if (idleTimer) clearTimeout(idleTimer);
+            pauseAutoMoving();
             
             // 1. Smooth Tilt Math (Stable bounding rect)
             const rect = wrapper.getBoundingClientRect();
@@ -1291,20 +1301,16 @@ try {
                 const c = +cubeEl.dataset.col;
                 scrollMarqueeTo(r, c);
             }
-
-            idleTimer = setTimeout(() => { userActive = false; }, 3000);
         };
 
         const onTouchMove = e => {
             e.preventDefault();
-            userActive = true;
-            if (idleTimer) clearTimeout(idleTimer);
+            pauseAutoMoving();
             const rect = wrapper.getBoundingClientRect();
             const colCenter = (e.touches[0].clientX - rect.left) / (rect.width / gridCols);
             const rowCenter = (e.touches[0].clientY - rect.top) / (rect.height / gridRows);
             if (raf) cancelAnimationFrame(raf);
             raf = requestAnimationFrame(() => tiltAt(rowCenter, colCenter));
-            idleTimer = setTimeout(() => { userActive = false; }, 3000);
         };
 
         let activeRippleTimeline = null;
@@ -1398,6 +1404,7 @@ try {
         };
 
         const onClick = e => {
+            pauseAutoMoving();
             if (!rippleOnClick) return;
             const cubeEl = e.target.closest('.cube');
             if (cubeEl) {
@@ -1420,7 +1427,7 @@ try {
         });
         wrapper.addEventListener('click', onClick);
         wrapper.addEventListener('touchmove', onTouchMove, { passive: false });
-        wrapper.addEventListener('touchstart', () => { userActive = true; }, { passive: true });
+        wrapper.addEventListener('touchstart', pauseAutoMoving, { passive: true });
         wrapper.addEventListener('touchend', resetAll, { passive: true });
 
         const simSpeed = 0.025;
