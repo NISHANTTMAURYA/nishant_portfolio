@@ -1339,7 +1339,9 @@ try {
                 gsap.killTweensOf(c.icons);
                 gsap.killTweensOf(c.rippleIcons);
                 gsap.set(c.overlays, { opacity: 0 });
-                gsap.set(c.icons, { opacity: (i, el) => el.dataset.origSrc ? 0.85 : 0 });
+                c.icons.forEach(icon => {
+                    gsap.set(icon, { opacity: icon.dataset.origSrc ? 0.85 : 0 });
+                });
                 gsap.set(c.rippleIcons, { opacity: 0 });
             });
 
@@ -1386,7 +1388,10 @@ try {
                 }, fadeOutTime);
 
                 if (clickedIconUrl) {
-                    activeRippleTimeline.to(origIcons, { opacity: (i, el) => el.dataset.origSrc ? 0.85 : 0, duration: fadeOutDur, ease: 'power2.out' }, fadeOutTime);
+                    origIcons.forEach(icon => {
+                        const targetOpacity = icon.dataset.origSrc ? 0.85 : 0;
+                        activeRippleTimeline.to(icon, { opacity: targetOpacity, duration: fadeOutDur, ease: 'power2.out' }, fadeOutTime);
+                    });
                     activeRippleTimeline.to(rippleIcons, { opacity: 0, duration: fadeOutDur, ease: 'power2.out' }, fadeOutTime);
                 }
             });
@@ -1429,8 +1434,7 @@ try {
 
         const lerpFactor = 0.14;
         const loop = () => {
-            const isMobileViewport = window.innerWidth <= 768;
-            if (!userActive && !isMobileViewport) {
+            if (!userActive) {
                 simPos.x += (simTarget.x - simPos.x) * simSpeed;
                 simPos.y += (simTarget.y - simPos.y) * simSpeed;
                 tiltAt(simPos.y, simPos.x);
