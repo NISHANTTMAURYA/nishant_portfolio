@@ -874,10 +874,11 @@ a:hover {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 180px;
+    width: 160px;
     height: 44px;
     pointer-events: none;
     z-index: 5;
+    transition: width 0.25s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
 .marquee-target-frame .target-corner {
@@ -910,7 +911,7 @@ a:hover {
 
 .marquee-track {
     display: inline-flex;
-    gap: 2.2rem;
+    gap: 3.2rem;
     padding: 0 50%;
     width: max-content;
     align-items: center;

@@ -1055,7 +1055,7 @@ try {
                 targetY: 0,
                 currX: 0,
                 currY: 0,
-                frontFace: cube.querySelector('.cube-face--front'),
+                faces: Array.from(cube.querySelectorAll('.cube-face')),
                 frontIcon: cube.querySelector('.cube-face--front .cube-icon'),
                 frontRippleIcon: cube.querySelector('.cube-face--front .ripple-icon')
             }));
@@ -1122,9 +1122,17 @@ try {
                 }
             });
 
+            const targetFrame = document.querySelector('.marquee-target-frame');
             allMarqueeItems.forEach(item => {
-                if (item.el === closestEl) item.el.classList.add('active-highlight');
-                else item.el.classList.remove('active-highlight');
+                if (item.el === closestEl) {
+                    item.el.classList.add('active-highlight');
+                    if (targetFrame) {
+                        const newWidth = Math.max(120, item.el.offsetWidth + 32);
+                        targetFrame.style.width = `${newWidth}px`;
+                    }
+                } else {
+                    item.el.classList.remove('active-highlight');
+                }
             });
 
             if (oneSetWidth > 0) {
@@ -1273,7 +1281,7 @@ try {
 
             Object.keys(rings).map(Number).sort((a, b) => a - b).forEach(ring => {
                 const delay = ring * (0.1 / speed);
-                const faces = rings[ring].map(c => c.frontFace).filter(Boolean);
+                const faces = rings[ring].flatMap(c => c.faces);
                 const origIcons = rings[ring].map(c => c.frontIcon).filter(Boolean);
                 const rippleIcons = rings[ring].map(c => c.frontRippleIcon).filter(Boolean);
 
