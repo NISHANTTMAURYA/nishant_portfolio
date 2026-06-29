@@ -1015,6 +1015,12 @@ try {
                 faceDiv.style.background = colors.face;
                 faceDiv.dataset.bg = colors.face;
                 faceDiv.style.border = `1.5px solid ${colors.border}`;
+
+                // Create and append the GPU ripple overlay
+                const rippleOverlay = document.createElement('div');
+                rippleOverlay.className = 'cube-ripple-overlay';
+                faceDiv.appendChild(rippleOverlay);
+
                 const img = document.createElement('img');
                 img.className = 'cube-icon';
                 const origSrc = tech.iconUrl ? tech.iconUrl : (tech.slug ? `./icons/${tech.slug}.svg` : '');
@@ -1049,15 +1055,14 @@ try {
                 el: cube,
                 row: +cube.dataset.row,
                 col: +cube.dataset.col,
-                setX: gsap.quickSetter(cube, 'rotateX', 'deg'),
-                setY: gsap.quickSetter(cube, 'rotateY', 'deg'),
                 targetX: 0,
                 targetY: 0,
                 currX: 0,
                 currY: 0,
                 faces: Array.from(cube.querySelectorAll('.cube-face')),
-                frontIcon: cube.querySelector('.cube-face--front .cube-icon'),
-                frontRippleIcon: cube.querySelector('.cube-face--front .ripple-icon')
+                icons: Array.from(cube.querySelectorAll('.cube-icon')),
+                rippleIcons: Array.from(cube.querySelectorAll('.ripple-icon')),
+                overlays: Array.from(cube.querySelectorAll('.cube-ripple-overlay'))
             }));
         };
         initCubeReferences();
@@ -1265,6 +1270,7 @@ try {
             const rippleColor = CATEGORY_COLORS[clickedTech.category]?.ripple || '#ffffff';
             const clickedIconUrl = clickedTech.slug ? `./icons/${clickedTech.slug}.svg` : (clickedTech.iconUrl || '');
 
+            scene.style.setProperty('--ripple-color', rippleColor);
             if (clickedIconUrl) {
                 scene.style.setProperty('--ripple-icon-url', `url("${clickedIconUrl}")`);
             }
@@ -1277,38 +1283,42 @@ try {
             });
 
             const isMobile = window.innerWidth <= 768;
-            const speed = isMobile ? 2.2 : rippleSpeed;
+            const speed = isMobile ? 1.6 : 1.0;
 
             Object.keys(rings).map(Number).sort((a, b) => a - b).forEach(ring => {
-                const delay = ring * (0.1 / speed);
-                const faces = rings[ring].flatMap(c => c.faces);
-                const origIcons = rings[ring].map(c => c.frontIcon).filter(Boolean);
-                const rippleIcons = rings[ring].map(c => c.frontRippleIcon).filter(Boolean);
+                const delay = ring * (0.08 / speed);
+                const overlays = rings[ring].flatMap(c => c.overlays);
+                const origIcons = rings[ring].flatMap(c => c.icons);
+                const rippleIcons = rings[ring].flatMap(c => c.rippleIcons);
 
-                // Wave start: animate face background + cross-fade icon to clicked ripple icon
-                gsap.to(faces, {
-                    backgroundColor: rippleColor,
-                    duration: 0.2 / speed,
+                const fadeInDur = 0.35 / speed;
+                const holdDur = 0.25 / speed;
+                const fadeOutDur = 0.45 / speed;
+
+                // Wave start: animate overlay opacity + cross-fade icon
+                gsap.to(overlays, {
+                    opacity: 1,
+                    duration: fadeInDur,
                     delay: delay,
                     ease: 'power2.out',
                     overwrite: 'auto'
                 });
                 if (clickedIconUrl) {
-                    gsap.to(origIcons, { opacity: 0, duration: 0.15 / speed, delay, ease: 'power2.out', overwrite: 'auto' });
-                    gsap.to(rippleIcons, { opacity: 0.9, duration: 0.15 / speed, delay, ease: 'power2.out', overwrite: 'auto' });
+                    gsap.to(origIcons, { opacity: 0, duration: fadeInDur, delay, ease: 'power2.out', overwrite: 'auto' });
+                    gsap.to(rippleIcons, { opacity: 0.9, duration: fadeInDur, delay, ease: 'power2.out', overwrite: 'auto' });
                 }
 
-                // Wave end: restore face background + cross-fade back to original tech icons
-                gsap.to(faces, {
-                    backgroundColor: (i, el) => el.dataset.bg,
-                    duration: 0.3 / speed,
-                    delay: delay + (0.2 / speed) + 0.05,
+                // Wave end: restore overlay opacity to 0 + cross-fade back to original tech icons
+                gsap.to(overlays, {
+                    opacity: 0,
+                    duration: fadeOutDur,
+                    delay: delay + fadeInDur + holdDur,
                     ease: 'power2.out',
                     overwrite: false
                 });
                 if (clickedIconUrl) {
-                    gsap.to(origIcons, { opacity: (i, el) => el.dataset.origSrc ? 0.85 : 0, duration: 0.25 / speed, delay: delay + (0.2 / speed) + 0.05, ease: 'power2.out', overwrite: false });
-                    gsap.to(rippleIcons, { opacity: 0, duration: 0.25 / speed, delay: delay + (0.2 / speed) + 0.05, ease: 'power2.out', overwrite: false });
+                    gsap.to(origIcons, { opacity: (i, el) => el.dataset.origSrc ? 0.85 : 0, duration: fadeOutDur, delay: delay + fadeInDur + holdDur, ease: 'power2.out', overwrite: false });
+                    gsap.to(rippleIcons, { opacity: 0, duration: fadeOutDur, delay: delay + fadeInDur + holdDur, ease: 'power2.out', overwrite: false });
                 }
             });
         };
@@ -1360,8 +1370,7 @@ try {
             cubes.forEach(c => {
                 c.currX += (c.targetX - c.currX) * lerpFactor;
                 c.currY += (c.targetY - c.currY) * lerpFactor;
-                c.setX(c.currX);
-                c.setY(c.currY);
+                c.el.style.transform = `rotateX(${c.currX}deg) rotateY(${c.currY}deg)`;
             });
 
             simRAF = requestAnimationFrame(loop);
