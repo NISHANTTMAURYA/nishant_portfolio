@@ -1427,9 +1427,10 @@ try {
         const skillsSection = document.getElementById('skills') || scene;
         const observer = new IntersectionObserver(entries => {
             const isVisible = entries[0].isIntersecting;
-            if (isVisible && !simRAF) {
+            const isMobileViewport = window.innerWidth <= 768;
+            if (isVisible && !simRAF && !isMobileViewport) {
                 simRAF = requestAnimationFrame(loop);
-            } else if (!isVisible && simRAF) {
+            } else if ((!isVisible || isMobileViewport) && simRAF) {
                 cancelAnimationFrame(simRAF);
                 simRAF = null;
             }
