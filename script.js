@@ -38,8 +38,12 @@ try {
        HERO BACKGROUND — Interactive Gravity Grid Canvas
     ----------------------------------------------- */
     const canvas = document.getElementById('hero-canvas');
+    const sparkCanvas = document.getElementById('spark-canvas');
+
     if (canvas) {
         const ctx = canvas.getContext('2d');
+        const sparkCtx = sparkCanvas ? sparkCanvas.getContext('2d') : null;
+
         let mouse = { x: null, y: null, radius: 200 };
         let gridSpacing = 45; // space between grid lines
         let time = 0;
@@ -47,8 +51,8 @@ try {
 
         // ReactBits ClickSpark Configuration Props
         const sparkColor = '#8b5cf6'; // Theme-matching purple
-        const sparkSize = 10;
-        const sparkRadius = 15;
+        const sparkSize = 12;
+        const sparkRadius = 18;
         const sparkCount = 8;
         const duration = 400;
         const easing = 'ease-out';
@@ -70,6 +74,10 @@ try {
         const resizeCanvas = () => {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
+            if (sparkCanvas) {
+                sparkCanvas.width = window.innerWidth;
+                sparkCanvas.height = window.innerHeight;
+            }
         };
 
         const drawGrid = () => {
@@ -163,34 +171,37 @@ try {
             time++;
             drawGrid();
 
-            // Render ReactBits ClickSpark animation frame
-            const now = performance.now();
-            sparks = sparks.filter(spark => {
-                const elapsed = now - spark.startTime;
-                if (elapsed >= duration) {
-                    return false;
-                }
+            // Render ReactBits ClickSpark animation frame on dedicated top-level sparkCanvas
+            if (sparkCtx) {
+                sparkCtx.clearRect(0, 0, sparkCanvas.width, sparkCanvas.height);
+                const now = performance.now();
+                sparks = sparks.filter(spark => {
+                    const elapsed = now - spark.startTime;
+                    if (elapsed >= duration) {
+                        return false;
+                    }
 
-                const progress = elapsed / duration;
-                const eased = easeFunc(progress);
+                    const progress = elapsed / duration;
+                    const eased = easeFunc(progress);
 
-                const distance = eased * sparkRadius * extraScale;
-                const lineLength = sparkSize * (1 - eased);
+                    const distance = eased * sparkRadius * extraScale;
+                    const lineLength = sparkSize * (1 - eased);
 
-                const x1 = spark.x + distance * Math.cos(spark.angle);
-                const y1 = spark.y + distance * Math.sin(spark.angle);
-                const x2 = spark.x + (distance + lineLength) * Math.cos(spark.angle);
-                const y2 = spark.y + (distance + lineLength) * Math.sin(spark.angle);
+                    const x1 = spark.x + distance * Math.cos(spark.angle);
+                    const y1 = spark.y + distance * Math.sin(spark.angle);
+                    const x2 = spark.x + (distance + lineLength) * Math.cos(spark.angle);
+                    const y2 = spark.y + (distance + lineLength) * Math.sin(spark.angle);
 
-                ctx.strokeStyle = sparkColor;
-                ctx.lineWidth = 2.5;
-                ctx.beginPath();
-                ctx.moveTo(x1, y1);
-                ctx.lineTo(x2, y2);
-                ctx.stroke();
+                    sparkCtx.strokeStyle = sparkColor;
+                    sparkCtx.lineWidth = 2.8;
+                    sparkCtx.beginPath();
+                    sparkCtx.moveTo(x1, y1);
+                    sparkCtx.lineTo(x2, y2);
+                    sparkCtx.stroke();
 
-                return true;
-            });
+                    return true;
+                });
+            }
 
             requestAnimationFrame(animate);
         };
@@ -211,9 +222,8 @@ try {
         });
 
         window.addEventListener('click', e => {
-            const rect = canvas.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
+            const x = e.clientX;
+            const y = e.clientY;
 
             const now = performance.now();
             const newSparks = Array.from({ length: sparkCount }, (_, i) => ({
