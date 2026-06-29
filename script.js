@@ -1129,14 +1129,9 @@ try {
                 }
             });
 
-            const targetFrame = document.querySelector('.marquee-target-frame');
             allMarqueeItems.forEach(item => {
                 if (item.el === closestEl) {
                     item.el.classList.add('active-highlight');
-                    if (targetFrame) {
-                        const newWidth = Math.max(140, item.width + 48); // Use cached item.width!
-                        targetFrame.style.width = `${newWidth}px`;
-                    }
                 } else {
                     item.el.classList.remove('active-highlight');
                 }
@@ -1165,6 +1160,12 @@ try {
                     item.dataset.tech = tech.name;
                     item.dataset.copy = copyIdx;
                     item.textContent = tech.name;
+                    
+                    const tl = document.createElement('div'); tl.className = 'target-corner corner-tl'; item.appendChild(tl);
+                    const tr = document.createElement('div'); tr.className = 'target-corner corner-tr'; item.appendChild(tr);
+                    const br = document.createElement('div'); br.className = 'target-corner corner-br'; item.appendChild(br);
+                    const bl = document.createElement('div'); bl.className = 'target-corner corner-bl'; item.appendChild(bl);
+
                     item.addEventListener('click', () => {
                         const idx = TECH_ITEMS.findIndex(t => t.name === tech.name);
                         if (idx !== -1) triggerRippleAt(Math.floor(idx / gridCols), idx % gridCols);
@@ -1178,10 +1179,8 @@ try {
             requestAnimationFrame(() => {
                 const items = marquee.querySelectorAll('.marquee-item');
                 const setSize = items.length / 3;
-                if (setSize > 0) {
-                    const firstItem = items[0];
-                    const lastFirstSetItem = items[setSize - 1];
-                    oneSetWidth = (lastFirstSetItem.offsetLeft + lastFirstSetItem.offsetWidth) - firstItem.offsetLeft;
+                if (setSize > 0 && items[setSize]) {
+                    oneSetWidth = items[setSize].offsetLeft - items[0].offsetLeft;
                     marquee.scrollLeft = oneSetWidth;
                 }
                 cacheItemPositions();
@@ -1198,10 +1197,8 @@ try {
                     document.fonts.ready.then(() => {
                         const items = marquee.querySelectorAll('.marquee-item');
                         const setSize = items.length / 3;
-                        if (setSize > 0) {
-                            const firstItem = items[0];
-                            const lastFirstSetItem = items[setSize - 1];
-                            oneSetWidth = (lastFirstSetItem.offsetLeft + lastFirstSetItem.offsetWidth) - firstItem.offsetLeft;
+                        if (setSize > 0 && items[setSize]) {
+                            oneSetWidth = items[setSize].offsetLeft - items[0].offsetLeft;
                             marquee.scrollLeft = oneSetWidth;
                         }
                         cacheItemPositions();
@@ -1213,10 +1210,8 @@ try {
             window.addEventListener('resize', () => {
                 const items = marquee.querySelectorAll('.marquee-item');
                 const setSize = items.length / 3;
-                if (setSize > 0) {
-                    const firstItem = items[0];
-                    const lastFirstSetItem = items[setSize - 1];
-                    oneSetWidth = (lastFirstSetItem.offsetLeft + lastFirstSetItem.offsetWidth) - firstItem.offsetLeft;
+                if (setSize > 0 && items[setSize]) {
+                    oneSetWidth = items[setSize].offsetLeft - items[0].offsetLeft;
                 }
                 cacheItemPositions();
                 updateLayout();
@@ -1343,10 +1338,15 @@ try {
 
         const onClick = e => {
             if (!rippleOnClick) return;
-            const rect = scene.getBoundingClientRect();
-            const colHit = Math.floor((e.clientX - rect.left) / (rect.width / gridCols));
-            const rowHit = Math.floor((e.clientY - rect.top) / (rect.height / gridRows));
-            if (colHit >= 0 && colHit < gridCols && rowHit >= 0 && rowHit < gridRows) triggerRippleAt(rowHit, colHit);
+            const cubeEl = e.target.closest('.cube');
+            if (cubeEl) {
+                const idx = cubes.findIndex(c => c.el === cubeEl);
+                if (idx !== -1) {
+                    const rowHit = Math.floor(idx / gridCols);
+                    const colHit = idx % gridCols;
+                    triggerRippleAt(rowHit, colHit);
+                }
+            }
         };
 
         const cursorDot = document.querySelector('.target-cursor-dot');

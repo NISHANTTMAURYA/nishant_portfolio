@@ -883,30 +883,7 @@ a:hover {
     align-items: center;
 }
 
-.marquee-target-frame {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 160px;
-    height: 44px;
-    pointer-events: none;
-    z-index: 5;
-    transition: width 0.25s cubic-bezier(0.25, 1, 0.5, 1);
-}
-
-.marquee-target-frame .target-corner {
-    position: absolute;
-    width: 12px;
-    height: 12px;
-    border: 2.5px solid var(--accent, #8b5cf6);
-    box-shadow: 0 0 8px rgba(139, 92, 246, 0.5);
-}
-
-.marquee-target-frame .corner-tl { top: -2px; left: -2px; border-right: none; border-bottom: none; }
-.marquee-target-frame .corner-tr { top: -2px; right: -2px; border-left: none; border-bottom: none; }
-.marquee-target-frame .corner-br { bottom: -2px; right: -2px; border-left: none; border-top: none; }
-.marquee-target-frame .corner-bl { bottom: -2px; left: -2px; border-right: none; border-top: none; }
+/* Corners are now styled directly inside each marquee-item */
 
 .marquee-container {
     overflow-x: hidden;
@@ -929,12 +906,14 @@ a:hover {
     padding: 0 50%;
     width: max-content;
     align-items: center;
+    position: relative;
     will-change: transform;
     backface-visibility: hidden;
 }
 
 .marquee-item {
     display: inline-block;
+    position: relative;
     font-size: 0.95rem;
     font-weight: 700;
     color: var(--text-color);
@@ -957,6 +936,32 @@ a:hover {
     color: var(--accent);
     text-shadow: 0 0 12px rgba(139, 92, 246, 0.5);
 }
+
+.marquee-item .target-corner {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    border: 2px solid var(--accent, #8b5cf6);
+    box-shadow: 0 0 6px rgba(139, 92, 246, 0.4);
+    opacity: 0;
+    transition: opacity 0.2s cubic-bezier(0.25, 1, 0.5, 1), transform 0.2s cubic-bezier(0.25, 1, 0.5, 1);
+    pointer-events: none;
+}
+
+.marquee-item.active-highlight .target-corner {
+    opacity: 1;
+}
+
+/* Offset the corners slightly outside the text boundaries and animate them snapping on */
+.marquee-item .corner-tl { top: -6px; left: -14px; border-right: none; border-bottom: none; transform: translate(3px, 3px); }
+.marquee-item .corner-tr { top: -6px; right: -14px; border-left: none; border-bottom: none; transform: translate(-3px, 3px); }
+.marquee-item .corner-br { bottom: -6px; right: -14px; border-left: none; border-top: none; transform: translate(-3px, -3px); }
+.marquee-item .corner-bl { bottom: -6px; left: -14px; border-right: none; border-top: none; transform: translate(3px, -3px); }
+
+.marquee-item.active-highlight .corner-tl { transform: translate(0, 0); }
+.marquee-item.active-highlight .corner-tr { transform: translate(0, 0); }
+.marquee-item.active-highlight .corner-br { transform: translate(0, 0); }
+.marquee-item.active-highlight .corner-bl { transform: translate(0, 0); }
 
 /* Position #skills section relatively so tooltip is anchored */
 #skills {
