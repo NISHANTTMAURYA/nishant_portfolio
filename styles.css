@@ -653,15 +653,18 @@ a:hover {
 
 .skills-cubes-layout {
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 3rem;
-    flex-wrap: wrap;
+    gap: 2rem;
+    width: 100%;
+    max-width: 520px;
+    margin: 0 auto;
 }
 
 /* The cubes wrapper is bigger in the skills section */
 #skills .default-animation {
-    max-width: 320px;
+    max-width: 480px;
     width: 100%;
 }
 
@@ -670,16 +673,18 @@ a:hover {
 .default-animation {
   position: relative;
   width: 100%;
-  max-width: 320px;
-  aspect-ratio: 1 / 1;
+  max-width: 480px;
+  /* 6 cols × 5 rows → 6:5 aspect ratio */
+  aspect-ratio: 6 / 5;
   height: auto;
   cursor: crosshair;
+  margin: 0 auto;
 }
 
 .default-animation--scene {
   display: grid;
   grid-template-columns: repeat(6, 1fr);
-  grid-template-rows: repeat(6, 1fr);
+  grid-template-rows: repeat(5, 1fr);
   width: 100%;
   height: 100%;
   column-gap: var(--col-gap);
@@ -1887,10 +1892,10 @@ a:hover {
 }
 
 .target-cursor-dot.cursor-dot--expanded {
-  width: 18px;
-  height: 18px;
-  background: rgba(167, 139, 250, 0.25);
-  box-shadow: 0 0 0 2px #a78bfa, 0 0 16px rgba(167, 139, 250, 0.6);
+  width: 11px;
+  height: 11px;
+  background: #a78bfa;
+  box-shadow: 0 0 0 2px rgba(167, 139, 250, 0.4), 0 0 10px rgba(167, 139, 250, 0.5);
 }
 
 .target-cursor-corner {

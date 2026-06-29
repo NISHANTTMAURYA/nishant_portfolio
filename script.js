@@ -11,7 +11,7 @@ try {
         apiBtns.forEach(btn => {
             btn.addEventListener('click', () => {
                 const targetTab = btn.getAttribute('data-tab');
-                
+
                 // Toggle active buttons
                 apiBtns.forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
@@ -74,10 +74,10 @@ try {
 
         const drawGrid = () => {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            
+
             const cols = Math.ceil(canvas.width / gridSpacing) + 1;
             const rows = Math.ceil(canvas.height / gridSpacing) + 1;
-            
+
             let nodes = [];
 
             // Calculate grid nodes with distortion
@@ -86,10 +86,10 @@ try {
                 for (let c = 0; c < cols; c++) {
                     const origX = c * gridSpacing;
                     const origY = r * gridSpacing;
-                    
+
                     let x = origX;
                     let y = origY;
-                    
+
                     // Faint breathing wave animation
                     const waveX = Math.sin(time * 0.02 + origY * 0.005) * 4;
                     const waveY = Math.cos(time * 0.02 + origX * 0.005) * 4;
@@ -101,11 +101,11 @@ try {
                         const dx = x - mouse.x;
                         const dy = y - mouse.y;
                         const dist = Math.sqrt(dx * dx + dy * dy);
-                        
+
                         if (dist < mouse.radius) {
                             const force = (mouse.radius - dist) / mouse.radius;
                             const angle = Math.atan2(dy, dx);
-                            const intensity = force * force * 35; 
+                            const intensity = force * force * 35;
                             x += Math.cos(angle) * intensity;
                             y += Math.sin(angle) * intensity;
                         }
@@ -199,7 +199,7 @@ try {
             resizeCanvas();
             drawGrid();
         });
-        
+
         window.addEventListener('mousemove', e => {
             mouse.x = e.clientX;
             mouse.y = e.clientY;
@@ -357,13 +357,13 @@ try {
     /* -----------------------------------------------
        CAROUSEL
     ----------------------------------------------- */
-    const track      = document.querySelector('.carousel-track');
-    const slides     = track ? Array.from(track.children) : [];
-    const nextBtn    = document.querySelector('.carousel-button.next');
-    const prevBtn    = document.querySelector('.carousel-button.prev');
-    const dotsNav    = document.querySelector('.carousel-nav');
-    const dots       = dotsNav ? Array.from(dotsNav.children) : [];
-    let current      = 0;
+    const track = document.querySelector('.carousel-track');
+    const slides = track ? Array.from(track.children) : [];
+    const nextBtn = document.querySelector('.carousel-button.next');
+    const prevBtn = document.querySelector('.carousel-button.prev');
+    const dotsNav = document.querySelector('.carousel-nav');
+    const dots = dotsNav ? Array.from(dotsNav.children) : [];
+    let current = 0;
     let autoInterval;
 
     if (track && slides.length && nextBtn && prevBtn && dotsNav) {
@@ -397,7 +397,7 @@ try {
             const diff = touchStartX - e.changedTouches[0].clientX;
             if (Math.abs(diff) > 40) {
                 if (diff > 0) goTo((current + 1) % slides.length);
-                else          goTo((current - 1 + slides.length) % slides.length);
+                else goTo((current - 1 + slides.length) % slides.length);
                 resetAuto();
             }
         });
@@ -720,7 +720,6 @@ try {
             { slug: 'c', name: 'C', category: 'language' },
             { slug: 'javascript', name: 'JavaScript', category: 'language' },
             { slug: 'gnubash', name: 'Bash', category: 'language' },
-            { slug: 'markdown', name: 'Markdown', category: 'language' },
             { slug: 'django', name: 'Django', category: 'backend' },
             { slug: 'postman', name: 'Django REST (API)', category: 'backend' },
             { slug: 'celery', name: 'Celery', category: 'backend' },
@@ -746,23 +745,19 @@ try {
             { slug: 'git', name: 'Git', category: 'tools' },
             { slug: 'github', name: 'GitHub', category: 'tools' },
             { slug: 'linux', name: 'Linux', category: 'tools' },
-            { slug: '', name: '', category: 'filler' },
-            { slug: '', name: '', category: 'filler' },
-            { slug: '', name: '', category: 'filler' },
-            { slug: '', name: '', category: 'filler' },
-            { slug: '', name: '', category: 'filler' },
         ];
 
         const CATEGORY_COLORS = {
             language: { border: '#a78bfa', ripple: '#c4b5fd', face: '#2b2244' },
-            backend:  { border: '#c084fc', ripple: '#e879f9', face: '#362146' },
+            backend: { border: '#c084fc', ripple: '#e879f9', face: '#362146' },
             frontend: { border: '#818cf8', ripple: '#a5b4fc', face: '#212646' },
             database: { border: '#f472b6', ripple: '#fbcfe8', face: '#3c2132' },
-            tools:    { border: '#38bdf8', ripple: '#7dd3fc', face: '#1e2c3a' },
-            filler:   { border: '#3b334a', ripple: '#a78bfa', face: '#1c1827' },
+            tools: { border: '#38bdf8', ripple: '#7dd3fc', face: '#1e2c3a' },
+            filler: { border: '#3b334a', ripple: '#a78bfa', face: '#1c1827' },
         };
 
-        const gridSize = 6;
+        const gridCols = 6;
+        const gridRows = 5;
         const maxAngle = 45;
         const radius = 3;
         const enterDur = 0.3;
@@ -772,15 +767,15 @@ try {
         const rippleOnClick = true;
         const rippleSpeed = 1.5;
 
-        scene.style.gridTemplateColumns = `repeat(${gridSize}, 1fr)`;
-        scene.style.gridTemplateRows = `repeat(${gridSize}, 1fr)`;
+        scene.style.gridTemplateColumns = `repeat(${gridCols}, 1fr)`;
+        scene.style.gridTemplateRows = `repeat(${gridRows}, 1fr)`;
         scene.innerHTML = '';
 
-        for (let i = 0; i < gridSize * gridSize; i++) {
+        for (let i = 0; i < gridCols * gridRows; i++) {
             const tech = TECH_ITEMS[i] || { slug: '', name: '', category: 'filler' };
             const colors = CATEGORY_COLORS[tech.category] || CATEGORY_COLORS.filler;
-            const r = Math.floor(i / gridSize);
-            const c = i % gridSize;
+            const r = Math.floor(i / gridCols);
+            const c = i % gridCols;
             const cube = document.createElement('div');
             cube.className = 'cube';
             cube.dataset.row = r;
@@ -807,8 +802,9 @@ try {
         let raf = null;
         let idleTimer = null;
         let userActive = false;
-        let simPos = { x: Math.random() * gridSize, y: Math.random() * gridSize };
-        let simTarget = { x: Math.random() * gridSize, y: Math.random() * gridSize };
+        // Start simPos at first cube center so auto-animation begins there, not a random spot
+        let simPos = { x: 0.5, y: 0.5 };
+        let simTarget = { x: 0.5, y: 0.5 };
         let simRAF = null;
 
         const tiltAt = (rowCenter, colCenter) => {
@@ -904,12 +900,12 @@ try {
                     if (copyIdx === 1) {
                         item.addEventListener('click', () => {
                             const idx = TECH_ITEMS.findIndex(t => t.name === tech.name);
-                            if (idx !== -1) triggerRippleAt(Math.floor(idx / gridSize), idx % gridSize);
+                            if (idx !== -1) triggerRippleAt(Math.floor(idx / gridCols), idx % gridCols);
                         });
                     } else {
                         item.addEventListener('click', () => {
                             const idx = TECH_ITEMS.findIndex(t => t.name === tech.name);
-                            if (idx !== -1) triggerRippleAt(Math.floor(idx / gridSize), idx % gridSize);
+                            if (idx !== -1) triggerRippleAt(Math.floor(idx / gridCols), idx % gridCols);
                         });
                     }
                     track.appendChild(item);
@@ -950,7 +946,7 @@ try {
 
         const scrollMarqueeTo = (rowHit, colHit) => {
             if (!marquee) return;
-            const idx = Math.floor(rowHit) * gridSize + Math.floor(colHit);
+            const idx = Math.floor(rowHit) * gridCols + Math.floor(colHit);
             const tech = TECH_ITEMS[Math.min(idx, TECH_ITEMS.length - 1)];
             if (!tech || !tech.slug || !tech.name) return;
             const allCopies = Array.from(marquee.querySelectorAll(`.marquee-item[data-tech="${tech.name}"]`));
@@ -971,8 +967,8 @@ try {
             userActive = true;
             if (idleTimer) clearTimeout(idleTimer);
             const rect = scene.getBoundingClientRect();
-            const colCenter = (e.clientX - rect.left) / (rect.width / gridSize);
-            const rowCenter = (e.clientY - rect.top) / (rect.height / gridSize);
+            const colCenter = (e.clientX - rect.left) / (rect.width / gridCols);
+            const rowCenter = (e.clientY - rect.top) / (rect.height / gridRows);
             if (raf) cancelAnimationFrame(raf);
             raf = requestAnimationFrame(() => tiltAt(rowCenter, colCenter));
             // Smoothly scroll marquee to match the hovered cube
@@ -985,15 +981,15 @@ try {
             userActive = true;
             if (idleTimer) clearTimeout(idleTimer);
             const rect = scene.getBoundingClientRect();
-            const colCenter = (e.touches[0].clientX - rect.left) / (rect.width / gridSize);
-            const rowCenter = (e.touches[0].clientY - rect.top) / (rect.height / gridSize);
+            const colCenter = (e.touches[0].clientX - rect.left) / (rect.width / gridCols);
+            const rowCenter = (e.touches[0].clientY - rect.top) / (rect.height / gridRows);
             if (raf) cancelAnimationFrame(raf);
             raf = requestAnimationFrame(() => tiltAt(rowCenter, colCenter));
             idleTimer = setTimeout(() => { userActive = false; }, 3000);
         };
 
         const triggerRippleAt = (rowHit, colHit) => {
-            const idx = rowHit * gridSize + colHit;
+            const idx = rowHit * gridCols + colHit;
             const clickedTech = TECH_ITEMS[idx];
             if (!clickedTech) return;
             // Marquee already follows hover; on click just snap it crisply
@@ -1011,30 +1007,65 @@ try {
             Object.keys(rings).map(Number).sort((a, b) => a - b).forEach(ring => {
                 const delay = ring * (0.15 / rippleSpeed);
                 const faces = rings[ring].flatMap(cube => Array.from(cube.querySelectorAll('.cube-face')));
-                gsap.to(faces, { backgroundColor: rippleColor, duration: 0.3 / rippleSpeed, delay, ease: 'power3.out', overwrite: true, onStart: () => {
-                    if (clickedIconUrl) rings[ring].forEach(c => c.querySelectorAll('.cube-icon').forEach(img => { img.src = clickedIconUrl; img.style.opacity = '0.9'; }));
-                }});
-                gsap.to(faces, { backgroundColor: (i, el) => el.dataset.bg, duration: 0.3 / rippleSpeed, delay: delay + (0.3 / rippleSpeed) + (0.6 / rippleSpeed), ease: 'power3.out', overwrite: false, onStart: () => {
-                    rings[ring].forEach(c => c.querySelectorAll('.cube-icon').forEach(img => { img.src = img.dataset.origSrc || ''; img.style.opacity = img.dataset.origSrc ? '0.85' : '0'; }));
-                }});
+                gsap.to(faces, {
+                    backgroundColor: rippleColor, duration: 0.3 / rippleSpeed, delay, ease: 'power3.out', overwrite: true, onStart: () => {
+                        if (clickedIconUrl) rings[ring].forEach(c => c.querySelectorAll('.cube-icon').forEach(img => { img.src = clickedIconUrl; img.style.opacity = '0.9'; }));
+                    }
+                });
+                gsap.to(faces, {
+                    backgroundColor: (i, el) => el.dataset.bg, duration: 0.3 / rippleSpeed, delay: delay + (0.3 / rippleSpeed) + (0.6 / rippleSpeed), ease: 'power3.out', overwrite: false, onStart: () => {
+                        rings[ring].forEach(c => c.querySelectorAll('.cube-icon').forEach(img => { img.src = img.dataset.origSrc || ''; img.style.opacity = img.dataset.origSrc ? '0.85' : '0'; }));
+                    }
+                });
             });
         };
 
         const onClick = e => {
             if (!rippleOnClick) return;
             const rect = scene.getBoundingClientRect();
-            const colHit = Math.floor((e.clientX - rect.left) / (rect.width / gridSize));
-            const rowHit = Math.floor((e.clientY - rect.top) / (rect.height / gridSize));
-            if (colHit >= 0 && colHit < gridSize && rowHit >= 0 && rowHit < gridSize) triggerRippleAt(rowHit, colHit);
+            const colHit = Math.floor((e.clientX - rect.left) / (rect.width / gridCols));
+            const rowHit = Math.floor((e.clientY - rect.top) / (rect.height / gridRows));
+            if (colHit >= 0 && colHit < gridCols && rowHit >= 0 && rowHit < gridRows) triggerRippleAt(rowHit, colHit);
         };
 
+        const cursorDot = document.querySelector('.target-cursor-dot');
+
         scene.addEventListener('pointermove', onPointerMove);
-        scene.addEventListener('pointerleave', resetAll);
+        scene.addEventListener('pointerenter', () => { if (cursorDot) cursorDot.classList.add('cursor-dot--expanded'); });
+        scene.addEventListener('pointerleave', () => {
+            resetAll();
+            if (cursorDot) cursorDot.classList.remove('cursor-dot--expanded');
+        });
         scene.addEventListener('click', onClick);
         scene.addEventListener('touchmove', onTouchMove, { passive: false });
         scene.addEventListener('touchstart', () => { userActive = true; }, { passive: true });
         scene.addEventListener('touchend', resetAll, { passive: true });
 
+        // Auto-animation: step linearly through each cube in order (first → last → repeat)
+        const simSpeed = 0.025;
+        const totalCubes = gridCols * gridRows;
+        let simIndex = 0;
+        const getSimTarget = (idx) => ({
+            x: (idx % gridCols) + 0.5,
+            y: (Math.floor(idx / gridCols)) + 0.5
+        });
+        simTarget = getSimTarget(0);
+
+        const loop = () => {
+            if (!userActive) {
+                simPos.x += (simTarget.x - simPos.x) * simSpeed;
+                simPos.y += (simTarget.y - simPos.y) * simSpeed;
+                tiltAt(simPos.y, simPos.x);
+                scrollMarqueeTo(simPos.y, simPos.x);
+                // Move to the next cube once close enough to the current target
+                if (Math.hypot(simPos.x - simTarget.x, simPos.y - simTarget.y) < 0.12) {
+                    simIndex = (simIndex + 1) % totalCubes;
+                    simTarget = getSimTarget(simIndex);
+                }
+            }
+            simRAF = requestAnimationFrame(loop);
+        };
+        simRAF = requestAnimationFrame(loop);
 
     };
 
