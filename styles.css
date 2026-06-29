@@ -952,3 +952,114 @@ body {
         filter: contrast(8);
     }
 }
+
+/* ==============================
+   Skills Section
+   ============================== */
+.skills-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 1.5rem;
+}
+
+.skill-category {
+    background: var(--card-background);
+    border: 2px solid var(--border-color);
+    box-shadow: var(--shadow-sm);
+    border-radius: 0.75rem;
+    padding: 1.25rem 1.5rem;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.skill-category:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: var(--shadow-hover);
+}
+
+.skill-category-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--secondary-color);
+    margin-bottom: 0.85rem;
+}
+
+.skill-category-title .material-icons {
+    font-size: 1.2rem;
+    color: var(--primary-color);
+}
+
+/* ==============================
+   Achievements Section
+   ============================== */
+.achievements-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.75rem;
+}
+
+.achievement-card {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    background: var(--card-background);
+    border: 2px solid var(--border-color);
+    box-shadow: var(--shadow-sm);
+    border-radius: 0.75rem;
+    padding: 1rem 1.25rem;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.achievement-card:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: var(--shadow-hover);
+}
+
+.achievement-rank {
+    font-size: 1.8rem;
+    flex-shrink: 0;
+}
+
+.achievement-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+}
+
+.achievement-title {
+    font-weight: 600;
+    color: var(--secondary-color);
+    font-size: 0.95rem;
+}
+
+.achievement-org {
+    font-size: 0.82rem;
+    color: var(--text-color);
+    opacity: 0.75;
+}
+
+.achievements-summary {
+    text-align: center;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--secondary-color);
+    background: var(--card-background);
+    border: 2px solid var(--border-color);
+    box-shadow: var(--shadow-sm);
+    border-radius: 2rem;
+    display: inline-block;
+    padding: 0.6rem 2rem;
+    margin: 0 auto;
+    display: block;
+    width: fit-content;
+}
+
+@media (max-width: 600px) {
+    .skills-grid,
+    .achievements-grid {
+        grid-template-columns: 1fr;
+    }
+}
