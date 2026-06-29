@@ -534,10 +534,10 @@ try {
 
                     if (scaleOnHover) {
                         el.addEventListener('mouseenter', () => {
-                            gsap.to(el, { scale: hoverScale, duration: 0.3, ease: 'power2.out' });
+                            gsap.to(el, { scale: hoverScale, duration: 0.3, ease: 'power2.out', force3D: true });
                         });
                         el.addEventListener('mouseleave', () => {
-                            gsap.to(el, { scale: 1, duration: 0.3, ease: 'power2.out' });
+                            gsap.to(el, { scale: 1, duration: 0.3, ease: 'power2.out', force3D: true });
                         });
                     }
 
@@ -548,7 +548,8 @@ try {
                     x: item.x,
                     y: item.y,
                     width: item.w,
-                    height: item.h
+                    height: item.h,
+                    force3D: true
                 };
 
                 if (!hasMounted) {
@@ -682,17 +683,16 @@ try {
         let spinTl = gsap.timeline({ repeat: -1 })
             .to(cursor, { rotation: '+=360', duration: spinDuration, ease: 'none' });
 
+        const xTo = gsap.quickTo(cursor, "x", { duration: 0.08, ease: "power3.out" });
+        const yTo = gsap.quickTo(cursor, "y", { duration: 0.08, ease: "power3.out" });
+
         const moveCursor = (x, y) => {
             const { x: offsetX, y: offsetY } = getOffset();
-            gsap.to(cursor, {
-                x: x - offsetX,
-                y: y - offsetY,
-                duration: 0.1,
-                ease: 'power3.out'
-            });
+            xTo(x - offsetX);
+            yTo(y - offsetY);
         };
 
-        window.addEventListener('mousemove', e => moveCursor(e.clientX, e.clientY));
+        window.addEventListener('mousemove', e => moveCursor(e.clientX, e.clientY), { passive: true });
 
         const tickerFn = () => {
             if (!targetCornerPositions || !cursor || !corners.length) return;
@@ -725,18 +725,25 @@ try {
             });
         };
 
+        let scrollTicking = false;
         window.addEventListener('scroll', () => {
-            if (!activeTarget) return;
-            const { x: offsetX, y: offsetY } = getOffset();
-            const mouseX = gsap.getProperty(cursor, 'x') + offsetX;
-            const mouseY = gsap.getProperty(cursor, 'y') + offsetY;
-            const elementUnderMouse = document.elementFromPoint(mouseX, mouseY);
-            const isStillOverTarget =
-                elementUnderMouse &&
-                (elementUnderMouse === activeTarget || elementUnderMouse.closest(targetSelector) === activeTarget);
-            if (!isStillOverTarget && currentLeaveHandler) {
-                currentLeaveHandler();
-            }
+            if (!activeTarget || scrollTicking) return;
+            scrollTicking = true;
+            requestAnimationFrame(() => {
+                if (activeTarget) {
+                    const { x: offsetX, y: offsetY } = getOffset();
+                    const mouseX = gsap.getProperty(cursor, 'x') + offsetX;
+                    const mouseY = gsap.getProperty(cursor, 'y') + offsetY;
+                    const elementUnderMouse = document.elementFromPoint(mouseX, mouseY);
+                    const isStillOverTarget =
+                        elementUnderMouse &&
+                        (elementUnderMouse === activeTarget || elementUnderMouse.closest(targetSelector) === activeTarget);
+                    if (!isStillOverTarget && currentLeaveHandler) {
+                        currentLeaveHandler();
+                    }
+                }
+                scrollTicking = false;
+            });
         }, { passive: true });
 
         window.addEventListener('mousedown', () => {
