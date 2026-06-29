@@ -7,9 +7,18 @@
     <meta name="description" content="Nishant Maurya — Backend Developer specializing in Django, PostgreSQL, Celery & Redis. 8 hackathon wins. Building production-grade systems.">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 </head>
 <link rel="stylesheet" href="styles.css">
 <body>
+    <div class="target-cursor-wrapper">
+        <div class="target-cursor-dot"></div>
+        <div class="target-cursor-corner corner-tl"></div>
+        <div class="target-cursor-corner corner-tr"></div>
+        <div class="target-cursor-corner corner-br"></div>
+        <div class="target-cursor-corner corner-bl"></div>
+    </div>
+    <canvas id="hero-canvas"></canvas>
     <!-- Navbar -->
     <nav class="navbar">
         <div class="logo-container">
@@ -37,15 +46,72 @@
 
     <!-- Hero -->
     <div class="hero">
-        <div class="hero-background"></div>
-        <div class="hero-content">
-            <div class="role-badge">&lt; Backend Developer /&gt;</div>
-            <h1>Nishant Maurya</h1>
-            <p class="hero-tagline">I build backend systems that actually ship.</p>
-            <p class="hero-sub">3rd-year CS @ Fr. CRCE &nbsp;·&nbsp; Django · PostgreSQL · Celery &nbsp;·&nbsp; 8 Hackathon Wins &nbsp;·&nbsp; Live at <a href="https://atttc.cloud" target="_blank">atttc.cloud</a></p>
-            <div class="hero-buttons">
-                <a href="#projects" class="button button-primary">View Projects</a>
-                <a href="#resume" class="button button-secondary">Download Resume</a>
+        <div class="hero-content api-playground">
+            <!-- Window Title bar -->
+            <div class="api-window-header">
+                <div class="window-controls">
+                    <span class="control-dot red"></span>
+                    <span class="control-dot yellow"></span>
+                    <span class="control-dot green"></span>
+                </div>
+                <div class="window-title">nishant-api-playground.exe</div>
+                <div class="window-status-pill">status: 200 OK</div>
+            </div>
+            <!-- Window body -->
+            <div class="api-window-body">
+                <div class="api-sidebar">
+                    <div class="sidebar-title">Endpoints</div>
+                    <button class="api-btn active" data-tab="profile">
+                        <span class="method get">GET</span> <span class="endpoint-path">/profile</span>
+                    </button>
+                    <button class="api-btn" data-tab="stack">
+                        <span class="method get">GET</span> <span class="endpoint-path">/stack</span>
+                    </button>
+                    <button class="api-btn" data-tab="metrics">
+                        <span class="method get">GET</span> <span class="endpoint-path">/metrics</span>
+                    </button>
+                </div>
+                <div class="api-panel">
+                    <!-- Tab 1: Profile -->
+                    <div class="api-tab-content active" id="tab-profile">
+                        <div class="role-badge">&lt; Backend Developer /&gt;</div>
+                        <h1>Nishant Maurya</h1>
+                        <p class="hero-tagline">I build backend systems that actually ship.</p>
+                        <p class="hero-sub">3rd-year CS @ Fr. CRCE &nbsp;·&nbsp; Django · PostgreSQL · Celery &nbsp;·&nbsp; 8 Hackathon Wins &nbsp;·&nbsp; Live at <a href="https://atttc.cloud" target="_blank">atttc.cloud</a></p>
+                        <div class="hero-buttons">
+                            <a href="#projects" class="button button-primary">View Projects</a>
+                            <a href="#resume" class="button button-secondary">Download Resume</a>
+                        </div>
+                    </div>
+                    
+                    <!-- Tab 2: Stack -->
+                    <div class="api-tab-content" id="tab-stack">
+                        <h3 class="tab-title">GET /stack</h3>
+                        <div class="json-code-container">
+                            <pre><code class="json-code"><span class="json-brace">{</span>
+  <span class="json-key">"languages"</span>: <span class="json-bracket">[</span><span class="json-val">"Python"</span>, <span class="json-val">"Dart"</span>, <span class="json-val">"C"</span><span class="json-bracket">]</span>,
+  <span class="json-key">"backend"</span>: <span class="json-bracket">[</span><span class="json-val">"Django"</span>, <span class="json-val">"Django REST Framework"</span>, <span class="json-val">"Celery"</span>, <span class="json-val">"Spring Boot"</span><span class="json-bracket">]</span>,
+  <span class="json-key">"frontend"</span>: <span class="json-bracket">[</span><span class="json-val">"Flutter"</span>, <span class="json-val">"HTML"</span>, <span class="json-val">"CSS"</span>, <span class="json-val">"JavaScript"</span><span class="json-bracket">]</span>,
+  <span class="json-key">"databases"</span>: <span class="json-bracket">[</span><span class="json-val">"PostgreSQL"</span>, <span class="json-val">"MySQL"</span>, <span class="json-val">"Firebase"</span>, <span class="json-val">"Redis"</span><span class="json-bracket">]</span>,
+  <span class="json-key">"infra"</span>: <span class="json-bracket">[</span><span class="json-val">"Docker"</span>, <span class="json-val">"Cloudflare R2"</span>, <span class="json-val">"OpenCV"</span>, <span class="json-val">"Ollama"</span><span class="json-bracket">]</span>
+<span class="json-brace">}</span></code></pre>
+                        </div>
+                    </div>
+
+                    <!-- Tab 3: Metrics -->
+                    <div class="api-tab-content" id="tab-metrics">
+                        <h3 class="tab-title">GET /metrics</h3>
+                        <div class="json-code-container">
+                            <pre><code class="json-code"><span class="json-brace">{</span>
+  <span class="json-key">"hackathon_wins"</span>: <span class="json-num">8</span>,
+  <span class="json-key">"finalist_positions"</span>: <span class="json-num">21</span>,
+  <span class="json-key">"academic_sgpa"</span>: <span class="json-num">9.0</span>,
+  <span class="json-key">"production_apps"</span>: <span class="json-num">2</span>,
+  <span class="json-key">"team"</span>: <span class="json-val">"4iStudios"</span>
+<span class="json-brace">}</span></code></pre>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
