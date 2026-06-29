@@ -929,7 +929,6 @@ a:hover {
     padding: 0 50%;
     width: max-content;
     align-items: center;
-    position: relative;
     will-change: transform;
     backface-visibility: hidden;
 }
