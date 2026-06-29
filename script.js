@@ -419,11 +419,14 @@ try {
 
         const ease = 'power3.out';
         const duration = 0.6;
-        const stagger = 0.05;
+        // Reduced stagger so animation completes faster and doesn't block interaction
+        const stagger = 0.03;
         const animateFrom = 'bottom';
         const scaleOnHover = true;
         const hoverScale = 0.95;
-        const blurToFocus = true;
+        // blurToFocus DISABLED — animating blur() on 22+ items simultaneously is
+        // extremely GPU-expensive and causes the section-load lag. Fade + translate is smooth.
+        const blurToFocus = false;
 
         const getColumns = () => {
             const queries = ['(min-width:1500px)', '(min-width:1000px)', '(min-width:600px)', '(min-width:400px)'];
@@ -432,27 +435,33 @@ try {
             return idx !== -1 ? values[idx] : 1;
         };
 
+        // Batch preload: fetch BATCH_SIZE images at a time so the browser network
+        // queue isn't saturated (some images are 10–13 MB unoptimized).
+        const BATCH_SIZE = 4;
         const preloadImages = async items => {
-            await Promise.all(
-                items.map(
-                    item =>
-                        new Promise(resolve => {
-                            const img = new Image();
-                            img.src = item.img;
-                            const onDone = () => {
-                                if (img.naturalWidth && img.naturalHeight) {
-                                    item.aspectRatio = img.naturalHeight / img.naturalWidth;
+            for (let i = 0; i < items.length; i += BATCH_SIZE) {
+                const batch = items.slice(i, i + BATCH_SIZE);
+                await Promise.all(
+                    batch.map(
+                        item =>
+                            new Promise(resolve => {
+                                const img = new Image();
+                                img.src = item.img;
+                                const onDone = () => {
+                                    if (img.naturalWidth && img.naturalHeight) {
+                                        item.aspectRatio = img.naturalHeight / img.naturalWidth;
+                                    }
+                                    resolve();
+                                };
+                                if (img.decode) {
+                                    img.decode().then(onDone).catch(onDone);
+                                } else {
+                                    img.onload = img.onerror = onDone;
                                 }
-                                resolve();
-                            };
-                            if (img.decode) {
-                                img.decode().then(onDone).catch(onDone);
-                            } else {
-                                img.onload = img.onerror = onDone;
-                            }
-                        })
-                )
-            );
+                            })
+                    )
+                );
+            }
         };
 
         const calculateGrid = (width, columns) => {
@@ -477,30 +486,19 @@ try {
         };
 
         const getInitialPosition = item => {
-            const containerRect = containerRef.getBoundingClientRect();
             let direction = animateFrom;
-
-            if (animateFrom === 'random') {
-                const directions = ['top', 'bottom', 'left', 'right'];
-                direction = directions[Math.floor(Math.random() * directions.length)];
-            }
 
             switch (direction) {
                 case 'top':
                     return { x: item.x, y: -200 };
                 case 'bottom':
-                    return { x: item.x, y: window.innerHeight + 200 };
+                    return { x: item.x, y: item.y + 80 };
                 case 'left':
                     return { x: -200, y: item.y };
                 case 'right':
                     return { x: window.innerWidth + 200, y: item.y };
-                case 'center':
-                    return {
-                        x: containerRect.width / 2 - item.w / 2,
-                        y: containerRect.height / 2 - item.h / 2
-                    };
                 default:
-                    return { x: item.x, y: item.y + 100 };
+                    return { x: item.x, y: item.y + 80 };
             }
         };
 
@@ -553,23 +551,9 @@ try {
                 };
 
                 if (!hasMounted) {
-                    const initialPos = getInitialPosition(item);
-                    const initialState = {
-                        opacity: 0,
-                        x: initialPos.x,
-                        y: initialPos.y,
-                        width: item.w,
-                        height: item.h,
-                        ...(blurToFocus && { filter: 'blur(10px)' })
-                    };
-
-                    gsap.fromTo(el, initialState, {
+                    gsap.set(el, {
                         opacity: 1,
-                        ...animationProps,
-                        ...(blurToFocus && { filter: 'blur(0px)' }),
-                        duration: 0.8,
-                        ease: 'power3.out',
-                        delay: index * stagger
+                        ...animationProps
                     });
                 } else {
                     gsap.to(el, {
@@ -584,9 +568,20 @@ try {
             hasMounted = true;
         };
 
-        preloadImages(GALLERY_ITEMS).then(() => {
-            renderGrid();
-        });
+        // Defer gallery init until the section is actually scrolled into view.
+        // This avoids preloading 200+ MB of images on page load.
+        const gallerySection = containerRef.closest('section') || containerRef.parentElement;
+        let galleryStarted = false;
+        const sectionObserver = new IntersectionObserver((entries) => {
+            if (entries[0].isIntersecting && !galleryStarted) {
+                galleryStarted = true;
+                sectionObserver.disconnect();
+                preloadImages(GALLERY_ITEMS).then(() => {
+                    renderGrid();
+                });
+            }
+        }, { rootMargin: '200px' });
+        sectionObserver.observe(gallerySection);
 
         let resizeTimer;
         window.addEventListener('resize', () => {
@@ -686,23 +681,29 @@ try {
         const xTo = gsap.quickTo(cursor, "x", { duration: 0.08, ease: "power3.out" });
         const yTo = gsap.quickTo(cursor, "y", { duration: 0.08, ease: "power3.out" });
 
+        // Cache offset — only update on resize, not on every mousemove
+        let cachedOffset = getOffset();
+
         const moveCursor = (x, y) => {
-            const { x: offsetX, y: offsetY } = getOffset();
-            xTo(x - offsetX);
-            yTo(y - offsetY);
+            xTo(x - cachedOffset.x);
+            yTo(y - cachedOffset.y);
         };
 
         window.addEventListener('mousemove', e => moveCursor(e.clientX, e.clientY), { passive: true });
 
+        // Pre-build quickSetters for each corner so tickerFn is allocation-free
+        const cornersArr = Array.from(corners);
+        const cornerXSetters = cornersArr.map(c => gsap.quickSetter(c, 'x', 'px'));
+        const cornerYSetters = cornersArr.map(c => gsap.quickSetter(c, 'y', 'px'));
+
         const tickerFn = () => {
-            if (!targetCornerPositions || !cursor || !corners.length) return;
+            if (!targetCornerPositions || !cursor || !cornersArr.length) return;
             const strength = activeStrength.current;
             if (strength === 0) return;
 
             const cursorX = gsap.getProperty(cursor, 'x');
             const cursorY = gsap.getProperty(cursor, 'y');
 
-            const cornersArr = Array.from(corners);
             cornersArr.forEach((corner, i) => {
                 const currentX = gsap.getProperty(corner, 'x');
                 const currentY = gsap.getProperty(corner, 'y');
@@ -713,15 +714,9 @@ try {
                 const finalX = currentX + (targetX - currentX) * strength;
                 const finalY = currentY + (targetY - currentY) * strength;
 
-                const duration = strength >= 0.99 ? (parallaxOn ? 0.2 : 0) : 0.05;
-
-                gsap.to(corner, {
-                    x: finalX,
-                    y: finalY,
-                    duration: duration,
-                    ease: duration === 0 ? 'none' : 'power1.out',
-                    overwrite: 'auto'
-                });
+                // Use quickSetters — zero allocations, no new tweens spawned per frame
+                cornerXSetters[i](finalX);
+                cornerYSetters[i](finalY);
             });
         };
 
@@ -902,6 +897,7 @@ try {
         window.addEventListener('mouseover', enterHandler, { passive: true });
         window.addEventListener('resize', () => {
             containingBlock = getContainingBlock(cursor);
+            cachedOffset = getOffset();
         });
     };
 
