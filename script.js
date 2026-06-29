@@ -1177,6 +1177,11 @@ try {
                     const r = Math.floor(idx / gridCols) + 0.5;
                     const c = (idx % gridCols) + 0.5;
                     tiltAt(r, c);
+
+                    // Sync simulation state so it resumes from this manually selected tech item
+                    simIndex = idx;
+                    simTarget = { x: c, y: r };
+                    simPos = { x: c, y: r };
                 }
             }
         };
