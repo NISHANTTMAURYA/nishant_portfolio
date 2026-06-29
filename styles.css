@@ -2667,7 +2667,7 @@ a:hover {
     pointer-events: none;
 }
 
-.vibe-browser.interacting #vibe-iframe {
+.vibe-browser.interacting .vibe-iframe-instance {
     pointer-events: auto !important;
 }
 
@@ -2693,7 +2693,7 @@ body:has(.vibe-browser.interacting) .target-cursor-wrapper {
 
 
 
-#vibe-iframe {
+.vibe-iframe-instance {
     position: absolute;
     top: 0;
     left: 0;
@@ -2712,7 +2712,7 @@ body:has(.vibe-browser.interacting) .target-cursor-wrapper {
     will-change: transform;
 }
 
-#vibe-iframe.loaded {
+.vibe-iframe-instance.loaded {
     opacity: 1;
 }
 

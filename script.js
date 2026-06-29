@@ -718,8 +718,8 @@ try {
         let spinTl = gsap.timeline({ repeat: -1 })
             .to(cursor, { rotation: '+=360', duration: spinDuration, ease: 'none' });
 
-        const xTo = gsap.quickTo(cursor, "x", { duration: 0.08, ease: "power3.out" });
-        const yTo = gsap.quickTo(cursor, "y", { duration: 0.08, ease: "power3.out" });
+        const xTo = gsap.quickTo(cursor, "x", { duration: 0.15, ease: "power2.out" });
+        const yTo = gsap.quickTo(cursor, "y", { duration: 0.15, ease: "power2.out" });
 
         // Cache offset — only update on resize, not on every mousemove
         let cachedOffset = getOffset();
@@ -1456,7 +1456,6 @@ try {
         if (!section) return;
 
         const tabs = section.querySelectorAll('.vibe-tab');
-        const iframe = section.querySelector('#vibe-iframe');
         const loader = section.querySelector('.vibe-loader');
         const browser = section.querySelector('.vibe-browser');
         const urlText = section.querySelector('#vibe-browser-url');
@@ -1464,12 +1463,38 @@ try {
         const descTitle = section.querySelector('#vibe-desc-title');
         const descText = section.querySelector('#vibe-desc-text');
         const browserBody = section.querySelector('.vibe-browser-body');
-        const wrapper = section.querySelector('.vibe-iframe-wrapper');
+        const iframeOverlay = section.querySelector('.vibe-iframe-overlay');
+        const originalIframe = section.querySelector('#vibe-iframe');
 
         const tabsColumn = section.querySelector('.vibe-tabs-column');
         const browserColumn = section.querySelector('.vibe-browser-column');
 
         let firstLoadTriggered = false;
+        const iframePool = {};
+        let currentIframe = null;
+
+        // Extract template and remove original to avoid duplicate IDs
+        const iframeTemplate = originalIframe.cloneNode(true);
+        iframeTemplate.removeAttribute('id');
+        originalIframe.remove();
+
+        const getOrCreateIframe = (url) => {
+            if (iframePool[url]) return iframePool[url];
+            const newIframe = iframeTemplate.cloneNode(true);
+            newIframe.src = url;
+            newIframe.style.display = 'none';
+            newIframe.classList.add('vibe-iframe-instance');
+            newIframe.addEventListener('load', () => {
+                newIframe.classList.add('loaded');
+                if (currentIframe === newIframe) {
+                    loader.style.opacity = '0';
+                    loader.style.pointerEvents = 'none';
+                }
+            });
+            browserBody.insertBefore(newIframe, iframeOverlay);
+            iframePool[url] = newIframe;
+            return newIframe;
+        };
 
         const updateIframeScale = () => {
             const H = browserBody.clientHeight;
@@ -1477,17 +1502,17 @@ try {
             if (!H || !W) return;
 
             const isMobileScreen = window.innerWidth <= 900;
-
             const wrapperWidth = W;
             const virtualWidth = 1280; // Standard desktop virtual resolution
             const virtualHeight = 800; // 16:10 aspect ratio height
-
             const scale = wrapperWidth / virtualWidth;
 
-            iframe.style.width = `${virtualWidth}px`;
-            iframe.style.height = `${virtualHeight}px`;
-            iframe.style.transform = `translate3d(0,0,0) scale(${scale})`;
-            iframe.style.transformOrigin = 'top left';
+            Object.values(iframePool).forEach(iframe => {
+                iframe.style.width = `${virtualWidth}px`;
+                iframe.style.height = `${virtualHeight}px`;
+                iframe.style.transform = `translate3d(0,0,0) scale(${scale})`;
+                iframe.style.transformOrigin = 'top left';
+            });
 
             // Dynamically scale the left-sidebar maxHeight to match the right column's height
             if (isMobileScreen) {
@@ -1513,19 +1538,23 @@ try {
             browser.classList.add('active-highlight-browser');
             setTimeout(() => browser.classList.remove('active-highlight-browser'), 1000);
 
-            // Show loader and hide old content
-            loader.style.opacity = '1';
-            loader.style.pointerEvents = 'auto';
-            iframe.classList.remove('loaded');
+            if (currentIframe) currentIframe.style.display = 'none';
+            currentIframe = getOrCreateIframe(url);
+            currentIframe.style.display = 'block';
 
-            // Update iframe src & detail bindings
-            iframe.src = url;
+            if (!currentIframe.classList.contains('loaded')) {
+                loader.style.opacity = '1';
+                loader.style.pointerEvents = 'auto';
+            } else {
+                loader.style.opacity = '0';
+                loader.style.pointerEvents = 'none';
+            }
+
             urlText.textContent = url;
             linkBtn.href = url;
             descTitle.textContent = title;
             descText.textContent = desc;
 
-            // Trigger scale recalculation after DOM update reflows
             requestAnimationFrame(updateIframeScale);
         };
 
@@ -1540,7 +1569,6 @@ try {
         });
 
         // Click to interact overlays, mouseleave to reset target cursor
-        const iframeOverlay = section.querySelector('.vibe-iframe-overlay');
         if (iframeOverlay) {
             iframeOverlay.addEventListener('click', () => {
                 browser.classList.add('interacting');
@@ -1550,15 +1578,17 @@ try {
             browser.classList.remove('interacting');
         });
 
-        // Hide loader when iframe finishes loading
-        iframe.addEventListener('load', () => {
-            loader.style.opacity = '0';
-            loader.style.pointerEvents = 'none';
-            iframe.classList.add('loaded');
-        });
-
         // Listen to window resizing to update scale proportions dynamically
         window.addEventListener('resize', updateIframeScale);
+
+        const preloadRemainingTabs = () => {
+            setTimeout(() => {
+                tabs.forEach(t => {
+                    const url = t.dataset.url;
+                    if (!iframePool[url]) getOrCreateIframe(url);
+                });
+            }, 2500); // Wait 2.5s after first load to trigger background loads
+        };
 
         // Lazy initialize first iframe once Vibe Labs section is visible
         const lazyObserver = new IntersectionObserver(entries => {
@@ -1568,6 +1598,7 @@ try {
                 if (activeTab) {
                     switchProject(activeTab);
                     setTimeout(updateIframeScale, 100);
+                    preloadRemainingTabs();
                 }
                 lazyObserver.disconnect();
             }
