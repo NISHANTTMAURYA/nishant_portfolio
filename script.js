@@ -72,11 +72,15 @@ try {
         };
 
         const resizeCanvas = () => {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
+            const dpr = window.devicePixelRatio || 1;
+            canvas.width = window.innerWidth * dpr;
+            canvas.height = window.innerHeight * dpr;
+            ctx.scale(dpr, dpr);
+
             if (sparkCanvas) {
-                sparkCanvas.width = window.innerWidth;
-                sparkCanvas.height = window.innerHeight;
+                sparkCanvas.width = window.innerWidth * dpr;
+                sparkCanvas.height = window.innerHeight * dpr;
+                if (sparkCtx) sparkCtx.scale(dpr, dpr);
             }
         };
 
@@ -130,7 +134,7 @@ try {
                 for (let c = 1; c < cols; c++) {
                     ctx.lineTo(nodes[r][c].x, nodes[r][c].y);
                 }
-                ctx.strokeStyle = 'rgba(139, 92, 246, 0.16)'; // Defined violet
+                ctx.strokeStyle = 'rgba(139, 92, 246, 0.28)'; // Defined violet (brighter opacity)
                 ctx.lineWidth = 1.2;
                 ctx.stroke();
             }
@@ -142,7 +146,7 @@ try {
                 for (let r = 1; r < rows; r++) {
                     ctx.lineTo(nodes[r][c].x, nodes[r][c].y);
                 }
-                ctx.strokeStyle = 'rgba(99, 102, 241, 0.16)'; // Defined indigo
+                ctx.strokeStyle = 'rgba(99, 102, 241, 0.28)'; // Defined indigo (brighter opacity)
                 ctx.lineWidth = 1.2;
                 ctx.stroke();
             }
@@ -643,8 +647,8 @@ try {
             return;
         }
 
-        // Add target class dynamically to links, buttons, cards, gallery items, and cubes grid
-        document.querySelectorAll('a, button, [role="button"], .project-card, .contact-link, .api-btn, .item-wrapper, .lightbox-close, #cubes-wrapper, .vibe-tab').forEach(el => {
+        // Add target class dynamically to links, buttons, cards, gallery items, cubes grid, and website preview container
+        document.querySelectorAll('a, button, [role="button"], .project-card, .contact-link, .api-btn, .item-wrapper, .lightbox-close, #cubes-wrapper, .vibe-tab, .vibe-browser-body').forEach(el => {
             el.classList.add('cursor-target');
         });
 
@@ -1478,7 +1482,7 @@ try {
 
             iframe.style.width = `${virtualWidth}px`;
             iframe.style.height = `${virtualHeight}px`;
-            iframe.style.transform = `scale(${scale})`;
+            iframe.style.transform = `translate3d(0,0,0) scale(${scale})`;
             iframe.style.transformOrigin = 'top left';
 
             // Dynamically scale the left-sidebar maxHeight to match the right column's height
@@ -1526,7 +1530,20 @@ try {
             tab.addEventListener('click', () => {
                 if (tab.classList.contains('active')) return;
                 switchProject(tab);
+                // Reset interaction state when switching projects
+                browser.classList.remove('interacting');
             });
+        });
+
+        // Click to interact overlays, mouseleave to reset target cursor
+        const iframeOverlay = section.querySelector('.vibe-iframe-overlay');
+        if (iframeOverlay) {
+            iframeOverlay.addEventListener('click', () => {
+                browser.classList.add('interacting');
+            });
+        }
+        browser.addEventListener('mouseleave', () => {
+            browser.classList.remove('interacting');
         });
 
         // Hide loader when iframe finishes loading
@@ -1554,23 +1571,27 @@ try {
         lazyObserver.observe(section);
     };
 
-    // Name Glitch & Focus Combo Controller
-    const initNameFocus = () => {
-        const container = document.getElementById('hero-name');
-        if (!container) return;
+    // Reusable Name Glitch & Focus Combo Controller
+    const initNameFocus = (containerId, frameId) => {
+        const container = document.getElementById(containerId);
+        if (!container) return null;
 
         const words = container.querySelectorAll('.focus-word');
-        const focusFrame = container.querySelector('#name-focus-frame');
-        if (words.length === 0 || !focusFrame) return;
+        const focusFrame = document.getElementById(frameId) || container.querySelector('#' + frameId);
+        if (words.length === 0 || !focusFrame) return null;
 
         let currentIndex = 0;
         let loopInterval = null;
         let isHovered = false;
 
+        const STATES_COUNT = words.length + 1; // individual words + combined state
+
         const updateFocus = (index) => {
             currentIndex = index;
+            const isCombined = index === words.length;
+
             words.forEach((word, idx) => {
-                if (idx === index) {
+                if (isCombined || idx === index) {
                     word.classList.add('active');
                     word.style.filter = 'blur(0px)';
                 } else {
@@ -1581,12 +1602,27 @@ try {
 
             // Calculate active rect coordinates relative to container
             const parentRect = container.getBoundingClientRect();
-            const activeRect = words[index].getBoundingClientRect();
+            let x = 0, y = 0, width = 0, height = 0;
 
-            const x = activeRect.left - parentRect.left;
-            const y = activeRect.top - parentRect.top;
-            const width = activeRect.width;
-            const height = activeRect.height;
+            if (isCombined) {
+                // Combined state: stretch from the first word to the last word
+                const firstRect = words[0].getBoundingClientRect();
+                const lastRect = words[words.length - 1].getBoundingClientRect();
+                
+                const top = Math.min(firstRect.top, lastRect.top);
+                const bottom = Math.max(firstRect.bottom, lastRect.bottom);
+                
+                x = firstRect.left - parentRect.left;
+                y = top - parentRect.top;
+                width = lastRect.right - firstRect.left;
+                height = bottom - top;
+            } else {
+                const activeRect = words[index].getBoundingClientRect();
+                x = activeRect.left - parentRect.left;
+                y = activeRect.top - parentRect.top;
+                width = activeRect.width;
+                height = activeRect.height;
+            }
 
             gsap.to(focusFrame, {
                 x: x,
@@ -1603,7 +1639,7 @@ try {
             if (loopInterval) clearInterval(loopInterval);
             loopInterval = setInterval(() => {
                 if (!isHovered) {
-                    const nextIndex = (currentIndex + 1) % words.length;
+                    const nextIndex = (currentIndex + 1) % STATES_COUNT;
                     updateFocus(nextIndex);
                 }
             }, 2000);
@@ -1641,12 +1677,146 @@ try {
             startLoop();
         }, 500);
 
-        window.addEventListener('resize', () => {
+        const resizeHandler = () => {
             updateFocus(currentIndex);
-        });
+        };
+        window.addEventListener('resize', resizeHandler);
+
+        return {
+            stop: () => {
+                stopLoop();
+                window.removeEventListener('resize', resizeHandler);
+            },
+            update: () => {
+                updateFocus(currentIndex);
+            }
+        };
     };
 
-    initNameFocus();
+    /* -----------------------------------------------
+       INTRO LOADER SEQUENCE — REAL RESOURCE PRELOADER
+       ----------------------------------------------- */
+    const initIntroLoader = () => {
+        const loaderBar     = document.getElementById('loader-bar');
+        const loaderPct     = document.getElementById('loader-percentage');
+        const bodyEl        = document.body;
+
+        // Run the hero name glitch + focus animation immediately
+        const nameAnim = initNameFocus('hero-name', 'name-focus-frame');
+
+        if (!loaderBar || !loaderPct) {
+            bodyEl.classList.remove('intro-loading');
+            return;
+        }
+
+        /* ── Resources to preload ─────────────────────────── */
+        const RESOURCES = [
+            // Gallery photos
+            './images/nishant_sih.jpg', './images/14.jpg',  './images/3.jpeg',
+            './images/20.jpg',          './images/7.jpeg',   './images/18.jpg',
+            './images/1.jpeg',          './images/24.jpg',   './images/11.jpg',
+            './images/16.jpg',          './images/2.jpeg',   './images/22.jpg',
+            './images/9.jpeg',          './images/15.jpg',   './images/26.jpg',
+            './images/10.jpg',          './images/112.jpg',  './images/19.jpg',
+            './images/23.jpg',          './images/13.jpg',   './images/25.jpg',
+            './images/21.jpg',          './images/17.jpg',
+            // Resume preview
+            './images/res.jpeg',
+            // Hero / key tech icons
+            './icons/python.svg',       './icons/django.svg',      './icons/postgresql.svg',
+            './icons/flutter.svg',      './icons/docker.svg',      './icons/redis.svg',
+            './icons/javascript.svg',   './icons/html5.svg',       './icons/css3.svg',
+            './icons/git.svg',          './icons/github.svg',      './icons/linux.svg',
+            './icons/firebase.svg',     './icons/mysql.svg',       './icons/celery.svg',
+            './icons/springboot.svg',   './icons/dart.svg',        './icons/gnubash.svg',
+            './icons/postman.svg',      './icons/jsonwebtokens.svg','./icons/cloudflare.svg',
+            './icons/opencv.svg',       './icons/numpy.svg',       './icons/pandas.svg',
+            './icons/letsencrypt.svg',  './icons/githubcopilot.svg','./icons/ollama.svg',
+        ];
+
+        const TOTAL_RESOURCES = RESOURCES.length;
+        let   loadedCount     = 0;
+        let   allDone         = false;
+        const MIN_MS          = 5000; // 5 seconds minimum
+        const startTime       = performance.now();
+
+        // Kick off actual image preloading in parallel
+        RESOURCES.forEach(src => {
+            const img = new Image();
+            img.onload = img.onerror = () => {
+                loadedCount++;
+                if (loadedCount >= TOTAL_RESOURCES) allDone = true;
+            };
+            img.src = src;
+        });
+
+        // Also wait for web fonts
+        if (document.fonts) {
+            document.fonts.ready.then(() => {
+                // fonts are one implicit "resource"; count them done
+                if (nameAnim) nameAnim.update();
+            });
+        }
+
+        /* ── rAF tick — drives the bar each frame ─────────── */
+        let displayed  = 0; // current displayed %
+        let revealed   = false;
+
+        const reveal = () => {
+            if (revealed) return;
+            revealed = true;
+            // Snap remaining gap to 100% with a quick GSAP tween
+            const snapObj = { v: displayed };
+            gsap.to(snapObj, {
+                v: 100,
+                duration: 0.45,
+                ease: 'power2.out',
+                onUpdate: () => {
+                    loaderBar.style.width  = `${snapObj.v}%`;
+                    loaderPct.textContent  = `${Math.round(snapObj.v)}%`;
+                },
+                onComplete: () => {
+                    setTimeout(() => {
+                        bodyEl.classList.remove('intro-loading');
+                        setTimeout(() => { if (nameAnim) nameAnim.update(); }, 600);
+                    }, 350);
+                }
+            });
+        };
+
+        const tick = () => {
+            if (revealed) return;
+
+            const elapsed      = performance.now() - startTime;
+            const timePct      = Math.min(elapsed / MIN_MS, 1) * 100;          // 0-100 over 5 s
+            const resourcePct  = (loadedCount / TOTAL_RESOURCES) * 100;        // actual load %
+
+            // Blend: resources drive 55%, time drives 45%
+            // Never exceed 97% until BOTH time AND resources are complete
+            const blended  = resourcePct * 0.55 + timePct * 0.45;
+            const target   = (allDone && elapsed >= MIN_MS) ? 100 : Math.min(blended, 97);
+
+            // Smooth the displayed value — lerp toward target, never go backwards
+            displayed += (target - displayed) * 0.04;
+            if (target === 100 && displayed > 99) displayed = 100;
+
+            loaderBar.style.width  = `${displayed}%`;
+            loaderPct.textContent  = `${Math.round(displayed)}%`;
+
+            if (displayed >= 99.9) {
+                reveal();
+            } else {
+                requestAnimationFrame(tick);
+            }
+        };
+
+        requestAnimationFrame(tick);
+
+        // Hard fallback: force reveal at 7 s even on very slow connections
+        setTimeout(() => reveal(), MIN_MS + 2000);
+    };
+
+    initIntroLoader();
     initVibeLabs();
 
 } catch (err) {

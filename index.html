@@ -16,7 +16,7 @@
 </head>
 <link rel="stylesheet" href="styles.css">
 
-<body>
+<body class="intro-loading">
     <div class="target-cursor-wrapper">
         <div class="target-cursor-dot"></div>
         <div class="target-cursor-corner corner-tl"></div>
@@ -24,7 +24,9 @@
         <div class="target-cursor-corner corner-br"></div>
         <div class="target-cursor-corner corner-bl"></div>
     </div>
-    <canvas id="hero-canvas"></canvas>
+
+    <div id="app-wrapper" class="hidden-app">
+        <canvas id="hero-canvas"></canvas>
     <canvas id="spark-canvas"></canvas>
     <!-- Navbar -->
     <nav class="navbar">
@@ -62,80 +64,55 @@
                     <span class="control-dot yellow"></span>
                     <span class="control-dot green"></span>
                 </div>
-                <div class="window-title">nishant-api-playground.exe</div>
-                <div class="window-status-pill">status: 200 OK</div>
+                <div class="window-title">
+                    <div class="url-bar">
+                        <!-- lock icon -->
+                        <svg class="url-bar-lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                        </svg>
+                        <span class="url-bar-text">
+                            <span class="url-dim">nishant.sh</span><span class="url-accent">/profile</span>
+                        </span>
+                    </div>
+                </div>
+                <div class="window-status-pill">200 OK</div>
             </div>
             <!-- Window body -->
             <div class="api-window-body">
-                <div class="api-sidebar">
-                    <div class="sidebar-title">Endpoints</div>
-                    <button class="api-btn active" data-tab="profile">
-                        <span class="method get">GET</span> <span class="endpoint-path">/profile</span>
-                    </button>
-                    <button class="api-btn" data-tab="stack">
-                        <span class="method get">GET</span> <span class="endpoint-path">/stack</span>
-                    </button>
-                    <button class="api-btn" data-tab="metrics">
-                        <span class="method get">GET</span> <span class="endpoint-path">/metrics</span>
-                    </button>
-                </div>
                 <div class="api-panel">
-                    <!-- Tab 1: Profile -->
-                    <div class="api-tab-content active" id="tab-profile">
-                        <div class="role-badge">&lt; Backend Developer /&gt;</div>
-                        <h1 class="focus-container" id="hero-name">
-                            <span class="focus-word glitch" data-text="Nishant"
-                                style="--after-duration: 3s; --before-duration: 2.2s; --after-shadow: -3px 0 var(--accent); --before-shadow: 3px 0 #27c93f;">Nishant</span>
-                            <span class="focus-word glitch" data-text="Maurya"
-                                style="--after-duration: 2.6s; --before-duration: 1.8s; --after-shadow: -3px 0 var(--accent); --before-shadow: 3px 0 #27c93f;">Maurya</span>
-                            <div class="focus-frame" id="name-focus-frame">
-                                <span class="corner top-left"></span>
-                                <span class="corner top-right"></span>
-                                <span class="corner bottom-left"></span>
-                                <span class="corner bottom-right"></span>
-                            </div>
-                        </h1>
-                        <p class="hero-tagline">I build backend systems that actually ship.</p>
-                        <div class="hero-sub">
-                            <span class="hero-chip">3rd-year CS @ Fr. CRCE</span>
-                            <span class="hero-chip">Django</span>
-                            <span class="hero-chip">PostgreSQL</span>
-                            <span class="hero-chip">Celery</span>
-                            <span class="hero-chip">8 Hackathon Wins</span>
-                            <span class="hero-chip">Live at&nbsp;<a href="https://atttc.cloud" target="_blank">atttc.cloud</a></span>
+                    <div class="role-badge">&lt; Backend Developer /&gt;</div>
+                    <h1 class="focus-container" id="hero-name">
+                        <span class="focus-word glitch" data-text="Nishant"
+                            style="--after-duration: 3s; --before-duration: 2.2s; --after-shadow: -3px 0 var(--accent); --before-shadow: 3px 0 #27c93f;">Nishant</span>
+                        <span class="focus-word glitch" data-text="Maurya"
+                            style="--after-duration: 2.6s; --before-duration: 1.8s; --after-shadow: -3px 0 var(--accent); --before-shadow: 3px 0 #27c93f;">Maurya</span>
+                        <div class="focus-frame" id="name-focus-frame">
+                            <span class="corner top-left"></span>
+                            <span class="corner top-right"></span>
+                            <span class="corner bottom-left"></span>
+                            <span class="corner bottom-right"></span>
                         </div>
-                        <div class="hero-buttons">
-                            <a href="#projects" class="button button-primary">View Projects</a>
-                            <a href="#resume" class="button button-secondary">Download Resume</a>
+                    </h1>
+                    <!-- Loader Bar (Visible only during intro loading) -->
+                    <div class="loader-bar-wrapper">
+                        <div class="loader-bar-container">
+                            <div class="loader-bar" id="loader-bar"></div>
                         </div>
+                        <div class="loader-percentage" id="loader-percentage">0%</div>
                     </div>
-
-                    <!-- Tab 2: Stack -->
-                    <div class="api-tab-content" id="tab-stack">
-                        <h3 class="tab-title">GET /stack</h3>
-                        <div class="json-code-container">
-                            <pre><code class="json-code"><span class="json-brace">{</span>
-  <span class="json-key">"languages"</span>: <span class="json-bracket">[</span><span class="json-val">"Python"</span>, <span class="json-val">"Dart"</span>, <span class="json-val">"C"</span><span class="json-bracket">]</span>,
-  <span class="json-key">"backend"</span>: <span class="json-bracket">[</span><span class="json-val">"Django"</span>, <span class="json-val">"Django REST Framework"</span>, <span class="json-val">"Celery"</span>, <span class="json-val">"Spring Boot"</span><span class="json-bracket">]</span>,
-  <span class="json-key">"frontend"</span>: <span class="json-bracket">[</span><span class="json-val">"Flutter"</span>, <span class="json-val">"HTML"</span>, <span class="json-val">"CSS"</span>, <span class="json-val">"JavaScript"</span><span class="json-bracket">]</span>,
-  <span class="json-key">"databases"</span>: <span class="json-bracket">[</span><span class="json-val">"PostgreSQL"</span>, <span class="json-val">"MySQL"</span>, <span class="json-val">"Firebase"</span>, <span class="json-val">"Redis"</span><span class="json-bracket">]</span>,
-  <span class="json-key">"infra"</span>: <span class="json-bracket">[</span><span class="json-val">"Docker"</span>, <span class="json-val">"Cloudflare R2"</span>, <span class="json-val">"OpenCV"</span>, <span class="json-val">"Ollama"</span><span class="json-bracket">]</span>
-<span class="json-brace">}</span></code></pre>
-                        </div>
+                    <p class="hero-tagline">I build backend systems that actually ship.</p>
+                    <div class="hero-sub">
+                        <span class="hero-chip">3rd-year CS @ Fr. CRCE</span>
+                        <span class="hero-chip">Django</span>
+                        <span class="hero-chip">PostgreSQL</span>
+                        <span class="hero-chip">Celery</span>
+                        <span class="hero-chip">8 Hackathon Wins</span>
+                        <span class="hero-chip">Live at&nbsp;<a href="https://atttc.cloud" target="_blank">atttc.cloud</a></span>
                     </div>
-
-                    <!-- Tab 3: Metrics -->
-                    <div class="api-tab-content" id="tab-metrics">
-                        <h3 class="tab-title">GET /metrics</h3>
-                        <div class="json-code-container">
-                            <pre><code class="json-code"><span class="json-brace">{</span>
-  <span class="json-key">"hackathon_wins"</span>: <span class="json-num">8</span>,
-  <span class="json-key">"finalist_positions"</span>: <span class="json-num">21</span>,
-  <span class="json-key">"academic_sgpa"</span>: <span class="json-num">9.0</span>,
-  <span class="json-key">"production_apps"</span>: <span class="json-num">2</span>,
-  <span class="json-key">"team"</span>: <span class="json-val">"tea4i"</span>
-<span class="json-brace">}</span></code></pre>
-                        </div>
+                    <div class="hero-buttons">
+                        <a href="#projects" class="button button-primary">View Projects</a>
+                        <a href="#resume" class="button button-secondary">Download Resume</a>
                     </div>
                 </div>
             </div>
@@ -512,6 +489,13 @@
                             <iframe id="vibe-iframe" src="" frameborder="0"
                                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                                 allowfullscreen></iframe>
+                            <!-- Click to interact overlay -->
+                            <div class="vibe-iframe-overlay">
+                                <div class="overlay-hint">
+                                    <i class="material-icons" style="font-size: 16px;">mouse</i>
+                                    <span>Click to Interact</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <!-- Description Card -->
@@ -811,6 +795,7 @@
                 </a>
             </div>
         </div>
+
         <!-- Lightbox Modal -->
         <div id="gallery-lightbox" class="lightbox" aria-hidden="true">
             <span class="lightbox-close" aria-label="Close lightbox">&times;</span>

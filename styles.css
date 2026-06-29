@@ -53,6 +53,7 @@ button, a, .nav-link, .item-wrapper, .project-card, .achievement-card, .stat-car
 html {
     scroll-behavior: smooth;
     overflow-x: hidden;
+    scrollbar-gutter: stable; /* keeps centered layout stable when scrollbar toggles */
 }
 
 body {
@@ -283,8 +284,54 @@ a:hover {
 
 .window-title {
     flex-grow: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 0.75rem;
+}
+
+/* Browser-style address bar */
+.url-bar {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    background: #fff;
+    border: 1.5px solid var(--border-color);
+    border-radius: 100px;
+    padding: 0.22rem 0.85rem;
+    min-width: 200px;
+    max-width: 280px;
+    width: 100%;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.06);
+    font-family: 'Courier New', monospace;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-color);
+}
+
+.url-bar-lock {
+    flex-shrink: 0;
+    width: 11px;
+    height: 11px;
+    opacity: 0.45;
+}
+
+.url-bar-text {
+    flex: 1;
     text-align: center;
-    letter-spacing: 0.5px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.url-dim {
+    opacity: 0.45;
+}
+
+.url-accent {
+    color: var(--secondary-color);
+    font-weight: 800;
+    opacity: 1;
 }
 
 .window-status-pill {
@@ -299,7 +346,8 @@ a:hover {
 
 .api-window-body {
     display: flex;
-    min-height: 380px;
+    height: 430px;
+    overflow: hidden; /* clip panel content — prevents loader from floating above card */
 }
 
 /* Sidebar */
@@ -369,8 +417,8 @@ a:hover {
 
 .api-panel {
     flex: 1;
-    min-width: 0; /* Prevents flex child from overflowing its container */
-    overflow: hidden;
+    min-width: 0;
+    overflow: hidden; /* no scroll — content is designed to fit */
     padding: 2.25rem;
     display: flex;
     flex-direction: column;
@@ -451,7 +499,7 @@ a:hover {
     border: 2px solid var(--border-color);
     border-radius: 50px;
     padding: 0.3rem 1rem;
-    margin-bottom: 1.25rem;
+    margin-bottom: 0.6rem;
     animation: fadeInUp 0.6s ease forwards;
     letter-spacing: 0.5px;
 }
@@ -460,7 +508,7 @@ a:hover {
     font-size: clamp(2.2rem, 6vw, 3.5rem);
     font-weight: 800;
     color: var(--secondary-color);
-    margin-bottom: 0.75rem;
+    margin-bottom: 0.4rem;
     animation: fadeInUp 0.7s ease 0.1s both;
     letter-spacing: -1px;
     line-height: 1.1;
@@ -470,7 +518,7 @@ a:hover {
     font-size: clamp(1.1rem, 2.5vw, 1.4rem);
     font-weight: 700;
     color: var(--text-color);
-    margin-bottom: 0.75rem;
+    margin-bottom: 0.5rem;
     animation: fadeInUp 0.7s ease 0.2s both;
 }
 
@@ -481,7 +529,7 @@ a:hover {
     justify-content: center;
     gap: 0.5rem;
     font-size: clamp(0.72rem, 1.8vw, 0.82rem);
-    margin-bottom: 2rem;
+    margin-bottom: 1rem;
     animation: fadeInUp 0.7s ease 0.3s both;
     width: 100%;
 }
@@ -2045,18 +2093,29 @@ a:hover {
     .logo   { width: 34px; height: 34px; box-shadow: none; }
     .logo i { font-size: 17px; }
 
-    /* Hero & API Playground Mobile Adjustments */
+    /* Hero & API Playground Mobile — full viewport height so stats are below fold */
     .hero {
-        padding: 4.5rem 0.75rem 2rem;
-        min-height: auto;
-        align-items: center;
-        padding-top: calc(60px + 1.25rem);
+        padding: calc(60px + 0.75rem) 0.75rem 0.75rem;
+        min-height: 100dvh;   /* fill the whole screen */
+        align-items: stretch;
+        justify-content: center;
+        box-sizing: border-box;
     }
-    .hero-content { padding: 0; margin: 0; width: 100%; }
+    .hero-content {
+        padding: 0;
+        margin: 0;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+    }
 
     .api-playground {
         border-radius: 14px;
         width: 100%;
+        flex: 1;              /* stretch to fill remaining height */
+        display: flex;
+        flex-direction: column;
     }
 
     /* Window Header Mobile Fix */
@@ -2084,10 +2143,12 @@ a:hover {
         flex-shrink: 0;
     }
 
-    /* Body & Sidebar Mobile Fix */
+    /* Body — on mobile use auto height so nothing ever clips */
     .api-window-body {
         flex-direction: column;
-        min-height: auto;
+        height: auto;          /* override the fixed 430px desktop height */
+        flex: 1;               /* fill remaining card height */
+        min-height: 0;
     }
     .api-sidebar {
         width: 100%;
@@ -2133,50 +2194,56 @@ a:hover {
         font-size: 0.75rem;
     }
 
-    /* Card Panel & Hero Content Mobile Fix */
     .api-panel {
-        padding: 1.5rem 1rem;
-        min-height: auto;
+        padding: 1.5rem 1.25rem;
         text-align: center;
         align-items: center;
+        justify-content: space-evenly; /* distribute content evenly across full card height */
+        overflow: visible;
     }
     .role-badge {
         font-size: 0.82rem;
-        padding: 0.25rem 0.85rem;
-        margin-bottom: 0.85rem;
+        padding: 0.25rem 0.9rem;
+        margin-bottom: 0; /* let space-evenly handle gaps */
     }
     .hero h1 {
-        font-size: clamp(1.8rem, 7.5vw, 2.4rem);
-        margin-bottom: 0.5rem;
+        font-size: clamp(2rem, 9vw, 2.8rem); /* bigger — fill the space */
+        margin-bottom: 0;
+        line-height: 1.15;
     }
     .hero-tagline {
-        font-size: clamp(0.95rem, 4vw, 1.15rem);
-        margin-bottom: 0.65rem;
+        font-size: clamp(1rem, 4.5vw, 1.2rem);
+        margin-bottom: 0;
+        font-weight: 700;
     }
     .hero-sub {
-        font-size: clamp(0.72rem, 3vw, 0.8rem);
+        font-size: clamp(0.72rem, 3.2vw, 0.82rem);
         gap: 0.4rem;
-        margin-bottom: 1.25rem;
+        margin-bottom: 0;
+        width: 100%;
     }
     .hero-chip {
-        padding: 0.2rem 0.45rem;
-        border-width: 1px;
+        padding: 0.22rem 0.5rem;
+        border-width: 1.5px;
         box-shadow: 1px 1px 0 var(--border-color);
     }
     .hero-buttons {
-        flex-direction: column;
+        flex-direction: row;
         align-items: center;
         justify-content: center;
+        flex-wrap: wrap;
         width: 100%;
         gap: 0.75rem;
     }
     .button {
-        width: 100%;
-        max-width: 280px;
+        width: auto;
         justify-content: center;
-        padding: 0.75rem 1.25rem;
-        font-size: 0.92rem;
+        padding: 0.75rem 1.35rem;
+        font-size: 0.88rem;
+        border-radius: 10px;
+        white-space: nowrap; /* never let button text wrap to a second line */
     }
+
     .tab-title {
         font-size: 0.95rem;
         margin-bottom: 0.75rem;
@@ -2510,6 +2577,7 @@ a:hover {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    color: #ffffff; /* make url white */
 }
 
 .browser-controls {
@@ -2549,6 +2617,66 @@ a:hover {
     overflow: hidden;
 }
 
+.vibe-iframe-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 10;
+    background: transparent;
+    cursor: none; /* Hide default cursor so custom cursor shows */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.3s ease, opacity 0.3s ease;
+}
+
+/* Subtle hover dark tint to show it's interactable */
+.vibe-browser-body:hover .vibe-iframe-overlay {
+    background: rgba(13, 14, 21, 0.25);
+}
+
+.overlay-hint {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(21, 22, 22, 0.95);
+    border: 2px solid var(--border-color);
+    box-shadow: 3.5px 3.5px 0px var(--border-color);
+    border-radius: 8px;
+    padding: 0.5rem 1rem;
+    color: #ffffff;
+    font-family: 'Courier New', monospace;
+    font-size: 0.8rem;
+    font-weight: 700;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    pointer-events: none;
+}
+
+.vibe-browser-body:hover .overlay-hint {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* When interacting, hide overlay and allow pointer events on iframe */
+.vibe-browser.interacting .vibe-iframe-overlay {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.vibe-browser.interacting #vibe-iframe {
+    pointer-events: auto !important;
+}
+
+/* Hide target cursor when active inside the iframe */
+body:has(.vibe-browser.interacting) .target-cursor-wrapper {
+    opacity: 0 !important;
+    visibility: hidden !important;
+}
+
 .vibe-iframe-wrapper {
     position: relative;
     width: 100%;
@@ -2574,6 +2702,14 @@ a:hover {
     border: none;
     opacity: 0;
     transition: opacity 0.4s ease;
+    pointer-events: none; /* let mouse events fall through so custom cursor tracks inside the preview */
+
+    /* Force GPU rasterization for crisp scaled text/images */
+    transform-style: preserve-3d;
+    backface-visibility: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    will-change: transform;
 }
 
 #vibe-iframe.loaded {
@@ -2846,4 +2982,133 @@ a:hover {
     right: -10px;
     border-left: none;
     border-top: none;
+}
+
+/* =============================================
+   INTRO LOADING SCREEN (IN-PLACE REVEAL)
+   ============================================= */
+body.intro-loading {
+    overflow: hidden;
+}
+
+/* 1. HIDE ALL ELEMENTS EXCEPT THE NAME ANIMATION IN HIERARCHY */
+body.intro-loading .navbar,
+body.intro-loading .api-window-header,
+body.intro-loading .api-sidebar,
+body.intro-loading .role-badge,
+body.intro-loading .hero-tagline,
+body.intro-loading .hero-sub,
+body.intro-loading .hero-buttons,
+body.intro-loading .stats-grid,
+body.intro-loading .section,
+body.intro-loading .footer,
+body.intro-loading .target-cursor-wrapper {
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+}
+
+/* 2. MAKE PLAYGROUND CARD TRANSPARENT DURING LOADING */
+body.intro-loading .api-playground {
+    background: transparent !important;
+    border-color: transparent !important;
+    box-shadow: none !important;
+    filter: none !important;
+}
+
+body.intro-loading .api-sidebar {
+    border-right-color: transparent !important;
+}
+
+/* 3. ENSURE GLITCH SHADOW SLICES BLEND WITH PAGE BACKGROUND DURING INTRO LOADING */
+body.intro-loading #hero-name .glitch::after,
+body.intro-loading #hero-name .glitch::before {
+    background-color: var(--background-color) !important;
+}
+
+/* 4. DEFINE TRANSITIONS FOR SMOOTH IN-PLACE REVEAL */
+.navbar,
+.api-window-header,
+.api-sidebar,
+.role-badge,
+.hero-tagline,
+.hero-sub,
+.hero-buttons,
+.stats-grid,
+.section,
+.footer {
+    transition: opacity 1.5s cubic-bezier(0.25, 1, 0.5, 1), visibility 1.5s cubic-bezier(0.25, 1, 0.5, 1) !important;
+}
+
+.api-playground {
+    transition: background-color 1.5s cubic-bezier(0.25, 1, 0.5, 1),
+                border-color 1.5s cubic-bezier(0.25, 1, 0.5, 1),
+                box-shadow 1.5s cubic-bezier(0.25, 1, 0.5, 1),
+                filter 1.5s cubic-bezier(0.25, 1, 0.5, 1) !important;
+}
+
+/* 5. LOADER BAR WRAPPER
+   Occupies exactly 0px of height in the layout flow so that the name
+   is centered at the exact same coordinates before, during, and after loading. */
+.loader-bar-wrapper {
+    height: 0;
+    margin: 0;
+    padding: 0;
+    overflow: visible;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transform: translateY(1.25rem); /* visual separation below name */
+    transition: opacity 0.5s ease, visibility 0.5s ease;
+}
+
+body.intro-loading .loader-bar-wrapper {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Lock page scroll while loading */
+body.intro-loading,
+html:has(body.intro-loading) {
+    overflow: hidden !important;
+    height: 100dvh !important;
+}
+
+/* Never clip the loader bar inside the panel or window body */
+body.intro-loading .api-panel,
+body.intro-loading .api-window-body {
+    overflow: visible !important;
+}
+
+.loader-bar-container {
+    flex-shrink: 0;       /* prevent collapsing in height:0 parent flexbox */
+    width: 90%;           /* responsive — scales with panel */
+    max-width: 260px;
+    height: 6px;
+    background: rgba(48, 41, 81, 0.08);
+    border: 2px solid var(--border-color);
+    border-radius: 10px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 2px 2px 0px var(--border-color);
+}
+
+.loader-bar {
+    height: 100%;
+    width: 0%;
+    background: var(--accent);
+    border-radius: 10px;
+}
+
+.loader-percentage {
+    flex-shrink: 0;       /* prevent collapsing in height:0 parent flexbox */
+    font-family: 'Courier New', monospace;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--secondary-color);
+    letter-spacing: 0.5px;
 }
