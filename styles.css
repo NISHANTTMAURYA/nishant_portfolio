@@ -2661,6 +2661,23 @@ a:hover {
     transform: translateY(0);
 }
 
+@media (max-width: 900px) {
+    .desktop-hint-icon,
+    .desktop-hint-text {
+        display: none !important;
+    }
+    .mobile-hint-icon {
+        display: inline-block !important;
+    }
+    .mobile-hint-text {
+        display: inline !important;
+    }
+    .overlay-hint {
+        opacity: 1 !important;
+        transform: translateY(0) !important;
+    }
+}
+
 /* When interacting, hide overlay and allow pointer events on iframe */
 .vibe-browser.interacting .vibe-iframe-overlay {
     opacity: 0;
