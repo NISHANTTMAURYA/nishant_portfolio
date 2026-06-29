@@ -1068,6 +1068,7 @@ try {
         let raf = null;
         let idleTimer = null;
         let userActive = false;
+        let pointerOverGrid = false;
         const pauseAutoMoving = () => {
             userActive = true;
             if (idleTimer) clearTimeout(idleTimer);
@@ -1176,7 +1177,11 @@ try {
                 if (idx !== -1) {
                     const r = Math.floor(idx / gridCols) + 0.5;
                     const c = (idx % gridCols) + 0.5;
-                    tiltAt(r, c);
+                    
+                    // Only tilt toward the marquee if the pointer is NOT hovering directly over the grid
+                    if (!pointerOverGrid) {
+                        tiltAt(r, c);
+                    }
 
                     // Sync simulation state so it resumes from this manually selected tech item
                     simIndex = idx;
@@ -1435,16 +1440,32 @@ try {
 
         const cursorDot = document.querySelector('.target-cursor-dot');
 
-        wrapper.addEventListener('pointermove', onPointerMove);
-        wrapper.addEventListener('pointerenter', () => { if (cursorDot) cursorDot.classList.add('cursor-dot--expanded'); });
+        wrapper.addEventListener('pointermove', e => {
+            pointerOverGrid = true;
+            onPointerMove(e);
+        });
+        wrapper.addEventListener('pointerenter', () => {
+            pointerOverGrid = true;
+            if (cursorDot) cursorDot.classList.add('cursor-dot--expanded');
+        });
         wrapper.addEventListener('pointerleave', () => {
+            pointerOverGrid = false;
             resetAll();
             if (cursorDot) cursorDot.classList.remove('cursor-dot--expanded');
         });
         wrapper.addEventListener('click', onClick);
-        wrapper.addEventListener('touchmove', onTouchMove, { passive: false });
-        wrapper.addEventListener('touchstart', pauseAutoMoving, { passive: true });
-        wrapper.addEventListener('touchend', resetAll, { passive: true });
+        wrapper.addEventListener('touchmove', e => {
+            pointerOverGrid = true;
+            onTouchMove(e);
+        }, { passive: false });
+        wrapper.addEventListener('touchstart', () => {
+            pointerOverGrid = true;
+            pauseAutoMoving();
+        }, { passive: true });
+        wrapper.addEventListener('touchend', () => {
+            pointerOverGrid = false;
+            resetAll();
+        }, { passive: true });
 
         const simSpeed = 0.025;
         const totalCubes = gridCols * gridRows;
