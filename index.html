@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nishant Maurya | Portfolio</title>
+    <title>Nishant Maurya | Backend Developer</title>
+    <meta name="description" content="Nishant Maurya — Backend Developer specializing in Django, PostgreSQL, Celery & Redis. 8 hackathon wins. Building production-grade systems.">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
 <link rel="stylesheet" href="styles.css">
 <body>
@@ -22,92 +23,152 @@
             </a>
         </div>
         <div class="nav-links">
-            <a href="" class="nav-link">About</a>
-            <a href="#gallery" class="nav-link">Gallery</a>
+            <a href="#about" class="nav-link">About</a>
             <a href="#projects" class="nav-link">Projects</a>
-            <a href="#skills" class="nav-link">Skills</a>
             <a href="#achievements" class="nav-link">Achievements</a>
-            <a href="#education" class="nav-link">Education</a>
+            <a href="#gallery" class="nav-link">Gallery</a>
             <a href="#resume" class="nav-link">Resume</a>
             <a href="#contact" class="nav-link">Contact</a>
         </div>
-        <button class="mobile-menu-btn">
+        <button class="mobile-menu-btn" aria-label="Toggle menu">
             <i class="material-icons">menu</i>
         </button>
     </nav>
 
+    <!-- Hero -->
     <div class="hero">
         <div class="hero-background"></div>
         <div class="hero-content">
+            <div class="role-badge">&lt; Backend Developer /&gt;</div>
             <h1>Nishant Maurya</h1>
-            <p>Backend Developer</p>
-            <p>Third-year Computer Engineering student passionate about solving real-life problems through technology. 8+ hackathon wins, building production-grade systems.</p>
-            <a href="#projects" class="button">View Projects</a>
-            <a href="#resume" class="button">View Resume</a>
+            <p class="hero-tagline">I build backend systems that actually ship.</p>
+            <p class="hero-sub">3rd-year CS @ Fr. CRCE &nbsp;·&nbsp; Django · PostgreSQL · Celery &nbsp;·&nbsp; 8 Hackathon Wins &nbsp;·&nbsp; Live at <a href="https://atttc.cloud" target="_blank">atttc.cloud</a></p>
+            <div class="hero-buttons">
+                <a href="#projects" class="button button-primary">View Projects</a>
+                <a href="#resume" class="button button-secondary">Download Resume</a>
+            </div>
         </div>
     </div>
 
     <div class="container">
-        <!-- Stats Section -->
+
+        <!-- Stats -->
         <div class="stats-grid">
             <div class="stat-card">
-                <div class="stat-number">1+</div>
-                <div class="stat-label">Years Experience</div>
+                <div class="stat-number">9.0</div>
+                <div class="stat-label">SGPA</div>
             </div>
             <div class="stat-card">
                 <div class="stat-number">8</div>
                 <div class="stat-label">Hackathon Wins</div>
             </div>
             <div class="stat-card">
-                <div class="stat-number">5+</div>
-                <div class="stat-label">Projects Completed</div>
+                <div class="stat-number">2</div>
+                <div class="stat-label">Production Apps</div>
             </div>
             <div class="stat-card">
                 <div class="stat-number">21</div>
                 <div class="stat-label">Finalist Positions</div>
             </div>
-            
         </div>
 
-        <!-- Experience Section -->
-        <section id="experience" class="section">
-            <h2 class="section-title">Experience</h2>
-            <div class="experience-timeline">
-                <div class="timeline-item">
-                    <div class="timeline-date">2025</div>
-                    <h3>Backend Developer &amp; Consultant — 4iStudios</h3>
-                    <p>Built and deployed the <strong>Agnel Trade Test &amp; Training Portal</strong> live at <a href="https://atttc.cloud" target="_blank">atttc.cloud</a> as a student-led college consultancy project under 4iStudios for the Agnel Trade Test Center. Delivered a secure role-based workflow (Office, Assessor, Validator) with AES-256 signature encryption, dynamic PDF certificate generation, automated SQL/Excel backups to Cloudflare R2 via Celery, and CAPTCHA-protected candidate portals with rate-limiting.</p>
+        <!-- About Me -->
+        <section id="about" class="section">
+            <h2 class="section-title">About Me</h2>
+            <div class="about-card">
+                <p class="about-text">
+                    Backend-focused Computer Engineering student (3rd year, Fr. CRCE · SGPA 9.0) with hands-on client consultancy experience under <strong>4iStudios</strong>. I specialize in building scalable APIs with <strong>Django</strong>, optimizing database schemas with <strong>PostgreSQL</strong>, and orchestrating background task queues with <strong>Celery/Redis</strong>. My work has shipped to real institutions — from a live candidate assessment portal to a mentoring platform used by my own department.
+                </p>
+                <div class="about-meta">
+                    <span class="about-meta-item"><i class="material-icons">school</i> Fr. Conceicao Rodrigues College of Engineering</span>
+                    <span class="about-meta-item"><i class="material-icons">email</i> <a href="mailto:mauryanishant2005@gmail.com">mauryanishant2005@gmail.com</a></span>
+                    <span class="about-meta-item"><i class="material-icons">place</i> Mumbai, Maharashtra</span>
                 </div>
-                <div class="timeline-item">
-                    <div class="timeline-date">2024-25</div>
-                    <h3>Backend Developer — MentorConnect</h3>
-                    <p>Developed digitized mentoring platform for the Computer Engineering branch at Fr. Conceicao Rodrigues College of Engineering (Fr.CRCE)</p>
+                <div class="soft-skills">
+                    <span class="soft-skill-tag">Leadership &amp; Team Management</span>
+                    <span class="soft-skill-tag">Effective Communication</span>
+                    <span class="soft-skill-tag">Problem-Solving &amp; Critical Thinking</span>
                 </div>
             </div>
         </section>
 
+        <!-- Experience -->
+        <section id="experience" class="section">
+            <h2 class="section-title">Experience</h2>
+            <div class="experience-timeline">
+                <div class="timeline-item">
+                    <div class="timeline-header">
+                        <div>
+                            <div class="timeline-date">2025</div>
+                            <h3>Backend Developer &amp; Consultant</h3>
+                            <div class="timeline-company"><a href="http://4istudios.in/" target="_blank">4iStudios</a> &nbsp;·&nbsp; Student-led Consultancy</div>
+                        </div>
+                        <div class="timeline-tags">
+                            <span class="tech-tag">Django</span>
+                            <span class="tech-tag">PostgreSQL</span>
+                            <span class="tech-tag">Celery</span>
+                            <span class="tech-tag">Redis</span>
+                        </div>
+                    </div>
+                    <p>Built and deployed the <strong><a href="https://atttc.cloud/" target="_blank">Agnel Trade Test &amp; Training Portal</a></strong> for the Agnel Trade Test Center. Delivered a secure role-based workflow (Office, Assessor, Validator) with AES-256 signature encryption, dynamic PDF certificate generation, automated SQL/Excel backups to Cloudflare R2 via Celery, and CAPTCHA-protected portals with rate-limiting.</p>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-header">
+                        <div>
+                            <div class="timeline-date">2024 – 25</div>
+                            <h3>Backend Developer</h3>
+                            <div class="timeline-company">MentorConnect &nbsp;·&nbsp; Fr. CRCE</div>
+                        </div>
+                        <div class="timeline-tags">
+                            <span class="tech-tag">Django</span>
+                            <span class="tech-tag">PostgreSQL</span>
+                        </div>
+                    </div>
+                    <p>Built the backend for Fr. CRCE's official mentoring platform — digitizing the entire mentoring process, eliminating offline paperwork, and providing in-depth student analytics for the Computer Engineering department.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Projects -->
         <section id="projects" class="section animated-background-section">
             <h2 class="section-title">Projects</h2>
             <div class="projects">
-                <div class="project-card">
-                    <h3>
-                        <a href="https://github.com/NISHANTTMAURYA/SplitKar/blob/main/README-TECHNICAL.md" target="_blank">SplitKar</a>
-                    </h3>
-                    <p>Developed a full-stack expense management application for group expense tracking. Designed scalable REST APIs using Django, implemented Google Authentication, and built group management features with a modern, youth-focused UI.</p>
+
+                <div class="project-card featured">
+                    <div class="project-card-top">
+                        <div class="project-badges">
+                            <span class="badge badge-live">🟢 Live</span>
+                            <span class="badge badge-featured">⭐ Featured</span>
+                        </div>
+                        <h3><a href="https://atttc.cloud/" target="_blank">Agnel Trade Test &amp; Training Portal</a></h3>
+                        <div class="project-links">
+                            <a href="https://atttc.cloud/" target="_blank" class="project-link"><i class="material-icons">open_in_new</i> Live</a>
+                            <a href="http://4istudios.in/" target="_blank" class="project-link"><i class="material-icons">business</i> 4iStudios</a>
+                        </div>
+                    </div>
+                    <p>Production candidate assessment portal for the Agnel Trade Test Center. Built a secure role-based workflow (Office, Assessor, Validator) with AES-256 signature encryption, dynamic PDF certificate generation, automated SQL/Excel backups to Cloudflare R2, and CAPTCHA-protected portals with rate-limiting and custom 429 handlers.</p>
                     <div class="tech-stack">
-                        <span class="tech-tag">Flutter</span>
                         <span class="tech-tag">Django</span>
                         <span class="tech-tag">PostgreSQL</span>
-                        <span class="tech-tag">Google Auth</span>
+                        <span class="tech-tag">Celery</span>
+                        <span class="tech-tag">Redis</span>
+                        <span class="tech-tag">Cloudflare R2</span>
+                        <span class="tech-tag">AES-256</span>
                     </div>
                 </div>
 
-                <div class="project-card">
-                    <h3>
-                        <a href="https://mitrai.social/" target="_blank">Mitrai</a>
-                        <a href="https://docs.google.com/presentation/d/1oUYzCvxEDUANjj_x1ySZQb_4EXVojhCn-rn3ca71h50/edit?usp=sharing" target="_blank" style="margin-left:8px;font-size:0.9em;">[Pitch Deck]</a>
-                    </h3>
-                    <p>Developed an AI-driven chat platform featuring JWT/OAuth-secured REST APIs and Google GenAI integration to generate persona-based responses from conversation data. Engineered scalable background task pipelines using Celery workers and Redis to handle data importing and chat analysis.</p>
+                <div class="project-card featured">
+                    <div class="project-card-top">
+                        <div class="project-badges">
+                            <span class="badge badge-live">🟢 Live</span>
+                        </div>
+                        <h3><a href="https://mitrai.social/" target="_blank">Mitrai</a></h3>
+                        <div class="project-links">
+                            <a href="https://mitrai.social/" target="_blank" class="project-link"><i class="material-icons">open_in_new</i> Live</a>
+                            <a href="https://docs.google.com/presentation/d/1oUYzCvxEDUANjj_x1ySZQb_4EXVojhCn-rn3ca71h50/edit?usp=sharing" target="_blank" class="project-link"><i class="material-icons">slideshow</i> Pitch Deck</a>
+                        </div>
+                    </div>
+                    <p>AI-driven chat platform with JWT/OAuth-secured REST APIs and Google GenAI integration to generate persona-based responses from conversation data. Engineered scalable background task pipelines using Celery workers and Redis to handle data importing and chat analysis at scale.</p>
                     <div class="tech-stack">
                         <span class="tech-tag">Django</span>
                         <span class="tech-tag">PostgreSQL</span>
@@ -119,11 +180,29 @@
                 </div>
 
                 <div class="project-card">
-                    <h3>
-                        MentorConnect
-                        <a href="https://docs.google.com/presentation/d/18gZvTnmns7fKk7o_HeOOsrgzzXewCXnX/edit?usp=sharing&ouid=116282146601498084420&rtpof=true&sd=true" target="_blank" style="margin-left:8px;font-size:0.9em;">[Presentation]</a>
-                    </h3>
-                    <p>Digitized the mentoring process to eliminate offline paperwork, building robust database models and analytics features to track student performance. <i>Currently used by the Computer Engineering Department at Fr. CRCE.</i></p>
+                    <div class="project-card-top">
+                        <h3><a href="https://github.com/NISHANTTMAURYA/SplitKar/blob/main/README-TECHNICAL.md" target="_blank">SplitKar</a></h3>
+                        <div class="project-links">
+                            <a href="https://github.com/NISHANTTMAURYA/SplitKar/blob/main/README-TECHNICAL.md" target="_blank" class="project-link"><i class="material-icons">code</i> GitHub</a>
+                        </div>
+                    </div>
+                    <p>Full-stack expense management app for group expense tracking. Designed scalable REST APIs with Django, implemented Google Authentication, and built friend/group management features with a modern, youth-focused Flutter UI.</p>
+                    <div class="tech-stack">
+                        <span class="tech-tag">Flutter</span>
+                        <span class="tech-tag">Django</span>
+                        <span class="tech-tag">PostgreSQL</span>
+                        <span class="tech-tag">Google Auth</span>
+                    </div>
+                </div>
+
+                <div class="project-card">
+                    <div class="project-card-top">
+                        <h3><a href="https://docs.google.com/presentation/d/18gZvTnmns7fKk7o_HeOOsrgzzXewCXnX/edit?usp=sharing&ouid=116282146601498084420&rtpof=true&sd=true" target="_blank">MentorConnect</a></h3>
+                        <div class="project-links">
+                            <a href="https://docs.google.com/presentation/d/18gZvTnmns7fKk7o_HeOOsrgzzXewCXnX/edit?usp=sharing&ouid=116282146601498084420&rtpof=true&sd=true" target="_blank" class="project-link"><i class="material-icons">slideshow</i> Presentation</a>
+                        </div>
+                    </div>
+                    <p>Built the backend for Fr. CRCE's official mentoring platform — used by the Computer Engineering Department. Digitized the entire mentoring workflow, eliminated offline paperwork, and delivered robust analytics to track student performance across semesters.</p>
                     <div class="tech-stack">
                         <span class="tech-tag">Django</span>
                         <span class="tech-tag">PostgreSQL</span>
@@ -131,43 +210,33 @@
                 </div>
 
                 <div class="project-card">
-                    <h3>
-                        GamiFied Platform
-                        <span style="font-size:0.75em;color:var(--accent);margin-left:8px;">SIH 2024</span>
-                        <a href="https://drive.google.com/file/d/1NKEZPcyvM1BMwsnfGxTPziXDk7wbC9U8/view?usp=sharing" target="_blank" style="margin-left:8px;font-size:0.9em;">[Demo]</a>
-                    </h3>
-                    <p>Designed the database architecture for a web gaming platform, integrating 6 mini-games from multiple contributors into a unified leaderboard system. Developed <b>Samvidhan Setu</b> and Hangman mini-games as part of the platform.</p>
+                    <div class="project-card-top">
+                        <div class="project-badges">
+                            <span class="badge badge-featured">⭐ SIH 2024 Finalist</span>
+                        </div>
+                        <h3>GamiFied Platform</h3>
+                        <div class="project-links">
+                            <a href="https://drive.google.com/file/d/1NKEZPcyvM1BMwsnfGxTPziXDk7wbC9U8/view?usp=sharing" target="_blank" class="project-link"><i class="material-icons">play_circle</i> Demo</a>
+                        </div>
+                    </div>
+                    <p>Led database design and integrated 6 mini-games from multiple contributors into a unified leaderboard for Smart India Hackathon 2024. Personally developed <strong>Samvidhan Setu</strong> (Snake &amp; Ladder variant) and Hangman mini-games as part of the platform.</p>
                     <div class="tech-stack">
-                        <span class="tech-tag">Web Technologies</span>
                         <span class="tech-tag">Django</span>
                         <span class="tech-tag">JavaScript</span>
+                        <span class="tech-tag">PostgreSQL</span>
                         <span class="tech-tag">Leaderboard</span>
                     </div>
                 </div>
 
-                <div class="project-card">
-                    <h3>
-                        Agnel Trade Test &amp; Training Portal
-                        <a href="https://atttc.cloud/" target="_blank" style="margin-left:8px;font-size:0.9em;">[Live]</a>
-                    </h3>
-                    <p>Developed a candidate assessment portal live at <a href="https://atttc.cloud/" target="_blank">atttc.cloud</a> under <b><a href="http://4istudios.in/" target="_blank">4iStudios</a></b> as a student-led college consultancy project for the Agnel Trade Test Center. Built a secure role-based workflow (Office, Assessor, Validator) with AES-256 signature encryption, dynamic PDF certificate generation, and automated SQL/Excel backups to Cloudflare R2 via Celery. Protected portals using rate-limiting, custom 429 handlers, and CAPTCHA validation.</p>
-                    <div class="tech-stack">
-                        <span class="tech-tag">Django</span>
-                        <span class="tech-tag">PostgreSQL</span>
-                        <span class="tech-tag">Celery</span>
-                        <span class="tech-tag">Redis</span>
-                        <span class="tech-tag">Cloudflare R2</span>
-                        <span class="tech-tag">AES-256</span>
-                    </div>
-                </div>
             </div>
         </section>
 
+        <!-- Gallery -->
         <section id="gallery" class="section animated-background-section">
             <h2 class="section-title">Gallery</h2>
             <div class="carousel-container">
                 <div class="carousel">
-                    <button class="carousel-button prev">
+                    <button class="carousel-button prev" aria-label="Previous slide">
                         <i class="material-icons">chevron_left</i>
                     </button>
                     <div class="carousel-track-container">
@@ -189,7 +258,7 @@
                             </div>
                         </div>
                     </div>
-                    <button class="carousel-button next">
+                    <button class="carousel-button next" aria-label="Next slide">
                         <i class="material-icons">chevron_right</i>
                     </button>
                 </div>
@@ -203,9 +272,9 @@
             </div>
         </section>
 
-        <!-- Skills Section -->
+        <!-- Tech Stack -->
         <section id="skills" class="section">
-            <h2 class="section-title">Technical Skills</h2>
+            <h2 class="section-title">Tech Stack</h2>
             <div class="skills-grid">
                 <div class="skill-category">
                     <h3 class="skill-category-title"><i class="material-icons">code</i> Languages</h3>
@@ -243,23 +312,36 @@
                     </div>
                 </div>
                 <div class="skill-category">
-                    <h3 class="skill-category-title"><i class="material-icons">build</i> Tools &amp; Libraries</h3>
+                    <h3 class="skill-category-title"><i class="material-icons">build</i> Tools &amp; Infra</h3>
                     <div class="tech-stack">
                         <span class="tech-tag">Docker</span>
+                        <span class="tech-tag">Cloudflare R2</span>
                         <span class="tech-tag">OpenCV</span>
                         <span class="tech-tag">NumPy</span>
-                        <span class="tech-tag">Cloudflare R2</span>
                         <span class="tech-tag">Ollama</span>
-                        <span class="tech-tag">Advanced MS Excel</span>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- Achievements Section -->
+        <!-- Achievements -->
         <section id="achievements" class="section">
             <h2 class="section-title">Achievements</h2>
             <div class="achievements-grid">
+                <div class="achievement-card">
+                    <span class="achievement-rank">🥇</span>
+                    <div class="achievement-info">
+                        <div class="achievement-title">Winners — SIH 2025</div>
+                        <div class="achievement-org">Ramaiah University, Bengaluru</div>
+                    </div>
+                </div>
+                <div class="achievement-card">
+                    <span class="achievement-rank">🥇</span>
+                    <div class="achievement-info">
+                        <div class="achievement-title">Winners — Sunhacks 2025</div>
+                        <div class="achievement-org">Sandip University, Nashik</div>
+                    </div>
+                </div>
                 <div class="achievement-card">
                     <span class="achievement-rank">🥇</span>
                     <div class="achievement-info">
@@ -268,10 +350,10 @@
                     </div>
                 </div>
                 <div class="achievement-card">
-                    <span class="achievement-rank">🥉</span>
+                    <span class="achievement-rank">🥇</span>
                     <div class="achievement-info">
-                        <div class="achievement-title">Second Runner Up — CODE ODYSSEY</div>
-                        <div class="achievement-org">KJ Somaiya</div>
+                        <div class="achievement-title">Winners — Prakalp-IKS Edition</div>
+                        <div class="achievement-org">Fr. CRCE</div>
                     </div>
                 </div>
                 <div class="achievement-card">
@@ -285,14 +367,14 @@
                     <span class="achievement-rank">💰</span>
                     <div class="achievement-info">
                         <div class="achievement-title">Winners — $250 Bounty</div>
-                        <div class="achievement-org">Organized by Tech Influencer @roshanvadassery</div>
+                        <div class="achievement-org">@roshanvadassery</div>
                     </div>
                 </div>
                 <div class="achievement-card">
-                    <span class="achievement-rank">🏆</span>
+                    <span class="achievement-rank">🥉</span>
                     <div class="achievement-info">
-                        <div class="achievement-title">Finalists — SIH 2024</div>
-                        <div class="achievement-org">Smart India Hackathon</div>
+                        <div class="achievement-title">Second Runner Up — CODE ODYSSEY</div>
+                        <div class="achievement-org">KJ Somaiya</div>
                     </div>
                 </div>
                 <div class="achievement-card">
@@ -303,36 +385,22 @@
                     </div>
                 </div>
                 <div class="achievement-card">
-                    <span class="achievement-rank">🥇</span>
+                    <span class="achievement-rank">🏆</span>
                     <div class="achievement-info">
-                        <div class="achievement-title">Winners — Prakalp-IKS Edition</div>
-                        <div class="achievement-org">Fr. CRCE</div>
-                    </div>
-                </div>
-                <div class="achievement-card">
-                    <span class="achievement-rank">🥇</span>
-                    <div class="achievement-info">
-                        <div class="achievement-title">Winners — Sunhacks 2025</div>
-                        <div class="achievement-org">Sandip University, Nashik</div>
-                    </div>
-                </div>
-                <div class="achievement-card">
-                    <span class="achievement-rank">🥇</span>
-                    <div class="achievement-info">
-                        <div class="achievement-title">Winners — SIH 2025</div>
-                        <div class="achievement-org">Ramaiah University, Bengaluru</div>
+                        <div class="achievement-title">Finalists — SIH 2024</div>
+                        <div class="achievement-org">Smart India Hackathon</div>
                     </div>
                 </div>
             </div>
             <div class="achievements-summary">8 Hackathon Wins &nbsp;|&nbsp; 21 Finalist Positions</div>
         </section>
 
-        <!-- Education Section -->
+        <!-- Education -->
         <section id="education" class="section">
             <h2 class="section-title">Education</h2>
             <div class="experience-timeline">
                 <div class="timeline-item">
-                    <div class="timeline-date">2023–Present</div>
+                    <div class="timeline-date">2023 – Present</div>
                     <h3>B.E. Computers (Third Year)</h3>
                     <p>Fr. Conceicao Rodrigues College of Engineering, Bandra(W) &mdash; <strong>SGPA: 9.0</strong></p>
                 </div>
@@ -354,11 +422,11 @@
             </div>
         </section>
 
-        <!-- Resume Section -->
-        <section id="resume" class="resume-section">
+        <!-- Resume -->
+        <section id="resume" class="resume-section section">
             <h2 class="section-title">My Resume</h2>
             <div class="resume-container">
-                <img src="images/res.jpeg" alt="Nishant's Resume" class="resume-image">
+                <img src="images/res.jpeg" alt="Nishant Maurya's Resume" class="resume-image">
                 <a href="images/nishant_resume.pdf" download class="download-button">
                     <i class="material-icons">download</i>
                     Download Resume
@@ -366,51 +434,69 @@
             </div>
         </section>
 
-        <!-- Contact Section -->
+        <!-- Contact -->
         <section id="contact" class="section">
             <h2 class="section-title">Contact Me</h2>
             <div class="contact-container">
                 <div class="contact-links">
                     <a href="https://www.linkedin.com/in/nishant-maurya-45bb86276?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app" target="_blank" class="contact-link">
                         <i class="material-icons">business</i>
-                        LinkedIn
+                        <div>
+                            <span class="contact-link-label">LinkedIn</span>
+                            <span class="contact-link-value">nishant-maurya-45bb86276</span>
+                        </div>
                     </a>
-                    <a href="https://github.com/team4ingineers" target="_blank" class="contact-link">
+                    <a href="https://github.com/NISHANTTMAURYA" target="_blank" class="contact-link">
                         <i class="material-icons">code</i>
-                        GitHub
+                        <div>
+                            <span class="contact-link-label">GitHub</span>
+                            <span class="contact-link-value">NISHANTTMAURYA</span>
+                        </div>
                     </a>
                     <a href="mailto:mauryanishant2005@gmail.com" class="contact-link">
                         <i class="material-icons">email</i>
-                        mauryanishant2005@gmail.com
+                        <div>
+                            <span class="contact-link-label">Email</span>
+                            <span class="contact-link-value">mauryanishant2005@gmail.com</span>
+                        </div>
                     </a>
                     <a href="tel:+919653215070" class="contact-link">
                         <i class="material-icons">phone</i>
-                        +91 9653215070
+                        <div>
+                            <span class="contact-link-label">Phone</span>
+                            <span class="contact-link-value">+91 9653215070</span>
+                        </div>
                     </a>
                 </div>
             </div>
-            <hr class="section-divider" />
         </section>
 
-        <!-- Social Media Section -->
-        <section id="social-media" class="section">
-            <h2 class="section-title">Social Media</h2>
-            <div class="contact-container">
-                <div class="contact-links">
-                    <a href="https://www.youtube.com/@Team4i/videos" target="_blank" class="contact-link">
-                        <i class="material-icons">ondemand_video</i>
-                        YouTube (Team 4i)
-                    </a>
-                    <a href="https://www.instagram.com/team.4i" target="_blank" class="contact-link">
-                        <i class="material-icons">photo_camera</i>
-                        Instagram (team.4i)
-                    </a>
-                </div>
-            </div>
-            <hr class="section-divider" />
-        </section>
     </div>
-    <script src="script.js"></script>
 
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-inner">
+            <span class="footer-copy">&copy; 2025 Nishant Maurya &nbsp;·&nbsp; Built with ❤️</span>
+            <div class="footer-links">
+                <a href="https://www.linkedin.com/in/nishant-maurya-45bb86276?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app" target="_blank" aria-label="LinkedIn">
+                    <i class="material-icons">business</i>
+                </a>
+                <a href="https://github.com/NISHANTTMAURYA" target="_blank" aria-label="GitHub">
+                    <i class="material-icons">code</i>
+                </a>
+                <a href="https://www.youtube.com/@Team4i/videos" target="_blank" aria-label="YouTube">
+                    <i class="material-icons">ondemand_video</i>
+                </a>
+                <a href="https://www.instagram.com/team.4i" target="_blank" aria-label="Instagram">
+                    <i class="material-icons">photo_camera</i>
+                </a>
+                <a href="mailto:mauryanishant2005@gmail.com" aria-label="Email">
+                    <i class="material-icons">email</i>
+                </a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
 </body>
-</html> 
+</html>
