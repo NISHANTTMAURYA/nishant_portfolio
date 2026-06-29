@@ -1099,8 +1099,10 @@ try {
         let techToMarqueeItems = {};
         let oneSetWidth = 0;
 
+        let cachedContainerWidth = 0;
         const cacheItemPositions = () => {
             if (!marquee) return;
+            cachedContainerWidth = marquee.clientWidth;
             allMarqueeItems = Array.from(marquee.querySelectorAll('.marquee-item')).map(el => ({
                 el,
                 tech: el.dataset.tech,
@@ -1111,7 +1113,7 @@ try {
 
         const updateLayout = () => {
             if (!marquee || !allMarqueeItems.length) return;
-            const containerWidth = marquee.clientWidth;
+            const containerWidth = cachedContainerWidth || marquee.clientWidth;
             const scrollLeft = marquee.scrollLeft;
             const containerCenterX = scrollLeft + containerWidth / 2;
             let closestEl = null;
@@ -1132,7 +1134,7 @@ try {
                 if (item.el === closestEl) {
                     item.el.classList.add('active-highlight');
                     if (targetFrame) {
-                        const newWidth = Math.max(140, item.el.offsetWidth + 48);
+                        const newWidth = Math.max(140, item.width + 48); // Use cached item.width!
                         targetFrame.style.width = `${newWidth}px`;
                     }
                 } else {
