@@ -2667,7 +2667,7 @@ a:hover {
     pointer-events: none;
 }
 
-.vibe-browser.interacting .vibe-iframe-instance {
+.vibe-browser.interacting .vibe-iframe-instance.active-iframe.loaded {
     pointer-events: auto !important;
 }
 
@@ -2703,6 +2703,7 @@ body:has(.vibe-browser.interacting) .target-cursor-wrapper {
     opacity: 0;
     transition: opacity 0.4s ease;
     pointer-events: none; /* let mouse events fall through so custom cursor tracks inside the preview */
+    z-index: 1;
 
     /* Force GPU rasterization for crisp scaled text/images */
     transform-style: preserve-3d;
@@ -2712,8 +2713,9 @@ body:has(.vibe-browser.interacting) .target-cursor-wrapper {
     will-change: transform;
 }
 
-.vibe-iframe-instance.loaded {
+.vibe-iframe-instance.active-iframe.loaded {
     opacity: 1;
+    z-index: 5;
 }
 
 .vibe-loader {

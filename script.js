@@ -540,7 +540,16 @@ try {
 
                     const imgDiv = document.createElement('div');
                     imgDiv.className = 'item-img';
-                    imgDiv.style.backgroundImage = `url(${item.img})`;
+
+                    const imgEl = document.createElement('img');
+                    imgEl.src = item.img;
+                    imgEl.loading = 'lazy';
+                    imgEl.alt = item.title;
+                    imgEl.style.width = '100%';
+                    imgEl.style.height = '100%';
+                    imgEl.style.objectFit = 'cover';
+                    imgEl.style.display = 'block';
+                    imgDiv.appendChild(imgEl);
 
                     const overlay = document.createElement('div');
                     overlay.className = 'item-caption-overlay';
@@ -1482,7 +1491,6 @@ try {
             if (iframePool[url]) return iframePool[url];
             const newIframe = iframeTemplate.cloneNode(true);
             newIframe.src = url;
-            newIframe.style.display = 'none';
             newIframe.classList.add('vibe-iframe-instance');
             newIframe.addEventListener('load', () => {
                 newIframe.classList.add('loaded');
@@ -1538,9 +1546,9 @@ try {
             browser.classList.add('active-highlight-browser');
             setTimeout(() => browser.classList.remove('active-highlight-browser'), 1000);
 
-            if (currentIframe) currentIframe.style.display = 'none';
+            if (currentIframe) currentIframe.classList.remove('active-iframe');
             currentIframe = getOrCreateIframe(url);
-            currentIframe.style.display = 'block';
+            currentIframe.classList.add('active-iframe');
 
             if (!currentIframe.classList.contains('loaded')) {
                 loader.style.opacity = '1';
