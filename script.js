@@ -1115,12 +1115,11 @@ try {
             if (!marquee || !allMarqueeItems.length) return;
             const containerWidth = cachedContainerWidth || marquee.clientWidth;
             const scrollLeft = marquee.scrollLeft;
-            const containerCenterX = scrollLeft + containerWidth / 2;
             let closestEl = null;
             let minDistance = Infinity;
 
             allMarqueeItems.forEach(item => {
-                const dx = (item.left + item.width / 2) - containerCenterX;
+                const dx = (item.left + item.width / 2) - scrollLeft;
                 const dist = Math.abs(dx);
                 item.el.style.opacity = Math.max(0.35, 1 - dist / (containerWidth * 0.4));
                 if (dist < minDistance) {
@@ -1234,7 +1233,7 @@ try {
 
             const allCopies = techToMarqueeItems[tech.name] || [];
             if (allCopies.length === 0) return;
-            const currentCenter = marquee.scrollLeft + marquee.clientWidth / 2;
+            const currentCenter = marquee.scrollLeft;
             let bestItem = allCopies[0];
             let bestDist = Infinity;
             allCopies.forEach(item => {
@@ -1242,7 +1241,7 @@ try {
                 const d = Math.abs(itemCenter - currentCenter);
                 if (d < bestDist) { bestDist = d; bestItem = item; }
             });
-            const targetScroll = bestItem.left + bestItem.width / 2 - marquee.clientWidth / 2;
+            const targetScroll = bestItem.left + bestItem.width / 2;
             gsap.to(marquee, { scrollLeft: targetScroll, duration: 0.4, ease: 'power2.out', overwrite: true, onUpdate: updateLayout });
         };
 
