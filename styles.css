@@ -977,7 +977,7 @@ a:hover {
 /* Corners are now styled directly inside each marquee-item */
 
 .marquee-container {
-    overflow-x: hidden;
+    overflow-x: auto;
     overflow-y: hidden;
     white-space: nowrap;
     width: 100%;
