@@ -1103,12 +1103,37 @@ try {
         const cacheItemPositions = () => {
             if (!marquee) return;
             cachedContainerWidth = marquee.clientWidth;
-            allMarqueeItems = Array.from(marquee.querySelectorAll('.marquee-item')).map(el => ({
-                el,
-                tech: el.dataset.tech,
-                left: el.offsetLeft,
-                width: el.offsetWidth
-            }));
+            const track = marquee.querySelector('.marquee-track');
+            if (!track) return;
+
+            // Get computed flex gap in pixels
+            const computedStyle = window.getComputedStyle(track);
+            const gap = parseFloat(computedStyle.gap) || 0;
+
+            const paddingLeft = cachedContainerWidth / 2;
+            let currentLeft = paddingLeft;
+
+            const items = Array.from(marquee.querySelectorAll('.marquee-item'));
+            allMarqueeItems = items.map(el => {
+                const w = el.offsetWidth;
+                const itemData = {
+                    el,
+                    tech: el.dataset.tech,
+                    left: currentLeft, // Manual scroll-independent absolute coordinate
+                    width: w
+                };
+                currentLeft += w + gap;
+                return itemData;
+            });
+
+            // Calculate oneSetWidth precisely as the sum of widths + gaps of exactly one set of items
+            const setSize = items.length / 3;
+            if (setSize > 0) {
+                oneSetWidth = 0;
+                for (let i = 0; i < setSize; i++) {
+                    oneSetWidth += items[i].offsetWidth + gap;
+                }
+            }
         };
 
         const updateLayout = () => {
@@ -1136,14 +1161,6 @@ try {
                     item.el.classList.remove('active-highlight');
                 }
             });
-
-            if (oneSetWidth > 0) {
-                if (scrollLeft < oneSetWidth * 0.5) {
-                    marquee.scrollLeft += oneSetWidth;
-                } else if (scrollLeft > oneSetWidth * 2.5) {
-                    marquee.scrollLeft -= oneSetWidth;
-                }
-            }
         };
 
         if (marquee) {
@@ -1177,13 +1194,10 @@ try {
             marquee.appendChild(track);
 
             requestAnimationFrame(() => {
-                const items = marquee.querySelectorAll('.marquee-item');
-                const setSize = items.length / 3;
-                if (setSize > 0 && items[setSize]) {
-                    oneSetWidth = items[setSize].offsetLeft - items[0].offsetLeft;
+                cacheItemPositions();
+                if (oneSetWidth > 0) {
                     marquee.scrollLeft = oneSetWidth;
                 }
-                cacheItemPositions();
                 
                 techToMarqueeItems = {};
                 allMarqueeItems.forEach(item => {
@@ -1195,24 +1209,16 @@ try {
                 // Recalculate once web fonts are fully loaded to prevent layout metric errors
                 if (document.fonts) {
                     document.fonts.ready.then(() => {
-                        const items = marquee.querySelectorAll('.marquee-item');
-                        const setSize = items.length / 3;
-                        if (setSize > 0 && items[setSize]) {
-                            oneSetWidth = items[setSize].offsetLeft - items[0].offsetLeft;
+                        cacheItemPositions();
+                        if (oneSetWidth > 0) {
                             marquee.scrollLeft = oneSetWidth;
                         }
-                        cacheItemPositions();
                         updateLayout();
                     });
                 }
             });
 
             window.addEventListener('resize', () => {
-                const items = marquee.querySelectorAll('.marquee-item');
-                const setSize = items.length / 3;
-                if (setSize > 0 && items[setSize]) {
-                    oneSetWidth = items[setSize].offsetLeft - items[0].offsetLeft;
-                }
                 cacheItemPositions();
                 updateLayout();
             });
@@ -1220,6 +1226,8 @@ try {
         }
 
         let lastTargetTech = null;
+        let scrollTween = null;
+        let scrollObj = { value: 0 };
         const scrollMarqueeTo = (rowHit, colHit) => {
             if (!marquee) return;
             const idx = Math.floor(rowHit) * gridCols + Math.floor(colHit);
@@ -1229,7 +1237,8 @@ try {
 
             const allCopies = techToMarqueeItems[tech.name] || [];
             if (allCopies.length === 0) return;
-            const currentCenter = marquee.scrollLeft + (cachedContainerWidth || marquee.clientWidth) / 2;
+            const containerWidth = cachedContainerWidth || marquee.clientWidth;
+            const currentCenter = marquee.scrollLeft + containerWidth / 2;
             let bestItem = allCopies[0];
             let bestDist = Infinity;
             allCopies.forEach(item => {
@@ -1237,8 +1246,29 @@ try {
                 const d = Math.abs(itemCenter - currentCenter);
                 if (d < bestDist) { bestDist = d; bestItem = item; }
             });
-            const targetScroll = bestItem.left + bestItem.width / 2 - (cachedContainerWidth || marquee.clientWidth) / 2;
-            gsap.to(marquee, { scrollLeft: targetScroll, duration: 0.4, ease: 'power2.out', overwrite: true, onUpdate: updateLayout });
+            const targetScroll = bestItem.left + bestItem.width / 2 - containerWidth / 2;
+            
+            scrollObj.value = marquee.scrollLeft;
+            if (scrollTween) scrollTween.kill();
+            scrollTween = gsap.to(scrollObj, {
+                value: targetScroll,
+                duration: 0.4,
+                ease: 'power2.out',
+                onUpdate: () => {
+                    let val = scrollObj.value;
+                    if (oneSetWidth > 0) {
+                        if (val < oneSetWidth * 0.5) {
+                            val += oneSetWidth;
+                            scrollObj.value += oneSetWidth;
+                        } else if (val > oneSetWidth * 2.5) {
+                            val -= oneSetWidth;
+                            scrollObj.value -= oneSetWidth;
+                        }
+                    }
+                    marquee.scrollLeft = val;
+                    updateLayout();
+                }
+            });
         };
 
         const onPointerMove = e => {
