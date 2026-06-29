@@ -9,7 +9,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script>window.gsap || document.write('<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"><\/script>')</script>
 </head>
 <link rel="stylesheet" href="styles.css">
 <body>
@@ -204,11 +205,10 @@
             <h2 class="section-title">Projects</h2>
             <div class="projects">
 
-                <div class="project-card featured">
+                <div class="timeline-item project-card cursor-target">
                     <div class="project-card-top">
                         <div class="project-badges">
                             <span class="badge badge-live">🟢 Live</span>
-                            <span class="badge badge-featured">⭐ Featured</span>
                         </div>
                         <h3><a href="https://atttc.cloud/" target="_blank">Agnel Trade Test &amp; Training Portal</a></h3>
                         <div class="project-links">
@@ -227,7 +227,7 @@
                     </div>
                 </div>
 
-                <div class="project-card featured">
+                <div class="timeline-item project-card cursor-target">
                     <div class="project-card-top">
                         <div class="project-badges">
                             <span class="badge badge-live">🟢 Live</span>
@@ -249,7 +249,7 @@
                     </div>
                 </div>
 
-                <div class="project-card">
+                <div class="timeline-item project-card cursor-target">
                     <div class="project-card-top">
                         <h3><a href="https://github.com/NISHANTTMAURYA/SplitKar/blob/main/README-TECHNICAL.md" target="_blank">SplitKar</a></h3>
                         <div class="project-links">
@@ -265,7 +265,7 @@
                     </div>
                 </div>
 
-                <div class="project-card">
+                <div class="timeline-item project-card cursor-target">
                     <div class="project-card-top">
                         <h3><a href="https://docs.google.com/presentation/d/18gZvTnmns7fKk7o_HeOOsrgzzXewCXnX/edit?usp=sharing&ouid=116282146601498084420&rtpof=true&sd=true" target="_blank">MentorConnect</a></h3>
                         <div class="project-links">
@@ -279,7 +279,7 @@
                     </div>
                 </div>
 
-                <div class="project-card">
+                <div class="timeline-item project-card cursor-target">
                     <div class="project-card-top">
                         <div class="project-badges">
                             <span class="badge badge-featured">⭐ SIH 2024 Finalist</span>
@@ -428,28 +428,81 @@
 
         <!-- Education -->
         <section id="education" class="section">
-            <h2 class="section-title">Education</h2>
-            <div class="experience-timeline">
-                <div class="timeline-item">
-                    <div class="timeline-date">2023 – Present</div>
-                    <h3>B.E. Computers (Third Year)</h3>
-                    <p>Fr. Conceicao Rodrigues College of Engineering, Bandra(W) &mdash; <strong>SGPA: 9.0</strong></p>
+            <h2 class="section-title">Education &amp; Academic Milestones</h2>
+            <div class="edu-roadmap">
+                
+                <div class="edu-item">
+                    <div class="edu-marker">
+                        <i class="material-icons">school</i>
+                    </div>
+                    <div class="edu-card cursor-target">
+                        <div class="edu-card-header">
+                            <span class="edu-year">2023 – Present</span>
+                            <span class="edu-score-badge gold">SGPA 9.0</span>
+                        </div>
+                        <h3 class="edu-title">B.E. Computer Engineering</h3>
+                        <div class="edu-institution"><i class="material-icons">account_balance</i> Fr. Conceicao Rodrigues College of Engineering, Bandra(W)</div>
+                        <div class="edu-tags">
+                            <span class="tech-tag">Third Year</span>
+                            <span class="tech-tag">Computer Science</span>
+                            <span class="tech-tag">Mumbai University</span>
+                        </div>
+                    </div>
                 </div>
-                <div class="timeline-item">
-                    <div class="timeline-date">2023</div>
-                    <h3>MHT-CET</h3>
-                    <p>Maharashtra &mdash; PCM &mdash; <strong>97.57 percentile</strong></p>
+
+                <div class="edu-item">
+                    <div class="edu-marker">
+                        <i class="material-icons">insights</i>
+                    </div>
+                    <div class="edu-card cursor-target">
+                        <div class="edu-card-header">
+                            <span class="edu-year">2023</span>
+                            <span class="edu-score-badge purple">97.57 Percentile</span>
+                        </div>
+                        <h3 class="edu-title">MHT-CET State Entrance Exam</h3>
+                        <div class="edu-institution"><i class="material-icons">verified_user</i> Maharashtra State CET Cell</div>
+                        <div class="edu-tags">
+                            <span class="tech-tag">PCM Stream</span>
+                            <span class="tech-tag">Engineering Entrance</span>
+                        </div>
+                    </div>
                 </div>
-                <div class="timeline-item">
-                    <div class="timeline-date">HSC</div>
-                    <h3>Higher Secondary Certificate</h3>
-                    <p>Queen Mary's Junior College, Mira Road(E) &mdash; PCM &mdash; <strong>89.33%</strong></p>
+
+                <div class="edu-item">
+                    <div class="edu-marker">
+                        <i class="material-icons">workspace_premium</i>
+                    </div>
+                    <div class="edu-card cursor-target">
+                        <div class="edu-card-header">
+                            <span class="edu-year">HSC · 2023</span>
+                            <span class="edu-score-badge blue">89.33%</span>
+                        </div>
+                        <h3 class="edu-title">Higher Secondary Certificate (HSC)</h3>
+                        <div class="edu-institution"><i class="material-icons">apartment</i> Queen Mary's Junior College, Mira Road(E)</div>
+                        <div class="edu-tags">
+                            <span class="tech-tag">Physics, Chemistry, Math</span>
+                            <span class="tech-tag">State Board</span>
+                        </div>
+                    </div>
                 </div>
-                <div class="timeline-item">
-                    <div class="timeline-date">SSC</div>
-                    <h3>Secondary School Certificate</h3>
-                    <p>Holy Cross Convent School, Mira Road(E) &mdash; <strong>83.80%</strong></p>
+
+                <div class="edu-item">
+                    <div class="edu-marker">
+                        <i class="material-icons">stars</i>
+                    </div>
+                    <div class="edu-card cursor-target">
+                        <div class="edu-card-header">
+                            <span class="edu-year">SSC · 2021</span>
+                            <span class="edu-score-badge green">83.80%</span>
+                        </div>
+                        <h3 class="edu-title">Secondary School Certificate (SSC)</h3>
+                        <div class="edu-institution"><i class="material-icons">location_city</i> Holy Cross Convent School, Mira Road(E)</div>
+                        <div class="edu-tags">
+                            <span class="tech-tag">Secondary Education</span>
+                        </div>
+                    </div>
                 </div>
+
             </div>
         </section>
 

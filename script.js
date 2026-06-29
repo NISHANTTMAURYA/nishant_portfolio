@@ -326,6 +326,7 @@ try {
             '.stat-card',
             '.project-card',
             '.timeline-item',
+            '.edu-item',
             '.skill-category',
             '.achievement-card',
             '.about-card',
@@ -532,10 +533,18 @@ try {
 
                     if (scaleOnHover) {
                         el.addEventListener('mouseenter', () => {
-                            gsap.to(el, { scale: hoverScale, duration: 0.3, ease: 'power2.out', force3D: true });
+                            if (typeof gsap !== 'undefined') {
+                                gsap.to(el, { scale: hoverScale, duration: 0.3, ease: 'power2.out', force3D: true });
+                            } else {
+                                el.style.transform = `translate(${item.x}px, ${item.y}px) scale(${hoverScale})`;
+                            }
                         });
                         el.addEventListener('mouseleave', () => {
-                            gsap.to(el, { scale: 1, duration: 0.3, ease: 'power2.out', force3D: true });
+                            if (typeof gsap !== 'undefined') {
+                                gsap.to(el, { scale: 1, duration: 0.3, ease: 'power2.out', force3D: true });
+                            } else {
+                                el.style.transform = `translate(${item.x}px, ${item.y}px) scale(1)`;
+                            }
                         });
                     }
 
@@ -550,18 +559,25 @@ try {
                     force3D: true
                 };
 
-                if (!hasMounted) {
-                    gsap.set(el, {
-                        opacity: 1,
-                        ...animationProps
-                    });
+                if (typeof gsap !== 'undefined') {
+                    if (!hasMounted) {
+                        gsap.set(el, {
+                            opacity: 1,
+                            ...animationProps
+                        });
+                    } else {
+                        gsap.to(el, {
+                            ...animationProps,
+                            duration: duration,
+                            ease: ease,
+                            overwrite: 'auto'
+                        });
+                    }
                 } else {
-                    gsap.to(el, {
-                        ...animationProps,
-                        duration: duration,
-                        ease: ease,
-                        overwrite: 'auto'
-                    });
+                    el.style.opacity = '1';
+                    el.style.width = `${item.w}px`;
+                    el.style.height = `${item.h}px`;
+                    el.style.transform = `translate(${item.x}px, ${item.y}px)`;
                 }
             });
 
