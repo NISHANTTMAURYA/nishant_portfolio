@@ -362,18 +362,25 @@ try {
     const nextBtn = document.querySelector('.carousel-button.next');
     const prevBtn = document.querySelector('.carousel-button.prev');
     const dotsNav = document.querySelector('.carousel-nav');
-    const dots = dotsNav ? Array.from(dotsNav.children) : [];
     let current = 0;
     let autoInterval;
 
     if (track && slides.length && nextBtn && prevBtn && dotsNav) {
-        slides.forEach((slide, i) => { slide.style.left = `${i * 100}%`; });
+        dotsNav.innerHTML = '';
+        const dots = [];
+        slides.forEach((slide, i) => {
+            slide.style.left = `${i * 100}%`;
+            const dot = document.createElement('div');
+            dot.className = i === 0 ? 'carousel-indicator active' : 'carousel-indicator';
+            dotsNav.appendChild(dot);
+            dots.push(dot);
+        });
 
         const goTo = (index) => {
             track.style.transform = `translateX(-${index * 100}%)`;
             current = index;
             dots.forEach(d => d.classList.remove('active'));
-            dots[index].classList.add('active');
+            if (dots[index]) dots[index].classList.add('active');
             prevBtn.style.opacity = index === 0 ? '0.45' : '1';
             nextBtn.style.opacity = index === slides.length - 1 ? '0.45' : '1';
         };
@@ -386,7 +393,8 @@ try {
         dotsNav.addEventListener('click', e => {
             const dot = e.target.closest('.carousel-indicator');
             if (!dot) return;
-            goTo(dots.indexOf(dot));
+            const idx = dots.indexOf(dot);
+            if (idx !== -1) goTo(idx);
             resetAuto();
         });
 
@@ -728,7 +736,7 @@ try {
             { slug: 'json', name: 'JSON', category: 'backend' },
             { slug: 'flutter', name: 'Flutter', category: 'frontend' },
             { slug: 'html5', name: 'HTML5', category: 'frontend' },
-            { slug: 'css', name: 'CSS3', category: 'frontend' },
+            { slug: 'css3', name: 'CSS3', category: 'frontend' },
             { slug: 'firebase', name: 'Firebase', category: 'frontend' },
             { slug: 'postgresql', name: 'PostgreSQL', category: 'database' },
             { slug: 'mysql', name: 'MySQL', category: 'database' },
@@ -739,7 +747,7 @@ try {
             { slug: 'numpy', name: 'NumPy', category: 'tools' },
             { slug: 'pandas', name: 'Pandas', category: 'tools' },
             { slug: 'letsencrypt', name: 'Cryptography', category: 'tools' },
-            { slug: 'microsoftexcel', name: 'Excel Sheets', category: 'tools' },
+            { slug: 'microsoftexcel', name: 'Excel Sheets', category: 'tools', iconUrl: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23ffffff"><path d="M21.17 3.25A.83.83 0 0 1 22 4.08v15.84a.83.83 0 0 1-.83.83H7.83a.83.83 0 0 1-.83-.83V17H2.83A.83.83 0 0 1 2 16.17V7.83A.83.83 0 0 1 2.83 7H7V4.08a.83.83 0 0 1 .83-.83h13.34zm-8.67 5.5l-1.9 3.25 1.9 3.25h-1.8l-1.1-2.05-1.1 2.05H6.7l1.9-3.25L6.7 8.75h1.8l1.1 2.05 1.1-2.05h1.8zM20.5 4.75H8.5v14.5h12v-14.5z"/></svg>' },
             { slug: 'githubcopilot', name: 'GitHub Copilot', category: 'tools' },
             { slug: 'ollama', name: 'Ollama', category: 'tools' },
             { slug: 'git', name: 'Git', category: 'tools' },
@@ -790,8 +798,17 @@ try {
                 faceDiv.style.border = `1.5px solid ${colors.border}`;
                 const img = document.createElement('img');
                 img.className = 'cube-icon';
-                const origSrc = tech.slug ? `https://cdn.simpleicons.org/${tech.slug}/fff` : '';
+                const origSrc = tech.iconUrl ? tech.iconUrl : (tech.slug ? `https://cdn.simpleicons.org/${tech.slug}/fff` : '');
                 img.dataset.origSrc = origSrc;
+                img.onerror = () => {
+                    img.style.display = 'none';
+                    if (!faceDiv.querySelector('.cube-label-fallback')) {
+                        const fallbackText = document.createElement('span');
+                        fallbackText.className = 'cube-label-fallback';
+                        fallbackText.textContent = tech.name || tech.slug;
+                        faceDiv.appendChild(fallbackText);
+                    }
+                };
                 if (origSrc) { img.src = origSrc; img.style.opacity = '0.85'; } else { img.style.opacity = '0'; }
                 faceDiv.appendChild(img);
                 cube.appendChild(faceDiv);

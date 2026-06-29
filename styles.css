@@ -736,6 +736,18 @@ a:hover {
   text-shadow: 0 0 8px currentColor;
 }
 
+.cube-label-fallback {
+  font-size: clamp(0.5rem, 1.2vw, 0.75rem);
+  font-weight: 750;
+  color: #ffffff;
+  text-align: center;
+  pointer-events: none;
+  user-select: none;
+  font-family: 'Inter', sans-serif;
+  padding: 2px;
+  line-height: 1.1;
+}
+
 .cube-icon {
   width: 60%;
   height: 60%;
@@ -1082,6 +1094,16 @@ a:hover {
     grid-column: span 1;
 }
 
+/* Symmetrical alignment: when 5 cards exist in a 2-col grid, center the 5th card */
+@media (min-width: 1025px) {
+    .project-card:last-child:nth-child(odd) {
+        grid-column: 1 / -1;
+        justify-self: center;
+        width: 100%;
+        max-width: calc(50% - 0.75rem);
+    }
+}
+
 .project-card {
     background: var(--card-background);
     border-radius: 16px;
@@ -1299,8 +1321,11 @@ a:hover {
 .carousel-nav {
     display: flex;
     justify-content: center;
-    gap: 0.5rem;
-    margin-top: 1rem;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+    margin: 1rem auto 0;
+    max-width: 90%;
 }
 
 .carousel-indicator {
@@ -1718,21 +1743,46 @@ a:hover {
     .logo   { width: 34px; height: 34px; box-shadow: none; }
     .logo i { font-size: 17px; }
 
-    /* Hero */
+    /* Hero & API Playground Mobile Adjustments */
     .hero {
-        padding: 5.5rem 1rem 2rem;
+        padding: 4.5rem 0.75rem 2rem;
         min-height: auto;
-        align-items: flex-start;
-        padding-top: calc(62px + 1.5rem);
+        align-items: center;
+        padding-top: calc(60px + 1.25rem);
     }
-    .hero-content  { padding: 0; margin: 0; }
-    .hero-buttons  { flex-direction: column; align-items: center; }
-    .button        { width: 100%; max-width: 260px; justify-content: center; }
+    .hero-content { padding: 0; margin: 0; width: 100%; }
 
-    /* API Playground Mobile Adjustments */
     .api-playground {
         border-radius: 14px;
+        width: 100%;
     }
+
+    /* Window Header Mobile Fix */
+    .api-window-header {
+        padding: 0.5rem 0.75rem;
+        gap: 0.4rem;
+    }
+    .window-controls {
+        gap: 0.3rem;
+        flex-shrink: 0;
+    }
+    .control-dot {
+        width: 8px;
+        height: 8px;
+    }
+    .window-title {
+        font-size: 0.72rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .window-status-pill {
+        font-size: 0.65rem;
+        padding: 0.08rem 0.4rem;
+        flex-shrink: 0;
+    }
+
+    /* Body & Sidebar Mobile Fix */
     .api-window-body {
         flex-direction: column;
         min-height: auto;
@@ -1742,9 +1792,10 @@ a:hover {
         border-right: none;
         border-bottom: 2px solid var(--border-color);
         flex-direction: row;
-        padding: 0.5rem;
+        justify-content: center;
+        padding: 0.4rem 0.2rem;
         overflow-x: auto;
-        gap: 0.4rem;
+        gap: 0.25rem;
         scrollbar-width: none;
     }
     .api-sidebar::-webkit-scrollbar {
@@ -1755,26 +1806,66 @@ a:hover {
     }
     .api-btn {
         width: auto;
-        padding: 0.4rem 0.85rem;
-        border-radius: 8px;
-        border: 2px solid transparent;
+        padding: 0.3rem 0.45rem;
+        gap: 0.3rem;
+        border-radius: 6px;
+        border: 1.5px solid transparent;
         border-left: none;
         white-space: nowrap;
-        font-size: 0.78rem;
+        font-size: 0.7rem;
+        justify-content: center;
     }
     .api-btn.active {
         background: var(--accent-light);
         border-color: var(--border-color);
         box-shadow: 2px 2px 0 0 var(--border-color);
     }
+    .method {
+        font-size: 0.65rem;
+        padding: 0.02rem 0.25rem;
+    }
+    .endpoint-path {
+        font-size: 0.7rem;
+    }
+
+    /* Card Panel & Hero Content Mobile Fix */
     .api-panel {
-        padding: 1.25rem 0.85rem;
-        min-height: 280px;
+        padding: 1.5rem 1rem;
+        min-height: auto;
         text-align: center;
         align-items: center;
     }
+    .role-badge {
+        font-size: 0.82rem;
+        padding: 0.25rem 0.85rem;
+        margin-bottom: 0.85rem;
+    }
+    .hero h1 {
+        font-size: clamp(1.8rem, 7.5vw, 2.4rem);
+        margin-bottom: 0.5rem;
+    }
+    .hero-tagline {
+        font-size: clamp(0.95rem, 4vw, 1.15rem);
+        margin-bottom: 0.65rem;
+    }
+    .hero-sub {
+        font-size: clamp(0.78rem, 3.2vw, 0.88rem);
+        line-height: 1.6;
+        margin-bottom: 1.25rem;
+    }
     .hero-buttons {
+        flex-direction: column;
+        align-items: center;
         justify-content: center;
+        width: 100%;
+        gap: 0.75rem;
+    }
+    .button {
+        width: 100%;
+        max-width: 280px;
+        justify-content: center;
+        padding: 0.75rem 1.25rem;
+        font-size: 0.92rem;
     }
     .tab-title {
         font-size: 0.95rem;
