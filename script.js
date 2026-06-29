@@ -1121,36 +1121,19 @@ try {
         const cacheItemPositions = () => {
             if (!marquee) return;
             cachedContainerWidth = marquee.clientWidth;
-            const track = marquee.querySelector('.marquee-track');
-            if (!track) return;
-
-            // Get computed flex gap in pixels
-            const computedStyle = window.getComputedStyle(track);
-            const gap = parseFloat(computedStyle.gap) || 0;
-
-            const paddingLeft = cachedContainerWidth / 2;
-            let currentLeft = paddingLeft;
-
             const items = Array.from(marquee.querySelectorAll('.marquee-item'));
-            allMarqueeItems = items.map(el => {
-                const w = el.offsetWidth;
-                const itemData = {
-                    el,
-                    tech: el.dataset.tech,
-                    left: currentLeft, // Manual scroll-independent absolute coordinate
-                    width: w
-                };
-                currentLeft += w + gap;
-                return itemData;
-            });
+            if (items.length === 0) return;
 
-            // Calculate oneSetWidth precisely as the sum of widths + gaps of exactly one set of items
+            allMarqueeItems = items.map(el => ({
+                el,
+                tech: el.dataset.tech,
+                left: el.offsetLeft,
+                width: el.offsetWidth
+            }));
+
             const setSize = items.length / 3;
-            if (setSize > 0) {
-                oneSetWidth = 0;
-                for (let i = 0; i < setSize; i++) {
-                    oneSetWidth += items[i].offsetWidth + gap;
-                }
+            if (setSize > 0 && items[setSize]) {
+                oneSetWidth = items[setSize].offsetLeft - items[0].offsetLeft;
             }
         };
 
