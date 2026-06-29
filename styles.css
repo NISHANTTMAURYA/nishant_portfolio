@@ -1351,27 +1351,35 @@ a:hover {
 
 .lightbox-close {
     position: absolute;
-    top: 2rem;
-    right: 2rem;
-    color: white;
-    font-size: 2.2rem;
+    top: 1.5rem;
+    right: 1.5rem;
+    z-index: 100;
+    color: #ffffff;
+    font-size: 1.8rem;
     font-weight: bold;
     cursor: pointer;
     width: 44px;
     height: 44px;
     border-radius: 50%;
-    background: rgba(255, 255, 255, 0.15);
+    background: rgba(21, 22, 22, 0.75);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
     display: flex;
     align-items: center;
     justify-content: center;
     transition: var(--transition);
-    border: 1.5px solid rgba(255, 255, 255, 0.3);
+    border: 1.5px solid rgba(255, 255, 255, 0.35);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5);
     line-height: 1;
+    user-select: none;
+    -webkit-user-select: none;
 }
 
 .lightbox-close:hover {
     background: var(--accent);
+    border-color: var(--accent);
     transform: scale(1.1);
+    box-shadow: 0 6px 20px rgba(139, 92, 246, 0.6);
 }
 
 /* =============================================
@@ -2124,8 +2132,11 @@ a:hover {
     .projects { grid-template-columns: 1fr; padding: 0; }
     .project-card.featured { grid-column: span 1; }
 
-    /* Gallery / Masonry */
+    /* Gallery / Masonry & Lightbox */
     .masonry-container { width: 100%; padding: 0.25rem; }
+    .lightbox { padding: 1rem; }
+    .lightbox-close { top: 1rem; right: 1rem; width: 40px; height: 40px; font-size: 1.6rem; }
+    .lightbox-content { max-width: 96vw; max-height: 78vh; }
 
     /* Skills */
     .skills-grid { grid-template-columns: 1fr; }

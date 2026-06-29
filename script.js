@@ -1046,6 +1046,10 @@ try {
                 col: +cube.dataset.col,
                 setX: gsap.quickSetter(cube, 'rotateX', 'deg'),
                 setY: gsap.quickSetter(cube, 'rotateY', 'deg'),
+                targetX: 0,
+                targetY: 0,
+                currX: 0,
+                currY: 0,
                 faces: Array.from(cube.querySelectorAll('.cube-face')),
                 icons: Array.from(cube.querySelectorAll('.cube-icon'))
             }));
@@ -1060,20 +1064,22 @@ try {
             cubes.forEach(c => {
                 const dist = Math.hypot(c.row - rowCenter, c.col - colCenter);
                 if (dist <= radius) {
-                    const pct = 1 - dist / radius;
+                    // Cosine smoothstep curve for silky organic falloff
+                    const pct = (1 + Math.cos((dist / radius) * Math.PI)) / 2;
                     const angle = pct * maxAngle;
-                    c.setX(-angle);
-                    c.setY(angle);
+                    c.targetX = -angle;
+                    c.targetY = angle;
                 } else {
-                    c.setX(0);
-                    c.setY(0);
+                    c.targetX = 0;
+                    c.targetY = 0;
                 }
             });
         };
 
         const resetAll = () => {
             cubes.forEach(c => {
-                gsap.to(c.el, { duration: leaveDur, rotateX: 0, rotateY: 0, ease: 'power3.out', overwrite: true });
+                c.targetX = 0;
+                c.targetY = 0;
             });
         };
 
@@ -1304,6 +1310,7 @@ try {
         });
         simTarget = getSimTarget(0);
 
+        const lerpFactor = 0.14;
         const loop = () => {
             if (!userActive) {
                 simPos.x += (simTarget.x - simPos.x) * simSpeed;
@@ -1315,6 +1322,15 @@ try {
                     scrollMarqueeTo(simTarget.y, simTarget.x);
                 }
             }
+
+            // Continuous silky smooth per-frame lerp dampening for all cubes
+            cubes.forEach(c => {
+                c.currX += (c.targetX - c.currX) * lerpFactor;
+                c.currY += (c.targetY - c.currY) * lerpFactor;
+                c.setX(c.currX);
+                c.setY(c.currY);
+            });
+
             simRAF = requestAnimationFrame(loop);
         };
 
