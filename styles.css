@@ -909,7 +909,7 @@ a:hover {
 .marquee-target-frame .corner-bl { bottom: -2px; left: -2px; border-right: none; border-top: none; }
 
 .marquee-container {
-    overflow-x: auto;
+    overflow-x: hidden;
     overflow-y: hidden;
     white-space: nowrap;
     width: 100%;

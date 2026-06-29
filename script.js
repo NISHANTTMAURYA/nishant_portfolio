@@ -1132,7 +1132,7 @@ try {
                 if (item.el === closestEl) {
                     item.el.classList.add('active-highlight');
                     if (targetFrame) {
-                        const newWidth = Math.max(120, item.el.offsetWidth + 32);
+                        const newWidth = Math.max(140, item.el.offsetWidth + 48);
                         targetFrame.style.width = `${newWidth}px`;
                     }
                 } else {
@@ -1190,6 +1190,22 @@ try {
                     techToMarqueeItems[item.tech].push(item);
                 });
                 updateLayout();
+
+                // Recalculate once web fonts are fully loaded to prevent layout metric errors
+                if (document.fonts) {
+                    document.fonts.ready.then(() => {
+                        const items = marquee.querySelectorAll('.marquee-item');
+                        const setSize = items.length / 3;
+                        if (setSize > 0) {
+                            const firstItem = items[0];
+                            const lastFirstSetItem = items[setSize - 1];
+                            oneSetWidth = (lastFirstSetItem.offsetLeft + lastFirstSetItem.offsetWidth) - firstItem.offsetLeft;
+                            marquee.scrollLeft = oneSetWidth;
+                        }
+                        cacheItemPositions();
+                        updateLayout();
+                    });
+                }
             });
 
             window.addEventListener('resize', () => {
