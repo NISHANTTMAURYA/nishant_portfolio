@@ -251,6 +251,7 @@ a:hover {
     display: flex;
     flex-direction: column;
     overflow: hidden;
+    transition: border-color 0.2s ease, filter 0.2s ease;
 }
 
 .api-window-header {
@@ -1379,6 +1380,8 @@ a:hover {
     border: 2px solid var(--border-color);
     filter: var(--shadow-sm);
     overflow: hidden;
+    -webkit-mask-image: -webkit-radial-gradient(white, black);
+    mask-image: radial-gradient(white, black);
     backface-visibility: hidden;
     transform: translateZ(0);
     transition: box-shadow 0.3s ease, border-color 0.3s ease;
@@ -2413,6 +2416,7 @@ a:hover {
     flex-direction: column;
     gap: 1rem;
     padding-right: 0.5rem;
+    padding-bottom: 1.5rem;
     overflow-y: auto;
 }
 
@@ -2873,7 +2877,7 @@ body:has(.vibe-browser.interacting) .target-cursor-wrapper {
     width: 100%;
     height: 100%;
     color: var(--secondary-color);
-    background-color: var(--card-background);
+    background-color: transparent;
     overflow: hidden;
     clip-path: inset(0 0 0 0);
 }
@@ -3071,6 +3075,12 @@ body.intro-loading .api-playground {
     filter: none !important;
 }
 
+body.intro-loading .card-spotlight {
+    opacity: 0 !important;
+    visibility: hidden !important;
+    display: none !important;
+}
+
 body.intro-loading .api-sidebar {
     border-right-color: transparent !important;
 }
@@ -3188,3 +3198,107 @@ body.intro-loading .api-window-body {
     color: var(--secondary-color);
     letter-spacing: 0.5px;
 }
+
+/* =============================================
+   CARD INTERACTION EFFECTS (MagicBento)
+   ============================================= */
+.project-card,
+.edu-card,
+.achievement-card,
+.vibe-tab,
+.stat-card,
+.about-card,
+.timeline-item {
+    position: relative;
+    /* Prevent default CSS transforms from fighting with GSAP mouse animations */
+    transition: border-color 0.2s ease, filter 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Gallery image container transition rules */
+.item-wrapper > .item-img {
+    transition: border-color 0.2s ease, filter 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Accent border color transition and soft purple drop shadow glow on hover */
+.project-card:hover,
+.edu-card:hover,
+.achievement-card:hover,
+.stat-card:hover,
+.about-card:hover,
+.timeline-item:hover,
+.api-playground:hover {
+    border-color: var(--accent) !important;
+    /* Combines the hard block Neo-Brutalist shadow with a soft glowing purple shadow */
+    filter: var(--shadow-hover) drop-shadow(0 0 14px rgba(139, 92, 246, 0.55));
+}
+
+.vibe-tab:hover {
+    border-color: var(--accent) !important;
+    /* Use standard box-shadow instead of filter: drop-shadow to prevent duplicate text rendering on transparent card backgrounds */
+    box-shadow: 6px 6px 0px 0px rgba(21, 22, 22, 1), 0 0 14px rgba(139, 92, 246, 0.55);
+}
+
+.vibe-tab.active:hover {
+    box-shadow: 6px 6px 0px var(--accent), 0 0 14px rgba(139, 92, 246, 0.55);
+}
+
+/* Gallery items use a child image container for their border/shadow */
+.item-wrapper:hover > .item-img {
+    border-color: var(--accent) !important;
+    filter: var(--shadow-hover) drop-shadow(0 0 14px rgba(139, 92, 246, 0.55));
+}
+
+/* Local spotlight overlay (prepend-injected, sits above background and behind text) */
+.card-spotlight {
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    background: radial-gradient(
+        220px circle at var(--glow-x, 50%) var(--glow-y, 50%),
+        rgba(139, 92, 246, 0.28) 0%,
+        rgba(139, 92, 246, 0.12) 50%,
+        transparent 100%
+    );
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: 0;
+    -webkit-mask-image: -webkit-radial-gradient(white, black); /* Force WebKit to respect border-radius */
+    mask-image: radial-gradient(white, black);
+    border: 1px solid transparent; /* Hard-forces the browser to allocate and render border-radius boundary */
+    background-clip: padding-box; /* Clip background gradient within the transparent border box */
+}
+
+/* Explicit border-radius mappings to bypass WebKit/Blink inherit bugs on absolute elements */
+.project-card .card-spotlight,
+.edu-card .card-spotlight,
+.achievement-card .card-spotlight,
+.stat-card .card-spotlight,
+.about-card .card-spotlight,
+.timeline-item .card-spotlight,
+.item-img .card-spotlight {
+    border-radius: 16px;
+}
+
+.api-playground .card-spotlight {
+    border-radius: 20px;
+}
+
+.vibe-tab .card-spotlight {
+    border-radius: 12px;
+}
+
+.project-card:hover .card-spotlight,
+.edu-card:hover .card-spotlight,
+.achievement-card:hover .card-spotlight,
+.vibe-tab:hover .card-spotlight,
+.item-wrapper:hover .card-spotlight,
+.stat-card:hover .card-spotlight,
+.about-card:hover .card-spotlight,
+.timeline-item:hover .card-spotlight,
+.api-playground:hover .card-spotlight {
+    opacity: 1;
+}
+
+
+

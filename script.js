@@ -559,19 +559,23 @@ try {
                     el.appendChild(imgDiv);
                     containerRef.appendChild(el);
 
+                    if (typeof initSingleCardEffect === 'function') {
+                        initSingleCardEffect(el);
+                    }
+
                     if (scaleOnHover) {
                         el.addEventListener('mouseenter', () => {
                             if (typeof gsap !== 'undefined') {
-                                gsap.to(el, { scale: hoverScale, duration: 0.3, ease: 'power2.out', force3D: true });
+                                gsap.to(imgDiv, { scale: hoverScale, duration: 0.3, ease: 'power2.out', force3D: true });
                             } else {
-                                el.style.transform = `translate(${item.x}px, ${item.y}px) scale(${hoverScale})`;
+                                imgDiv.style.transform = `scale(${hoverScale})`;
                             }
                         });
                         el.addEventListener('mouseleave', () => {
                             if (typeof gsap !== 'undefined') {
-                                gsap.to(el, { scale: 1, duration: 0.3, ease: 'power2.out', force3D: true });
+                                gsap.to(imgDiv, { scale: 1, duration: 0.3, ease: 'power2.out', force3D: true });
                             } else {
-                                el.style.transform = `translate(${item.x}px, ${item.y}px) scale(1)`;
+                                imgDiv.style.transform = `scale(1)`;
                             }
                         });
                     }
@@ -2078,8 +2082,103 @@ try {
         setTimeout(() => reveal(), MIN_MS + 2000);
     };
 
+    /* -----------------------------------------------
+       CARD INTERACTION EFFECTS (MagicBento)
+    ----------------------------------------------- */
+    function isMobileDevice() {
+        const hasTouchScreen = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+        const isSmallScreen = window.innerWidth <= 768;
+        const mobileRegex = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i;
+        return (hasTouchScreen && isSmallScreen) || mobileRegex.test(navigator.userAgent.toLowerCase());
+    }
+
+    function initSingleCardEffect(card) {
+        if (!card) return;
+
+        // If it is a gallery item (.item-wrapper), target the inner image container (.item-img)
+        // for spotlight and transforms to avoid breaking masonry layout positioning!
+        const interactiveTarget = card.classList.contains('item-wrapper') 
+            ? card.querySelector('.item-img') 
+            : card;
+
+        if (!interactiveTarget) return;
+
+        // Programmatically inject spotlight element if not exists (prepended behind content)
+        let spotlight = interactiveTarget.querySelector('.card-spotlight');
+        if (!spotlight) {
+            spotlight = document.createElement('div');
+            spotlight.className = 'card-spotlight';
+            interactiveTarget.insertBefore(spotlight, interactiveTarget.firstChild);
+        }
+
+        const handleMouseLeave = () => {
+            if (isMobileDevice()) return;
+
+            // Reset tilt & magnetism on the interactiveTarget
+            gsap.to(interactiveTarget, {
+                x: 0,
+                y: 0,
+                rotateX: 0,
+                rotateY: 0,
+                duration: 0.5,
+                ease: 'power3.out',
+                overwrite: 'auto'
+            });
+        };
+
+        const handleMouseMove = (e) => {
+            if (isMobileDevice()) return;
+
+            const rect = interactiveTarget.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+
+            // Update spotlight coordinates inside interactiveTarget (using CSS variables)
+            interactiveTarget.style.setProperty('--glow-x', `${(x / rect.width) * 100}%`);
+            interactiveTarget.style.setProperty('--glow-y', `${(y / rect.height) * 100}%`);
+
+            // 3D Tilt calculation
+            const centerX = rect.width / 2;
+            const centerY = rect.height / 2;
+            const rotateX = ((y - centerY) / centerY) * -6; // max 6 deg tilt
+            const rotateY = ((x - centerX) / centerX) * 6;  // max 6 deg tilt
+
+            gsap.to(interactiveTarget, {
+                rotateX,
+                rotateY,
+                duration: 0.2,
+                ease: 'power2.out',
+                transformPerspective: 1000,
+                overwrite: 'auto'
+            });
+
+            // Magnetism calculation
+            const magnetX = (x - centerX) * 0.04; // max 4% pull
+            const magnetY = (y - centerY) * 0.04;
+
+            gsap.to(interactiveTarget, {
+                x: magnetX,
+                y: magnetY,
+                duration: 0.3,
+                ease: 'power2.out',
+                overwrite: 'auto'
+            });
+        };
+
+        card.addEventListener('mouseleave', handleMouseLeave);
+        card.addEventListener('mousemove', handleMouseMove);
+    }
+
+    function initCardEffects() {
+        const cards = document.querySelectorAll('.project-card, .edu-card, .achievement-card, .vibe-tab, .stat-card, .about-card, .timeline-item, .api-playground');
+        if (!cards.length) return;
+
+        cards.forEach(card => initSingleCardEffect(card));
+    }
+
     initIntroLoader();
     initVibeLabs();
+    initCardEffects();
 
 } catch (err) {
     console.error('Portfolio script error:', err);
