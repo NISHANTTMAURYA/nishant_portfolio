@@ -2108,7 +2108,14 @@ try {
         if (!spotlight) {
             spotlight = document.createElement('div');
             spotlight.className = 'card-spotlight';
-            interactiveTarget.insertBefore(spotlight, interactiveTarget.firstChild);
+            if (card.classList.contains('vibe-tab')) {
+                const clip = document.createElement('div');
+                clip.className = 'card-spotlight-clip';
+                clip.appendChild(spotlight);
+                interactiveTarget.insertBefore(clip, interactiveTarget.firstChild);
+            } else {
+                interactiveTarget.insertBefore(spotlight, interactiveTarget.firstChild);
+            }
         }
 
         const handleMouseLeave = () => {

@@ -2414,8 +2414,10 @@ a:hover {
 .vibe-tabs-column {
     display: flex;
     flex-direction: column;
-    gap: 1rem;
-    padding-right: 0.5rem;
+    gap: 1.5rem;
+    padding-top: 20px;
+    padding-left: 20px;
+    padding-right: 20px;
     padding-bottom: 1.5rem;
     overflow-y: auto;
 }
@@ -2438,10 +2440,11 @@ a:hover {
 
 .vibe-tab {
     background: rgba(255, 255, 255, 0.02);
-    border: 2px solid var(--border);
-    border-radius: 12px;
+    border: 2px solid var(--border-color);
+    border-radius: 16px;
     padding: 1.1rem 1.25rem;
     cursor: pointer;
+    flex-shrink: 0;
     transition: transform 0.2s cubic-bezier(0.25, 1, 0.5, 1), 
                 border-color 0.2s ease, 
                 box-shadow 0.2s cubic-bezier(0.25, 1, 0.5, 1),
@@ -2449,9 +2452,10 @@ a:hover {
 }
 
 .vibe-tab:hover {
-    transform: translateX(4px);
-    border-color: rgba(139, 92, 246, 0.4);
+    transform: translate(-2px, -2px);
+    border-color: var(--accent) !important;
     background: rgba(255, 255, 255, 0.04);
+    box-shadow: 6px 6px 0px 0px rgba(21, 22, 22, 1), 0 0 14px rgba(139, 92, 246, 0.55);
 }
 
 .vibe-tab.active {
@@ -2797,6 +2801,10 @@ body:has(.vibe-browser.interacting) .target-cursor-wrapper {
         max-height: none;
         padding-bottom: 0.75rem;
         scrollbar-width: none;
+        margin-left: -1rem;
+        margin-right: -1rem;
+        padding-left: 1rem;
+        padding-right: 1rem;
     }
     
     .vibe-tabs-column::-webkit-scrollbar {
@@ -3205,13 +3213,23 @@ body.intro-loading .api-window-body {
 .project-card,
 .edu-card,
 .achievement-card,
-.vibe-tab,
 .stat-card,
 .about-card,
 .timeline-item {
     position: relative;
+    overflow: hidden;
+    -webkit-mask-image: -webkit-radial-gradient(white, black);
+    mask-image: radial-gradient(white, black);
+    backface-visibility: hidden;
+    transform: translateZ(0);
     /* Prevent default CSS transforms from fighting with GSAP mouse animations */
     transition: border-color 0.2s ease, filter 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.vibe-tab {
+    position: relative;
+    /* Prevent default CSS transforms from fighting with GSAP mouse animations */
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
 }
 
 /* Gallery image container transition rules */
@@ -3230,16 +3248,6 @@ body.intro-loading .api-window-body {
     border-color: var(--accent) !important;
     /* Combines the hard block Neo-Brutalist shadow with a soft glowing purple shadow */
     filter: var(--shadow-hover) drop-shadow(0 0 14px rgba(139, 92, 246, 0.55));
-}
-
-.vibe-tab:hover {
-    border-color: var(--accent) !important;
-    /* Use standard box-shadow instead of filter: drop-shadow to prevent duplicate text rendering on transparent card backgrounds */
-    box-shadow: 6px 6px 0px 0px rgba(21, 22, 22, 1), 0 0 14px rgba(139, 92, 246, 0.55);
-}
-
-.vibe-tab.active:hover {
-    box-shadow: 6px 6px 0px var(--accent), 0 0 14px rgba(139, 92, 246, 0.55);
 }
 
 /* Gallery items use a child image container for their border/shadow */
@@ -3269,6 +3277,20 @@ body.intro-loading .api-window-body {
     background-clip: padding-box; /* Clip background gradient within the transparent border box */
 }
 
+/* Clipping wrapper for transparent vibe coding tab spotlights to bypass WebKit compositor bugs */
+.card-spotlight-clip {
+    position: absolute;
+    inset: 0;
+    border-radius: 16px;
+    overflow: hidden;
+    pointer-events: none;
+    z-index: 0;
+    -webkit-mask-image: -webkit-radial-gradient(white, black);
+    mask-image: radial-gradient(white, black);
+    backface-visibility: hidden;
+    transform: translateZ(0);
+}
+
 /* Explicit border-radius mappings to bypass WebKit/Blink inherit bugs on absolute elements */
 .project-card .card-spotlight,
 .edu-card .card-spotlight,
@@ -3276,16 +3298,13 @@ body.intro-loading .api-window-body {
 .stat-card .card-spotlight,
 .about-card .card-spotlight,
 .timeline-item .card-spotlight,
-.item-img .card-spotlight {
+.item-img .card-spotlight,
+.vibe-tab .card-spotlight {
     border-radius: 16px;
 }
 
 .api-playground .card-spotlight {
     border-radius: 20px;
-}
-
-.vibe-tab .card-spotlight {
-    border-radius: 12px;
 }
 
 .project-card:hover .card-spotlight,
