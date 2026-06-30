@@ -2194,7 +2194,8 @@ a:hover {
         padding: 1.5rem 1.25rem;
         text-align: center;
         align-items: center;
-        justify-content: space-evenly; /* distribute content evenly across full card height */
+        justify-content: center;
+        gap: 1.25rem;
         overflow: visible;
     }
     .role-badge {
@@ -2202,8 +2203,8 @@ a:hover {
         padding: 0.25rem 0.9rem;
         margin-bottom: 0; /* let space-evenly handle gaps */
     }
-    .hero h1 {
-        font-size: clamp(2rem, 9vw, 2.8rem); /* bigger — fill the space */
+    .hero h1.focus-container#hero-name {
+        font-size: clamp(2.1rem, 9.2vw, 2.7rem); /* bigger — fill the space */
         margin-bottom: 0;
         line-height: 1.15;
     }
@@ -2714,7 +2715,8 @@ body:has(.vibe-browser.interacting) .target-cursor-wrapper {
     height: 100%;
     border: none;
     opacity: 0;
-    transition: opacity 0.4s ease;
+    visibility: hidden;
+    transition: opacity 0.4s ease, visibility 0.4s ease;
     pointer-events: none; /* let mouse events fall through so custom cursor tracks inside the preview */
     z-index: 1;
 
@@ -2728,6 +2730,7 @@ body:has(.vibe-browser.interacting) .target-cursor-wrapper {
 
 .vibe-iframe-instance.active-iframe.loaded {
     opacity: 1;
+    visibility: visible;
     z-index: 5;
 }
 
@@ -3025,6 +3028,25 @@ body.intro-loading {
     overflow: hidden;
 }
 
+/* ── DOT FIELD CANVAS ───────────────────────────────────────────────────
+   Sits behind the API playground card during the intro loading screen.
+   Hidden by default; fades in when intro-loading is active,
+   fades out smoothly once the page reveals. */
+#dot-field-canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1;          /* above hero bg canvas (z:-1), below card (z:2) */
+    opacity: 0;
+    transition: opacity 0.6s ease;
+}
+
+body.intro-loading #dot-field-canvas {
+    opacity: 1;
+}
+
 /* 1. HIDE ALL ELEMENTS EXCEPT THE NAME ANIMATION IN HIERARCHY */
 body.intro-loading .navbar,
 body.intro-loading .api-window-header,
@@ -3035,8 +3057,7 @@ body.intro-loading .hero-sub,
 body.intro-loading .hero-buttons,
 body.intro-loading .stats-grid,
 body.intro-loading .section,
-body.intro-loading .footer,
-body.intro-loading .target-cursor-wrapper {
+body.intro-loading .footer {
     opacity: 0 !important;
     visibility: hidden !important;
     pointer-events: none !important;
@@ -3058,6 +3079,26 @@ body.intro-loading .api-sidebar {
 body.intro-loading #hero-name .glitch::after,
 body.intro-loading #hero-name .glitch::before {
     background-color: var(--background-color) !important;
+}
+
+/* 3b. FIX CURSOR VISIBILITY DURING INTRO LOADING
+   mix-blend-mode: difference makes the white cursor invisible over the
+   light background. Override to brand purple with no blending. */
+body.intro-loading .target-cursor-wrapper {
+    mix-blend-mode: normal;
+}
+
+body.intro-loading .target-cursor-dot {
+    background: #A855F7 !important;
+}
+
+body.intro-loading .target-cursor-dot.cursor-dot--expanded {
+    background: #A855F7 !important;
+    box-shadow: 0 0 0 2px rgba(168, 85, 247, 0.5), 0 0 12px rgba(168, 85, 247, 0.6) !important;
+}
+
+body.intro-loading .target-cursor-corner {
+    border-color: #A855F7 !important;
 }
 
 /* 4. DEFINE TRANSITIONS FOR SMOOTH IN-PLACE REVEAL */

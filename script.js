@@ -1543,6 +1543,20 @@ try {
         iframeTemplate.removeAttribute('id');
         originalIframe.remove();
 
+        const preloadNextIframe = () => {
+            const activeTab = section.querySelector('.vibe-tab.active');
+            if (!activeTab) return;
+            const tabsArray = Array.from(tabs);
+            const activeIdx = tabsArray.indexOf(activeTab);
+            if (activeIdx !== -1 && activeIdx < tabsArray.length - 1) {
+                const nextTab = tabsArray[activeIdx + 1];
+                const nextUrl = nextTab.dataset.url;
+                if (!iframePool[nextUrl]) {
+                    getOrCreateIframe(nextUrl);
+                }
+            }
+        };
+
         const getOrCreateIframe = (url) => {
             if (iframePool[url]) return iframePool[url];
             const newIframe = iframeTemplate.cloneNode(true);
@@ -1553,6 +1567,7 @@ try {
                 if (currentIframe === newIframe) {
                     loader.style.opacity = '0';
                     loader.style.pointerEvents = 'none';
+                    preloadNextIframe();
                 }
             });
             browserBody.insertBefore(newIframe, iframeOverlay);
@@ -1612,6 +1627,7 @@ try {
             } else {
                 loader.style.opacity = '0';
                 loader.style.pointerEvents = 'none';
+                preloadNextIframe();
             }
 
             urlText.textContent = url;
@@ -1642,17 +1658,15 @@ try {
             browser.classList.remove('interacting');
         });
 
+        // Add document-wide click/touch listener to exit interacting mode when clicking/tapping outside
+        document.addEventListener('pointerdown', e => {
+            if (!browser.contains(e.target) && !tabsColumn.contains(e.target)) {
+                browser.classList.remove('interacting');
+            }
+        });
+
         // Listen to window resizing to update scale proportions dynamically
         window.addEventListener('resize', updateIframeScale);
-
-        const preloadRemainingTabs = () => {
-            setTimeout(() => {
-                tabs.forEach(t => {
-                    const url = t.dataset.url;
-                    if (!iframePool[url]) getOrCreateIframe(url);
-                });
-            }, 2500); // Wait 2.5s after first load to trigger background loads
-        };
 
         // Lazy initialize first iframe once Vibe Labs section is visible
         const lazyObserver = new IntersectionObserver(entries => {
@@ -1662,7 +1676,6 @@ try {
                 if (activeTab) {
                     switchProject(activeTab);
                     setTimeout(updateIframeScale, 100);
-                    preloadRemainingTabs();
                 }
                 lazyObserver.disconnect();
             }
@@ -1793,6 +1806,150 @@ try {
     };
 
     /* -----------------------------------------------
+       DOT FIELD — Loading Screen Background Animation
+       Ported from ReactBits DotField to vanilla JS/Canvas
+       ----------------------------------------------- */
+    const initDotField = () => {
+        const canvas = document.getElementById('dot-field-canvas');
+        if (!canvas) return null;
+
+        const ctx = canvas.getContext('2d', { alpha: true });
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+        // ── Config (matching ReactBits usage params) ──────────────────
+        const DOT_RADIUS    = 1.5;
+        const DOT_SPACING   = 14;
+        const BULGE_STR     = 67;
+        const CURSOR_RADIUS = 500;
+        const GRAD_FROM     = 'rgba(168, 85, 247, 0.35)';
+        const GRAD_TO       = 'rgba(180, 151, 207, 0.25)';
+        const TWO_PI        = Math.PI * 2;
+        const STEP          = DOT_RADIUS + DOT_SPACING;
+
+        let dots = [];
+        let w = 0, h = 0;
+        let frameCount = 0;
+        let raf = null;
+        let resizeTimer = null;
+
+        const mouse = { x: -9999, y: -9999, prevX: -9999, prevY: -9999, speed: 0 };
+        let engagement = 0;
+
+        // ── Build dot grid ────────────────────────────────────────────
+        const buildDots = () => {
+            const cols = Math.floor(w / STEP);
+            const rows = Math.floor(h / STEP);
+            const padX = (w % STEP) / 2;
+            const padY = (h % STEP) / 2;
+            dots = [];
+            for (let r = 0; r < rows; r++) {
+                for (let c = 0; c < cols; c++) {
+                    const ax = padX + c * STEP + STEP / 2;
+                    const ay = padY + r * STEP + STEP / 2;
+                    dots.push({ ax, ay, sx: ax, sy: ay });
+                }
+            }
+        };
+
+        // ── Resize ────────────────────────────────────────────────────
+        const doResize = () => {
+            const rect = canvas.parentElement.getBoundingClientRect();
+            w = rect.width;
+            h = rect.height;
+            canvas.width  = w * dpr;
+            canvas.height = h * dpr;
+            canvas.style.width  = `${w}px`;
+            canvas.style.height = `${h}px`;
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+            buildDots();
+        };
+
+        const onResize = () => {
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(doResize, 100);
+        };
+
+        // ── Mouse ─────────────────────────────────────────────────────
+        const onMouseMove = e => {
+            const rect = canvas.getBoundingClientRect();
+            mouse.x = e.clientX - rect.left;
+            mouse.y = e.clientY - rect.top;
+        };
+
+        // Speed interval for engagement dampening
+        const speedInterval = setInterval(() => {
+            const dx = mouse.prevX - mouse.x;
+            const dy = mouse.prevY - mouse.y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            mouse.speed += (dist - mouse.speed) * 0.5;
+            if (mouse.speed < 0.001) mouse.speed = 0;
+            mouse.prevX = mouse.x;
+            mouse.prevY = mouse.y;
+        }, 20);
+
+        // ── Render loop ───────────────────────────────────────────────
+        const tick = () => {
+            frameCount++;
+            const len = dots.length;
+            const crSq = CURSOR_RADIUS * CURSOR_RADIUS;
+            const rad  = DOT_RADIUS / 2;
+
+            const targetEng = Math.min(mouse.speed / 5, 1);
+            engagement += (targetEng - engagement) * 0.06;
+            if (engagement < 0.001) engagement = 0;
+
+            ctx.clearRect(0, 0, w, h);
+
+            const grad = ctx.createLinearGradient(0, 0, w, h);
+            grad.addColorStop(0, GRAD_FROM);
+            grad.addColorStop(1, GRAD_TO);
+            ctx.fillStyle = grad;
+
+            ctx.beginPath();
+
+            for (let i = 0; i < len; i++) {
+                const d = dots[i];
+                const dx = mouse.x - d.ax;
+                const dy = mouse.y - d.ay;
+                const distSq = dx * dx + dy * dy;
+
+                if (distSq < crSq && engagement > 0.01) {
+                    const dist = Math.sqrt(distSq);
+                    const t    = 1 - dist / CURSOR_RADIUS;
+                    const push = t * t * BULGE_STR * engagement;
+                    const ang  = Math.atan2(dy, dx);
+                    d.sx += (d.ax - Math.cos(ang) * push - d.sx) * 0.15;
+                    d.sy += (d.ay - Math.sin(ang) * push - d.sy) * 0.15;
+                } else {
+                    d.sx += (d.ax - d.sx) * 0.1;
+                    d.sy += (d.ay - d.sy) * 0.1;
+                }
+
+                ctx.moveTo(d.sx + rad, d.sy);
+                ctx.arc(d.sx, d.sy, rad, 0, TWO_PI);
+            }
+
+            ctx.fill();
+            raf = requestAnimationFrame(tick);
+        };
+
+        // ── Init ──────────────────────────────────────────────────────
+        doResize();
+        window.addEventListener('resize', onResize);
+        window.addEventListener('mousemove', onMouseMove, { passive: true });
+        raf = requestAnimationFrame(tick);
+
+        // ── Cleanup — call once loader finishes ───────────────────────
+        return () => {
+            cancelAnimationFrame(raf);
+            clearInterval(speedInterval);
+            clearTimeout(resizeTimer);
+            window.removeEventListener('resize', onResize);
+            window.removeEventListener('mousemove', onMouseMove);
+        };
+    };
+
+    /* -----------------------------------------------
        INTRO LOADER SEQUENCE — REAL RESOURCE PRELOADER
        ----------------------------------------------- */
     const initIntroLoader = () => {
@@ -1801,7 +1958,8 @@ try {
         const bodyEl        = document.body;
 
         // Run the hero name glitch + focus animation immediately
-        const nameAnim = initNameFocus('hero-name', 'name-focus-frame');
+        const nameAnim    = initNameFocus('hero-name', 'name-focus-frame');
+        const destroyDots = initDotField();
 
         if (!loaderBar || !loaderPct) {
             bodyEl.classList.remove('intro-loading');
@@ -1881,6 +2039,8 @@ try {
                         // Dispatch resize event to trigger layout calculations (like Masonry)
                         window.dispatchEvent(new Event('resize'));
                         setTimeout(() => { if (nameAnim) nameAnim.update(); }, 600);
+                        // Let CSS fade-out finish (0.6s), then kill the DotField loop
+                        setTimeout(() => { if (destroyDots) destroyDots(); }, 700);
                     }, 350);
                 }
             });
