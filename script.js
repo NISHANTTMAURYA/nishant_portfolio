@@ -2183,9 +2183,68 @@ try {
         cards.forEach(card => initSingleCardEffect(card));
     }
 
+    /* -----------------------------------------------
+       VIDEO LIGHTBOX
+    ----------------------------------------------- */
+    function initVideoLightbox() {
+        const videoLightbox = document.getElementById('video-lightbox');
+        const lightboxVideo = document.getElementById('lightbox-video');
+        const videoCloseBtn = document.querySelector('.video-close-btn');
+        const videoTriggers = document.querySelectorAll('.video-trigger');
+
+        if (videoLightbox && lightboxVideo) {
+            videoTriggers.forEach(trigger => {
+                trigger.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const videoSrc = trigger.getAttribute('data-video');
+                    const videoTitle = trigger.getAttribute('data-title') || 'Video Demo';
+                    
+                    // Set video source and title
+                    lightboxVideo.src = videoSrc;
+                    const captionEl = document.getElementById('video-lightbox-caption');
+                    if (captionEl) captionEl.textContent = videoTitle;
+                    
+                    // Open lightbox
+                    videoLightbox.classList.add('active');
+                    videoLightbox.setAttribute('aria-hidden', 'false');
+                    
+                    // Play video automatically
+                    lightboxVideo.play().catch(err => {
+                        console.log("Auto-play prevented or failed:", err);
+                    });
+                });
+            });
+
+            const closeVideoLightbox = () => {
+                videoLightbox.classList.remove('active');
+                videoLightbox.setAttribute('aria-hidden', 'true');
+                // Pause and reset video
+                lightboxVideo.pause();
+                lightboxVideo.src = "";
+            };
+
+            if (videoCloseBtn) {
+                videoCloseBtn.addEventListener('click', closeVideoLightbox);
+            }
+
+            videoLightbox.addEventListener('click', (e) => {
+                if (e.target === videoLightbox) {
+                    closeVideoLightbox();
+                }
+            });
+
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && videoLightbox.classList.contains('active')) {
+                    closeVideoLightbox();
+                }
+            });
+        }
+    }
+
     initIntroLoader();
     initVibeLabs();
     initCardEffects();
+    initVideoLightbox();
 
 } catch (err) {
     console.error('Portfolio script error:', err);
