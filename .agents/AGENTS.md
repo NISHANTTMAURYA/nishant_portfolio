@@ -60,3 +60,36 @@ This document defines critical design, layout, and implementation rules for the 
     const cols = Math.ceil(logicalWidth / gridSpacing) + 1;
     const rows = Math.ceil(logicalHeight / gridSpacing) + 1;
     ```
+
+---
+
+## 6. Tech Stack Grid Height Collapse (Flexbox & aspect-ratio)
+* **Constraint:** Placing a container that relies on `aspect-ratio` (e.g. `.default-animation` wrapper) inside a flexbox child (like `.skills-cubes-layout`) causes the vertical height to collapse to `0px` in many mobile browser layout engines. This causes subsequent elements (marquee, category legend) to slide up and overlap the grid.
+* **Implementation Rule:**
+  * **Never** use `display: flex` on container elements enclosing child elements with `aspect-ratio`. 
+  * **Always** use block layout (`display: block`) for these containers so the browser calculates height correctly (`width * heightRatio / widthRatio`), maintaining grid spacing and layout flow.
+
+---
+
+## 7. Responsive Mockup Window Scaling
+* **Constraint:** Hiding mockup browser header elements (like traffic lights or the domain address bar) on mobile screens ruins the desktop-mockup visual identity.
+* **Implementation Rule:**
+  * **Never** hide `.browser-dots` or `.browser-address` inside mobile responsive queries.
+  * **Always** scale down mockup elements (e.g., using smaller fonts like `0.65rem`, smaller widths like `62%`, and dot dimensions like `7px`) inside media queries so the browser mockup is preserved without clipping.
+
+---
+
+## 8. GSAP Tween Compilation & Functional Values
+* **Constraint:** Passing dynamic arrow-function values to properties inside GSAP timelines (e.g. `opacity: (i, el) => ...`) can cause compile-time or run-time exceptions if elements evaluate to null or undefined. A single crash stops the entire GSAP timeline execution, leaving element opacities in an intermediate "stuck" state.
+* **Implementation Rule:**
+  * **Never** use dynamic functions inside timeline tweens or `gsap.set` targets.
+  * **Always** use a standard Javascript loop (like `.forEach`) to evaluate states at timeline compile-time and insert static, individual tweens into the timeline.
+
+---
+
+## 9. Interactive Auto-Moving Synchronization
+* **Constraint:** Manual interactions (scrolling, clicking, swiping) must pause auto-scrolling cleanly and prevent simulation snapping when the idle timer expires.
+* **Implementation Rule:**
+  * **Always** invoke a unified `pauseAutoMoving()` helper to reset a 3-second idle timer on any pointer, touch, scroll, or click events on both the cubes grid and the marquee line.
+  * **Always** sync the auto-moving simulation trackers (`simIndex`, `simTarget`, `simPos`) with the manually highlighted item in the marquee scroll listener while `userActive` is true. This ensures the loop resumes seamlessly from where the user manually scrolled.
+
