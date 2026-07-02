@@ -2208,7 +2208,8 @@ try {
                     videoLightbox.classList.add('active');
                     videoLightbox.setAttribute('aria-hidden', 'false');
                     
-                    // Play video automatically
+                    // Load and play video (using load() ensures WebKit parses the updated src)
+                    lightboxVideo.load();
                     lightboxVideo.play().catch(err => {
                         console.log("Auto-play prevented or failed:", err);
                     });
