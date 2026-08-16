@@ -2242,10 +2242,58 @@ try {
         }
     }
 
+    /* -----------------------------------------------
+       FOOTER SUBSCRIBE FORM
+    ----------------------------------------------- */
+    function initFooterSubscribe() {
+        const form = document.getElementById('subscribe-form');
+        if (!form) return;
+
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const input = form.querySelector('.memail');
+            const messageEl = form.querySelector('.mchimp-message');
+            if (!input || !messageEl) return;
+
+            const email = input.value.trim();
+            if (!email) {
+                messageEl.textContent = 'Please enter an email address.';
+                messageEl.className = 'mchimp-message error';
+                messageEl.style.display = 'block';
+                return;
+            }
+
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                messageEl.textContent = 'Please enter a valid email address.';
+                messageEl.className = 'mchimp-message error';
+                messageEl.style.display = 'block';
+                return;
+            }
+
+            // Simulate form submission success
+            messageEl.textContent = 'Thank you for subscribing!';
+            messageEl.className = 'mchimp-message success';
+            messageEl.style.display = 'block';
+            input.value = '';
+
+            // Auto-hide success message after 5 seconds
+            setTimeout(() => {
+                messageEl.style.transition = 'opacity 0.4s ease';
+                messageEl.style.opacity = '0';
+                setTimeout(() => {
+                    messageEl.style.display = 'none';
+                    messageEl.style.opacity = '1';
+                }, 400);
+            }, 5000);
+        });
+    }
+
     initIntroLoader();
     initVibeLabs();
     initCardEffects();
     initVideoLightbox();
+    initFooterSubscribe();
 
 } catch (err) {
     console.error('Portfolio script error:', err);
