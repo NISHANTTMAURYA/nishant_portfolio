@@ -3570,7 +3570,28 @@ body.intro-loading .api-window-body {
     position: absolute;
     bottom: 35px;
     left: 38%;
-    animation: myfirst 30s linear infinite;
+    animation: myfirst 16s linear infinite;
+}
+
+.footer_center_reveal_text {
+    position: absolute;
+    bottom: 42px;
+    left: 50%;
+    transform: translateX(-50%);
+    white-space: nowrap;
+    font-family: 'Space Grotesk', 'Plus Jakarta Sans', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    letter-spacing: -0.2px;
+    color: #ffffff;
+    background: linear-gradient(135deg, #7C3AED 0%, #6D28D9 100%);
+    padding: 0.45rem 1.4rem;
+    border-radius: 8px;
+    border: 2px solid #151616;
+    box-shadow: 4px 4px 0px #151616;
+    pointer-events: none;
+    z-index: 2;
+    clip-path: inset(0 100% 0 0);
 }
 
 @keyframes myfirst {

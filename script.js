@@ -2289,11 +2289,42 @@ try {
         });
     }
 
+    /* -----------------------------------------------
+       DYNAMIC CYCLIST TEXT REVEAL BINDING
+    ----------------------------------------------- */
+    function initCyclistTextReveal() {
+        const bike = document.querySelector('.footer_bg_two');
+        const text = document.querySelector('.footer_center_reveal_text');
+        if (!bike || !text) return;
+
+        function updateReveal() {
+            const bikeRect = bike.getBoundingClientRect();
+            const textRect = text.getBoundingClientRect();
+
+            if (textRect.width > 0) {
+                // Measure bike's rear trailing wheel position with reduced delay offset
+                const bikeRearX = bikeRect.left - 6;
+                const textLeft = textRect.left;
+                const textWidth = textRect.width;
+
+                let progress = ((bikeRearX - textLeft) / textWidth) * 100;
+                progress = Math.max(0, Math.min(100, progress));
+
+                text.style.clipPath = `inset(0 ${100 - progress}% 0 0)`;
+            }
+
+            requestAnimationFrame(updateReveal);
+        }
+
+        requestAnimationFrame(updateReveal);
+    }
+
     initIntroLoader();
     initVibeLabs();
     initCardEffects();
     initVideoLightbox();
     initFooterSubscribe();
+    initCyclistTextReveal();
 
 } catch (err) {
     console.error('Portfolio script error:', err);
