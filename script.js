@@ -1999,7 +1999,7 @@ try {
         const TOTAL_RESOURCES = RESOURCES.length;
         let   loadedCount     = 0;
         let   allDone         = false;
-        const MIN_MS          = 5000; // 5 seconds minimum
+        const MIN_MS          = 1600; // Snappy intro duration
         const startTime       = performance.now();
 
         // Kick off actual image preloading in parallel
@@ -2031,7 +2031,7 @@ try {
             const snapObj = { v: displayed };
             gsap.to(snapObj, {
                 v: 100,
-                duration: 0.45,
+                duration: 0.3,
                 ease: 'power2.out',
                 onUpdate: () => {
                     loaderBar.style.width  = `${snapObj.v}%`;
@@ -2042,10 +2042,10 @@ try {
                         bodyEl.classList.remove('intro-loading');
                         // Dispatch resize event to trigger layout calculations (like Masonry)
                         window.dispatchEvent(new Event('resize'));
-                        setTimeout(() => { if (nameAnim) nameAnim.update(); }, 600);
+                        setTimeout(() => { if (nameAnim) nameAnim.update(); }, 400);
                         // Let CSS fade-out finish (0.6s), then kill the DotField loop
-                        setTimeout(() => { if (destroyDots) destroyDots(); }, 700);
-                    }, 350);
+                        setTimeout(() => { if (destroyDots) destroyDots(); }, 600);
+                    }, 200);
                 }
             });
         };
@@ -2054,7 +2054,7 @@ try {
             if (revealed) return;
 
             const elapsed      = performance.now() - startTime;
-            const timePct      = Math.min(elapsed / MIN_MS, 1) * 100;          // 0-100 over 5 s
+            const timePct      = Math.min(elapsed / MIN_MS, 1) * 100;          // 0-100 over MIN_MS
             const resourcePct  = (loadedCount / TOTAL_RESOURCES) * 100;        // actual load %
 
             // Blend: resources drive 55%, time drives 45%
@@ -2063,7 +2063,7 @@ try {
             const target   = (allDone && elapsed >= MIN_MS) ? 100 : Math.min(blended, 97);
 
             // Smooth the displayed value — lerp toward target, never go backwards
-            displayed += (target - displayed) * 0.04;
+            displayed += (target - displayed) * 0.08;
             if (target === 100 && displayed > 99) displayed = 100;
 
             loaderBar.style.width  = `${displayed}%`;
@@ -2078,8 +2078,8 @@ try {
 
         requestAnimationFrame(tick);
 
-        // Hard fallback: force reveal at 7 s even on very slow connections
-        setTimeout(() => reveal(), MIN_MS + 2000);
+        // Hard fallback: force reveal if connection is slow
+        setTimeout(() => reveal(), MIN_MS + 1500);
     };
 
     /* -----------------------------------------------
