@@ -407,6 +407,16 @@ try {
         }
     });
 
+    document.querySelectorAll('.project-photo-item').forEach(item => {
+        item.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            const img = item.getAttribute('data-img');
+            const title = item.getAttribute('data-title');
+            openLightbox(img, title);
+        });
+    });
+
     const initMasonryGallery = () => {
         const containerRef = document.getElementById('masonry-list');
         if (!containerRef) return;
@@ -434,7 +444,11 @@ try {
             { id: "20", img: "./images/13.jpg", title: "SIH 2025 — Grand Finale Winners, ₹75,000", height: 480 },
             { id: "21", img: "./images/25.jpg", title: "Sunhacks 2025 — Outdoor Victory at Sandip", height: 450 },
             { id: "22", img: "./images/21.jpg", title: "Codeutsava 8.0 — Status 200 Winners", height: 450 },
-            { id: "24", img: "./images/17.jpg", title: "SIH 2024 — Grand Finale, Team4i at Work", height: 520 }
+            { id: "24", img: "./images/17.jpg", title: "SIH 2024 — Grand Finale, Team4i at Work", height: 520 },
+            { id: "25", img: "./images/mentorconnect1.jpg", title: "MentorConnect — Live Faculty & Student Demo", height: 460 },
+            { id: "26", img: "./images/mentorconnect2.jpg", title: "MentorConnect — Computer Lab Portal Demonstration", height: 460 },
+            { id: "27", img: "./images/mentorconnect4.jpg", title: "MentorConnect — Department Mentoring Session at Fr. CRCE", height: 500 },
+            { id: "28", img: "./images/100x.vc_pitching_with_shashank_randev.jpg", title: "Pitching to Shashank Randev — 100X.VC", height: 460 }
         ];
 
         const ease = 'power3.out';

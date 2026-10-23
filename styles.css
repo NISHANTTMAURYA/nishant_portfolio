@@ -1259,6 +1259,11 @@ a:hover {
     color: #92400e;
 }
 
+.badge-info {
+    background: #e0f2fe;
+    color: #0369a1;
+}
+
 .project-card h3 {
     font-size: 1.2rem;
     font-weight: 700;
@@ -1311,6 +1316,69 @@ a:hover {
     font-size: 0.92rem;
     line-height: 1.7;
     color: var(--text-color);
+}
+
+.project-photos-strip {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.65rem;
+    margin: 0.75rem 0 0.35rem 0;
+}
+
+.project-photo-item {
+    position: relative;
+    border-radius: 10px;
+    overflow: hidden;
+    aspect-ratio: 16 / 10;
+    border: 1.5px solid var(--border-color);
+    background: #111;
+    cursor: pointer;
+    filter: var(--shadow-sm);
+    transition: var(--transition);
+}
+
+.project-photo-item:hover {
+    transform: translate(-2px, -2px);
+    filter: var(--shadow-hover);
+}
+
+.project-photo-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.3s ease;
+}
+
+.project-photo-item:hover img {
+    transform: scale(1.06);
+}
+
+.project-photo-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(48, 41, 81, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.project-photo-overlay i {
+    color: #fff;
+    font-size: 1.6rem;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+}
+
+.project-photo-item:hover .project-photo-overlay {
+    opacity: 1;
+}
+
+@media (max-width: 500px) {
+    .project-photos-strip {
+        gap: 0.4rem;
+    }
 }
 
 .project-highlights {
@@ -1600,6 +1668,12 @@ a:hover {
     grid-template-columns: repeat(3, 1fr);
     gap: 1.25rem;
     margin-bottom: 1.75rem;
+}
+
+@media (min-width: 1025px) {
+    .achievement-card:last-child:nth-child(3n+1) {
+        grid-column: 2;
+    }
 }
 
 @media (max-width: 1024px) and (min-width: 641px) {
