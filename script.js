@@ -407,7 +407,7 @@ try {
         }
     });
 
-    document.querySelectorAll('.project-photo-item').forEach(item => {
+    document.querySelectorAll('.project-thumb-item, .project-photo-item').forEach(item => {
         item.addEventListener('click', (e) => {
             e.preventDefault();
             e.stopPropagation();
