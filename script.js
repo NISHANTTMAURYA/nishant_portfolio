@@ -2412,12 +2412,107 @@ try {
         requestAnimationFrame(updateReveal);
     }
 
+    /* -----------------------------------------------
+       REACT BITS COUNTUP COMPONENT INTEGRATION
+       mode: "count", easing: easeOut (cubicBezier), trigger: "view",
+       replayOnHover: true, format: "standard"
+    ----------------------------------------------- */
+    function initCountUp() {
+        const cards = document.querySelectorAll('.stats-grid .stat-card');
+        if (!cards.length) return;
+
+        function cubicBezier(x1, y1, x2, y2) {
+            return function(t) {
+                if (t <= 0) return 0;
+                if (t >= 1) return 1;
+                let currentT = t;
+                for (let i = 0; i < 6; i++) {
+                    const currentX = 3 * (1 - currentT) * (1 - currentT) * currentT * x1 + 3 * (1 - currentT) * currentT * currentT * x2 + currentT * currentT * currentT;
+                    const derivativeX = 3 * (1 - currentT) * (1 - currentT) * x1 + 6 * (1 - currentT) * currentT * (x2 - x1) + 3 * currentT * currentT * (1 - x2);
+                    if (Math.abs(derivativeX) < 1e-6) break;
+                    currentT -= (currentX - t) / derivativeX;
+                }
+                currentT = Math.min(1, Math.max(0, currentT));
+                return 3 * (1 - currentT) * (1 - currentT) * currentT * y1 + 3 * (1 - currentT) * currentT * currentT * y2 + currentT * currentT * currentT;
+            };
+        }
+        const easeOut = cubicBezier(0.33, 1, 0.68, 1);
+
+        const runCountUp = (card, isReplay = false) => {
+            const valEl = card.querySelector('.count-up-value');
+            if (!valEl) return;
+
+            const targetStr = card.getAttribute('data-count-target') || '0';
+            const target = parseFloat(targetStr) || 0;
+            const decimals = parseInt(card.getAttribute('data-decimals') ?? (targetStr.includes('.') ? targetStr.split('.')[1].length : 0), 10);
+            const duration = 1600; // 1.6s
+            const startTime = performance.now();
+            const startVal = 0;
+
+            if (card._isCountAnimating && !isReplay) return;
+            if (card._countRafId) cancelAnimationFrame(card._countRafId);
+            card._isCountAnimating = true;
+
+            const step = (currentTime) => {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(1, Math.max(0, elapsed / duration));
+                const easedProgress = easeOut(progress);
+                const currentVal = startVal + (target - startVal) * easedProgress;
+
+                valEl.textContent = currentVal.toFixed(decimals);
+
+                if (progress < 1) {
+                    card._countRafId = requestAnimationFrame(step);
+                } else {
+                    valEl.textContent = target.toFixed(decimals);
+                    card._isCountAnimating = false;
+                    card._countRafId = null;
+                }
+            };
+
+            card._countRafId = requestAnimationFrame(step);
+        };
+
+        const triggerInitial = (card) => {
+            if (document.body.classList.contains('intro-loading')) {
+                const checkLoader = setInterval(() => {
+                    if (!document.body.classList.contains('intro-loading')) {
+                        clearInterval(checkLoader);
+                        setTimeout(() => runCountUp(card, false), 200);
+                    }
+                }, 100);
+            } else {
+                runCountUp(card, false);
+            }
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach((entry) => {
+                if (entry.isIntersecting) {
+                    triggerInitial(entry.target);
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.2 });
+
+        cards.forEach((card) => {
+            observer.observe(card);
+
+            card.addEventListener('mouseenter', () => {
+                if (!card._isCountAnimating && !document.body.classList.contains('intro-loading')) {
+                    runCountUp(card, true);
+                }
+            });
+        });
+    }
+
     initIntroLoader();
     initVibeLabs();
     initCardEffects();
     initVideoLightbox();
     initFooterSubscribe();
     initCyclistTextReveal();
+    initCountUp();
 
 } catch (err) {
     console.error('Portfolio script error:', err);

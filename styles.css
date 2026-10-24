@@ -17,6 +17,10 @@
     --y: 50vh;
     --pattern: radial-gradient(closest-side, #302951, transparent) 0/ 1em 1em space;
     --map: radial-gradient(circle farthest-corner at var(--x) var(--y), black, transparent 90%);
+    --font-main: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    --font-display: 'Space Grotesk', -apple-system, sans-serif;
+    --font-mono: 'JetBrains Mono', ui-monospace, Menlo, Monaco, Consolas, monospace;
+    --font-handwritten: 'Patrick Hand', 'Caveat', cursive, sans-serif;
 }
 
 @property --x {
@@ -57,7 +61,7 @@ html {
 }
 
 body {
-    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    font-family: var(--font-main);
     background-color: var(--background-color);
     color: var(--text-color);
     line-height: 1.6;
@@ -87,13 +91,15 @@ a:hover {
 }
 
 .section-title {
-    font-size: clamp(1.5rem, 3vw, 2rem);
+    font-family: var(--font-main);
+    font-size: clamp(2.2rem, 5.2vw, 3.2rem);
     font-weight: 800;
+    line-height: 1.15;
+    letter-spacing: -0.035em;
     color: var(--secondary-color);
-    margin-top: 4rem;
+    margin-top: 4.5rem;
     margin-bottom: 2rem;
     text-align: center;
-    letter-spacing: -0.5px;
 }
 
 /* =============================================
@@ -148,6 +154,7 @@ a:hover {
     text-decoration: none;
     display: flex;
     align-items: center;
+    font-family: var(--font-display);
     font-size: 1.4rem;
     font-weight: 700;
     letter-spacing: -0.5px;
@@ -261,7 +268,7 @@ a:hover {
     align-items: center;
     justify-content: space-between;
     padding: 0.65rem 1.25rem;
-    font-family: 'Courier New', monospace;
+    font-family: var(--font-mono);
     font-size: 0.82rem;
     font-weight: 700;
     color: var(--secondary-color);
@@ -304,7 +311,7 @@ a:hover {
     max-width: 280px;
     width: 100%;
     box-shadow: inset 0 1px 3px rgba(0,0,0,0.06);
-    font-family: 'Courier New', monospace;
+    font-family: var(--font-mono);
     font-size: 0.75rem;
     font-weight: 600;
     color: var(--text-color);
@@ -371,7 +378,7 @@ a:hover {
     opacity: 0.5;
     letter-spacing: 1px;
     padding: 0 1.25rem 0.5rem;
-    font-family: 'Courier New', monospace;
+    font-family: var(--font-mono);
 }
 
 .api-btn {
@@ -385,7 +392,7 @@ a:hover {
     align-items: center;
     gap: 0.5rem;
     cursor: pointer;
-    font-family: 'Courier New', monospace;
+    font-family: var(--font-mono);
     font-size: 0.85rem;
     font-weight: 700;
     color: var(--text-color);
@@ -443,7 +450,7 @@ a:hover {
 }
 
 .tab-title {
-    font-family: 'Courier New', monospace;
+    font-family: var(--font-mono);
     font-size: 1.1rem;
     font-weight: 700;
     color: var(--secondary-color);
@@ -477,7 +484,7 @@ a:hover {
 }
 
 .json-code {
-    font-family: 'Courier New', Courier, monospace;
+    font-family: var(--font-mono);
     font-size: 0.88rem;
     line-height: 1.6;
     color: #e2e8f0;
@@ -492,7 +499,7 @@ a:hover {
 
 .role-badge {
     display: inline-block;
-    font-family: 'Courier New', monospace;
+    font-family: var(--font-mono);
     font-size: 0.95rem;
     font-weight: 700;
     color: var(--accent);
@@ -536,7 +543,7 @@ a:hover {
 }
 
 .hero-chip {
-    font-family: 'Courier New', monospace;
+    font-family: var(--font-mono);
     font-size: inherit;
     font-weight: 700;
     color: var(--secondary-color);
@@ -628,60 +635,349 @@ a:hover {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 1.25rem;
-    margin-bottom: 1rem;
+    margin-bottom: 2rem;
 }
 
 .stat-card {
-    background: var(--card-background);
-    padding: 1.5rem;
-    border-radius: 16px;
-    filter: var(--shadow-sm);
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 1.15rem;
+    padding: 1.15rem 1.35rem;
+    border-radius: 18px;
     border: 2px solid var(--border-color);
-    text-align: center;
-    transition: var(--transition);
+    box-shadow: 3.5px 3.5px 0px var(--border-color);
+    filter: none;
+    text-align: left;
+    transition: transform 0.22s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.22s cubic-bezier(0.2, 0.8, 0.2, 1);
+    cursor: pointer;
+    user-select: none;
+    overflow: hidden;
 }
 
 .stat-card:hover {
-    transform: translate(-2px, -2px);
-    filter: var(--shadow-hover);
+    transform: translate(-2px, -3px);
+    box-shadow: 5.5px 5.5px 0px var(--border-color);
+}
+
+/* Subtle cream solid variations with matching soft pastel icon badges */
+/* 1. Academic (CGPA) - Warm Vanilla Cream */
+.stat-card-academic {
+    background: #FFFDF7;
+}
+.stat-card-academic .stat-icon-box {
+    background: #EDE9FE;
+    color: #6D28D9;
+    border: 1.5px solid rgba(109, 40, 217, 0.16);
+}
+
+/* 2. Hackathons - Soft Peach/Apricot Cream */
+.stat-card-wins {
+    background: #FFFBF2;
+}
+.stat-card-wins .stat-icon-box {
+    background: #FEF3C7;
+    color: #D97706;
+    border: 1.5px solid rgba(217, 119, 6, 0.18);
+}
+
+/* 3. Production Apps - Soft Sky Cream */
+.stat-card-apps {
+    background: #F7FAFD;
+}
+.stat-card-apps .stat-icon-box {
+    background: #E0F2FE;
+    color: #0284C7;
+    border: 1.5px solid rgba(2, 132, 199, 0.18);
+}
+
+/* 4. Finalist Positions - Soft Sage/Mint Cream */
+.stat-card-finalist {
+    background: #F6FAF7;
+}
+.stat-card-finalist .stat-icon-box {
+    background: #DCFCE7;
+    color: #16A34A;
+    border: 1.5px solid rgba(22, 163, 74, 0.18);
+}
+
+.stat-icon-box {
+    width: 52px;
+    height: 52px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.stat-card:hover .stat-icon-box {
+    transform: scale(1.08) rotate(-3deg);
+}
+
+.stat-icon-svg {
+    width: 26px;
+    height: 26px;
+    display: block;
+}
+
+.stat-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-width: 0;
 }
 
 .stat-number {
-    font-size: clamp(2rem, 4vw, 2.75rem);
+    font-family: var(--font-display);
+    font-size: clamp(1.85rem, 2.3vw, 2.35rem);
     font-weight: 800;
-    color: var(--accent);
-    line-height: 1;
-    margin-bottom: 0.4rem;
+    color: #1e1b4b;
+    line-height: 1.05;
+    margin-bottom: 0.15rem;
+    letter-spacing: -0.025em;
+    font-variant-numeric: tabular-nums;
 }
 
 .stat-label {
-    font-size: 0.82rem;
-    font-weight: 600;
-    color: var(--text-color);
-    opacity: 0.75;
+    font-family: var(--font-main);
+    font-size: 0.76rem;
+    font-weight: 700;
+    color: #64748b;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.05em;
+    line-height: 1.25;
+    white-space: nowrap;
 }
 
 /* =============================================
    ABOUT ME & CUBES GRID
    ============================================= */
-.about-grid {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    max-width: 850px;
+/* =============================================
+   ABOUT ME SECTION (REDESIGNED)
+   ============================================= */
+.about-container {
+    max-width: 1100px;
     margin: 0 auto;
     width: 100%;
 }
 
 .about-card {
-    background: var(--card-background);
+    background: #ffffff;
     border: 2px solid var(--border-color);
-    filter: var(--shadow-sm);
-    border-radius: 16px;
-    padding: 2rem;
+    box-shadow: 4px 4px 0px var(--border-color);
+    border-radius: 22px;
+    padding: 2.5rem 2.75rem;
     width: 100%;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.22s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.22s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.about-card:hover {
+    transform: translate(-2px, -3px);
+    box-shadow: 6px 6px 0px var(--border-color);
+}
+
+.about-card-body {
+    display: grid;
+    grid-template-columns: 1.25fr 0.95fr;
+    gap: 2.75rem;
+    align-items: stretch;
+}
+
+/* Left Column */
+.about-col-main {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-width: 0;
+}
+
+.about-story {
+    display: flex;
+    flex-direction: column;
+}
+
+.about-hero-title {
+    font-family: var(--font-display);
+    font-size: clamp(1.85rem, 3.2vw, 2.35rem);
+    font-weight: 800;
+    color: #111827;
+    letter-spacing: -0.03em;
+    margin-bottom: 1.15rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    line-height: 1.15;
+}
+
+.wave-emoji {
+    display: inline-block;
+    transform-origin: 70% 70%;
+    animation: wave-animation 2.4s infinite ease-in-out;
+}
+
+@keyframes wave-animation {
+    0%, 60%, 100% { transform: rotate(0deg); }
+    10%, 30% { transform: rotate(14deg); }
+    20% { transform: rotate(-8deg); }
+    40% { transform: rotate(-4deg); }
+    50% { transform: rotate(10deg); }
+}
+
+.about-text {
+    font-size: 0.96rem;
+    line-height: 1.72;
+    color: #4b5563;
+    margin-bottom: 0.95rem;
+}
+
+.about-text strong {
+    color: #111827;
+    font-weight: 700;
+}
+
+.about-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 1.25rem;
+    margin-top: 1.15rem;
+    padding-top: 1.15rem;
+    border-top: 1.5px solid #f1f5f9;
+}
+
+.about-meta-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: #64748b;
+}
+
+.about-meta-item a {
+    color: inherit;
+    text-decoration: none;
+    transition: color 0.15s ease;
+}
+
+.about-meta-item a:hover {
+    color: var(--accent);
+    text-decoration: underline;
+}
+
+.about-meta-icon {
+    width: 17px;
+    height: 17px;
+    color: #7c3aed;
+    flex-shrink: 0;
+}
+
+/* Right Column */
+.about-col-side {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    min-width: 0;
+    padding-top: 2.5rem;
+}
+
+.about-drives-card,
+.about-strengths-card {
+    background: #f8f6fe;
+    border: 1.5px solid #ede9fe;
+    border-radius: 16px;
+    padding: 1.25rem 1.4rem;
+    width: 100%;
+    box-sizing: border-box;
+    transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.about-drives-card:hover,
+.about-strengths-card:hover {
+    border-color: #c4b5fd;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(124, 58, 237, 0.06);
+}
+
+.about-drives-title,
+.about-strengths-title {
+    font-family: var(--font-display);
+    font-size: 1.05rem;
+    font-weight: 800;
+    color: #1e1b4b;
+    margin-bottom: 0.85rem;
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    letter-spacing: -0.015em;
+}
+
+.drives-icon,
+.strengths-icon {
+    font-size: 1.1rem;
+}
+
+.about-drives-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+}
+
+.about-drives-list li {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    font-size: 0.86rem;
+    font-weight: 600;
+    color: #374151;
+    line-height: 1.35;
+}
+
+.check-icon {
+    width: 18px;
+    height: 18px;
+    background: #8b5cf6;
+    color: #ffffff;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.check-icon svg {
+    width: 11px;
+    height: 11px;
+}
+
+.soft-skills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.55rem;
+}
+
+.soft-skill-tag {
+    background: #ede9fe;
+    color: #4338ca;
+    border: 1.5px solid #c7d2fe;
+    border-radius: 9999px;
+    padding: 0.32rem 0.85rem;
+    font-size: 0.76rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    transition: transform 0.15s ease, background-color 0.15s ease;
+}
+
+.soft-skill-tag:hover {
+    background: #ddd6fe;
+    transform: translateY(-1px);
 }
 
 .about-visual {
@@ -716,6 +1012,7 @@ a:hover {
 }
 
 .about-stat-number {
+    font-family: var(--font-display);
     font-size: 1.8rem;
     font-weight: 800;
     color: var(--accent);
@@ -848,7 +1145,7 @@ a:hover {
   text-align: center;
   pointer-events: none;
   user-select: none;
-  font-family: 'Inter', monospace;
+  font-family: var(--font-mono);
   text-shadow: 0 0 8px currentColor;
 }
 
@@ -859,7 +1156,7 @@ a:hover {
   text-align: center;
   pointer-events: none;
   user-select: none;
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-main);
   padding: 2px;
   line-height: 1.1;
 }
@@ -1061,53 +1358,6 @@ a:hover {
 }
 
 
-.about-text {
-    font-size: 1.05rem;
-    line-height: 1.8;
-    color: var(--text-color);
-    margin-bottom: 1.5rem;
-}
-
-.about-meta {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1rem;
-    margin-bottom: 1.25rem;
-}
-
-.about-meta-item {
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
-    font-size: 0.88rem;
-    color: var(--text-color);
-    opacity: 0.8;
-}
-
-.about-meta-item i {
-    font-size: 1rem;
-    color: var(--accent);
-}
-
-.about-meta-item a {
-    color: inherit;
-}
-
-.soft-skills {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.6rem;
-}
-
-.soft-skill-tag {
-    background: var(--accent-light);
-    color: var(--secondary-color);
-    font-size: 0.82rem;
-    font-weight: 600;
-    padding: 0.35rem 0.85rem;
-    border-radius: 50px;
-    border: 1.5px solid var(--border-color);
-}
 
 /* =============================================
    EXPERIENCE TIMELINE
@@ -1155,8 +1405,9 @@ a:hover {
 }
 
 .timeline-date {
-    font-size: 0.8rem;
-    font-weight: 700;
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    font-weight: 600;
     color: var(--accent);
     text-transform: uppercase;
     letter-spacing: 0.5px;
@@ -1165,8 +1416,10 @@ a:hover {
 
 .timeline-item h3,
 .project-card h3 {
+    font-family: var(--font-display);
     font-size: 1.15rem;
     font-weight: 700;
+    letter-spacing: -0.02em;
     color: var(--secondary-color);
     margin-bottom: 0.2rem;
 }
@@ -1244,7 +1497,8 @@ a:hover {
 }
 
 .badge {
-    font-size: 0.75rem;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
     font-weight: 700;
     padding: 0.2rem 0.65rem;
     border-radius: 50px;
@@ -1267,8 +1521,10 @@ a:hover {
 }
 
 .project-card h3 {
+    font-family: var(--font-display);
     font-size: 1.2rem;
     font-weight: 700;
+    letter-spacing: -0.02em;
     color: var(--secondary-color);
     line-height: 1.3;
 }
@@ -1436,11 +1692,13 @@ a:hover {
 }
 
 .tech-tag {
+    font-family: var(--font-mono);
     background: var(--accent-light);
-    padding: 0.3rem 0.75rem;
+    padding: 0.28rem 0.7rem;
     border-radius: 20px;
-    font-size: 0.8rem;
+    font-size: 0.76rem;
     font-weight: 600;
+    letter-spacing: -0.01em;
     color: var(--secondary-color);
     border: 1.5px solid var(--border-color);
     transition: var(--transition);
@@ -1879,8 +2137,10 @@ a:hover {
 .edu-score-badge.green { background: #d1fae5; color: #065f46; }
 
 .edu-title {
+    font-family: var(--font-display);
     font-size: 1.2rem;
     font-weight: 700;
+    letter-spacing: -0.02em;
     color: var(--secondary-color);
     line-height: 1.3;
 }
@@ -2409,11 +2669,20 @@ a:hover {
 
     /* Stats */
     .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 0.85rem; }
+    .stat-card { padding: 0.95rem 1.05rem; gap: 0.85rem; border-radius: 14px; }
+    .stat-icon-box { width: 44px; height: 44px; border-radius: 11px; }
+    .stat-icon-svg { width: 22px; height: 22px; }
+    .stat-number { font-size: 1.6rem; }
+    .stat-label { font-size: 0.68rem; }
 
     /* About */
-    .about-meta { flex-direction: column; gap: 0.6rem; }
-    .about-card { padding: 1.25rem; }
-    .about-text { font-size: 0.95rem; margin-bottom: 0.85rem; line-height: 1.6; }
+    .about-card-body { grid-template-columns: 1fr; gap: 1.75rem; }
+    .about-card { padding: 1.75rem 1.4rem; border-radius: 18px; }
+    .about-hero-title { font-size: 1.75rem; margin-bottom: 0.85rem; }
+    .about-text { font-size: 0.92rem; margin-bottom: 0.85rem; line-height: 1.65; }
+    .about-meta { flex-direction: column; align-items: flex-start; gap: 0.6rem; padding-top: 0.9rem; margin-top: 0.9rem; }
+    .about-col-side { padding-top: 0; gap: 1rem; }
+    .about-drives-card, .about-strengths-card { padding: 1.15rem 1.25rem; }
 
     /* Timeline */
     .timeline-header { flex-direction: column; gap: 0.75rem; }
@@ -2478,9 +2747,21 @@ a:hover {
    ============================================= */
 @media (max-width: 420px) {
     .container { padding: 1rem; }
-    .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 0.65rem; }
-    .stat-number { font-size: 1.8rem; }
+    .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 0.6rem; }
+    .stat-card { padding: 0.75rem 0.65rem; gap: 0.6rem; border-radius: 12px; }
+    .stat-icon-box { width: 36px; height: 36px; border-radius: 9px; }
+    .stat-icon-svg { width: 18px; height: 18px; }
+    .stat-number { font-size: 1.35rem; }
+    .stat-label { font-size: 0.62rem; letter-spacing: 0.02em; }
     .hero-sub { font-size: 0.78rem; }
+    .about-card { padding: 1.25rem 1rem; border-radius: 16px; }
+    .about-hero-title { font-size: 1.5rem; }
+    .about-text { font-size: 0.88rem; }
+    .about-meta-item { font-size: 0.76rem; }
+    .soft-skill-tag { font-size: 0.72rem; padding: 0.28rem 0.65rem; }
+    .about-drives-title,
+    .about-strengths-title { font-size: 0.95rem; }
+    .about-drives-list li { font-size: 0.82rem; }
     .achievements-summary { font-size: 0.9rem; padding: 0.5rem 1.25rem; }
 }
 
@@ -2804,7 +3085,7 @@ a:hover {
     border-radius: 8px;
     padding: 0.5rem 1rem;
     color: #ffffff;
-    font-family: 'Courier New', monospace;
+    font-family: var(--font-mono);
     font-size: 0.8rem;
     font-weight: 700;
     opacity: 0;
@@ -2928,8 +3209,10 @@ body:has(.vibe-browser.interacting) .target-cursor-wrapper {
 
 .vibe-desc-card h3 {
     margin: 0 0 0.4rem 0;
+    font-family: var(--font-display);
     font-size: 1.15rem;
     font-weight: 700;
+    letter-spacing: -0.02em;
     color: var(--accent);
 }
 
@@ -3352,7 +3635,7 @@ body.intro-loading .api-window-body {
 
 .loader-percentage {
     flex-shrink: 0;       /* prevent collapsing in height:0 parent flexbox */
-    font-family: 'Courier New', monospace;
+    font-family: var(--font-mono);
     font-size: 0.95rem;
     font-weight: 700;
     color: var(--secondary-color);
@@ -3380,7 +3663,7 @@ body.intro-loading .api-window-body {
     text-align: left !important;
     pointer-events: none;
     position: relative;
-    font-family: 'Courier New', Courier, Menlo, Monaco, Consolas, monospace;
+    font-family: var(--font-mono);
     font-size: 0.95rem;
     line-height: 28px;
 }
@@ -3613,7 +3896,7 @@ body.intro-loading .api-window-body {
     border-top: 3px solid var(--border-color);
     margin-top: 5rem;
     position: relative;
-    font-family: 'Inter', sans-serif;
+    font-family: var(--font-main);
     padding: 0 !important;
 }
 
@@ -3813,7 +4096,7 @@ body.intro-loading .api-window-body {
     left: 50%;
     transform: translateX(-50%);
     white-space: nowrap;
-    font-family: 'Space Grotesk', 'Plus Jakarta Sans', sans-serif;
+    font-family: var(--font-display);
     font-size: 1.1rem;
     font-weight: 700;
     letter-spacing: -0.2px;
