@@ -1973,7 +1973,76 @@ try {
     const initIntroLoader = () => {
         const loaderBar     = document.getElementById('loader-bar');
         const loaderPct     = document.getElementById('loader-percentage');
+        const terminalLines = document.getElementById('terminal-lines');
         const bodyEl        = document.body;
+
+        const INSTALL_LOGS = [
+            { status: "loading",    pkg: "hackathons (8x championship wins)" },
+            { status: "verifying",  pkg: "sih-2025-winners (gold cup)" },
+            { status: "mounting",   pkg: "client consultancy @ 4istudios" },
+            { status: "linking",    pkg: "nit raipur (b.tech comp science)" },
+            { status: "deploying",  pkg: "mentorconnect @ yukti-aicte" },
+            { status: "indexing",   pkg: "atttc.cloud + mitrai.online" },
+            { status: "ready",      pkg: "production-grade-systems initialized" }
+        ];
+
+        let currentStageIdx = -1;
+        const updateTerminalStream = (stageIdx) => {
+            if (!terminalLines) return;
+            const clamped = Math.max(0, Math.min(stageIdx, INSTALL_LOGS.length - 1));
+            if (clamped === currentStageIdx) return;
+            currentStageIdx = clamped;
+
+            // Command line is ALWAYS line index 0
+            let html = `
+                <div class="t-line t-line-cmd">
+                    <span class="t-prompt">$</span><span class="t-cmd">./nishant.sh --install</span>
+                </div>
+            `;
+
+            for (let i = 0; i <= clamped; i++) {
+                const item = INSTALL_LOGS[i];
+                const isFinal = (i === INSTALL_LOGS.length - 1);
+                const isDone = (i < clamped);
+
+                if (isFinal) {
+                    html += `
+                        <div class="t-line ready">
+                            <span class="t-icon icon-ready">✨</span>
+                            <span>${item.pkg}</span>
+                        </div>
+                    `;
+                } else if (isDone) {
+                    html += `
+                        <div class="t-line done">
+                            <span class="t-icon icon-ok">✔</span>
+                            <span>${item.pkg}</span>
+                        </div>
+                    `;
+                } else {
+                    html += `
+                        <div class="t-line active">
+                            <span class="t-icon icon-spin">›</span>
+                            <span>${item.status} ${item.pkg}...</span>
+                        </div>
+                    `;
+                }
+            }
+
+            terminalLines.innerHTML = html;
+
+            // Total lines = 1 (cmd) + (clamped + 1)
+            const totalLines = 1 + (clamped + 1);
+            const maxVisible = 4;
+            if (totalLines > maxVisible) {
+                const offsetLines = totalLines - maxVisible;
+                const isMobile = window.innerWidth <= 480;
+                const lineH = isMobile ? 24 : 28;
+                terminalLines.style.transform = `translateY(-${offsetLines * lineH}px)`;
+            } else {
+                terminalLines.style.transform = 'translateY(0px)';
+            }
+        };
 
         // Run the hero name glitch + focus animation immediately
         const nameAnim    = initNameFocus('hero-name', 'name-focus-frame');
@@ -2013,7 +2082,7 @@ try {
         const TOTAL_RESOURCES = RESOURCES.length;
         let   loadedCount     = 0;
         let   allDone         = false;
-        const MIN_MS          = 1600; // Snappy intro duration
+        const MIN_MS          = 2500; // Paced to cycle through all 7 achievement lines (~350ms each)
         const startTime       = performance.now();
 
         // Kick off actual image preloading in parallel
@@ -2041,11 +2110,14 @@ try {
         const reveal = () => {
             if (revealed) return;
             revealed = true;
+            // Always lock the final ready package state
+            updateTerminalStream(INSTALL_LOGS.length - 1);
+
             // Snap remaining gap to 100% with a quick GSAP tween
             const snapObj = { v: displayed };
             gsap.to(snapObj, {
                 v: 100,
-                duration: 0.3,
+                duration: 0.25,
                 ease: 'power2.out',
                 onUpdate: () => {
                     loaderBar.style.width  = `${snapObj.v}%`;
@@ -2068,22 +2140,29 @@ try {
             if (revealed) return;
 
             const elapsed      = performance.now() - startTime;
-            const timePct      = Math.min(elapsed / MIN_MS, 1) * 100;          // 0-100 over MIN_MS
-            const resourcePct  = (loadedCount / TOTAL_RESOURCES) * 100;        // actual load %
+            const timeProgress = Math.min(elapsed / MIN_MS, 1); // 0.0 -> 1.0
 
-            // Blend: resources drive 55%, time drives 45%
-            // Never exceed 97% until BOTH time AND resources are complete
-            const blended  = resourcePct * 0.55 + timePct * 0.45;
-            const target   = (allDone && elapsed >= MIN_MS) ? 100 : Math.min(blended, 97);
+            // Step through all 9 stages sequentially based on elapsed time so NONE are skipped
+            const stageIndex = Math.min(
+                Math.floor(timeProgress * INSTALL_LOGS.length),
+                INSTALL_LOGS.length - 1
+            );
+            updateTerminalStream(stageIndex);
 
-            // Smooth the displayed value — lerp toward target, never go backwards
-            displayed += (target - displayed) * 0.08;
+            const resourceRatio = (loadedCount / TOTAL_RESOURCES);
+            // Smooth target percentage: climbs steadily with time even on cached assets
+            const target = (allDone && elapsed >= MIN_MS)
+                ? 100
+                : Math.min(timeProgress * 98, (resourceRatio * 0.25 + timeProgress * 0.75) * 98);
+
+            // Smooth the displayed value — lerp toward target
+            displayed += (target - displayed) * 0.14;
             if (target === 100 && displayed > 99) displayed = 100;
 
             loaderBar.style.width  = `${displayed}%`;
             loaderPct.textContent  = `${Math.round(displayed)}%`;
 
-            if (displayed >= 99.9) {
+            if (displayed >= 99.5 && elapsed >= MIN_MS) {
                 reveal();
             } else {
                 requestAnimationFrame(tick);
@@ -2093,7 +2172,7 @@ try {
         requestAnimationFrame(tick);
 
         // Hard fallback: force reveal if connection is slow
-        setTimeout(() => reveal(), MIN_MS + 1500);
+        setTimeout(() => reveal(), MIN_MS + 1000);
     };
 
     /* -----------------------------------------------

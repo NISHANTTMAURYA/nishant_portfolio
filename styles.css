@@ -1390,8 +1390,12 @@ a:hover {
     flex: 1;
 }
 
+.project-card > p {
+    flex: none !important;
+}
+
 .project-highlights {
-    flex: 1;
+    flex: none;
     margin-top: 0.25rem;
     margin-bottom: 0.5rem;
     padding-left: 0;
@@ -3353,6 +3357,144 @@ body.intro-loading .api-window-body {
     font-weight: 700;
     color: var(--secondary-color);
     letter-spacing: 0.5px;
+    margin-top: 0.25rem;
+    text-align: center;
+}
+
+.terminal-text-window {
+    flex-shrink: 0;       /* prevent collapsing in height:0 parent flexbox (AGENTS.md Rule 1) */
+    width: fit-content;
+    max-width: 92vw;
+    height: 112px;        /* exactly 4 lines (4 * 28px) */
+    max-height: 112px;
+    overflow: hidden;
+    margin-top: 0.75rem;
+    margin-left: auto;
+    margin-right: auto;
+    background: transparent !important;
+    background-color: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    text-align: left !important;
+    pointer-events: none;
+    position: relative;
+    font-family: 'Courier New', Courier, Menlo, Monaco, Consolas, monospace;
+    font-size: 0.95rem;
+    line-height: 28px;
+}
+
+.terminal-lines {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start !important;
+    width: 100%;
+    background: transparent !important;
+    transition: transform 0.22s cubic-bezier(0.2, 0.8, 0.2, 1);
+    will-change: transform;
+}
+
+.t-line {
+    font-family: inherit;
+    font-size: 0.95rem;
+    font-weight: 700 !important; /* Constant font-weight across all states: NO size jump */
+    line-height: 28px;
+    height: 28px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    background: transparent !important;
+    background-color: transparent !important;
+    color: #000000 !important;
+    text-align: left !important;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start !important;
+    letter-spacing: 0.2px;
+}
+
+.t-line-cmd {
+    color: #000000 !important;
+    font-weight: 700 !important;
+}
+
+.t-line-cmd .t-prompt {
+    color: var(--accent);
+    font-weight: 900;
+    width: 18px;
+    min-width: 18px;
+    max-width: 18px;
+    margin-right: 0.5rem;
+    display: inline-block;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+.t-line-cmd .t-cmd {
+    color: #000000 !important;
+}
+
+.t-line.active {
+    color: #000000 !important;
+    font-weight: 700 !important;
+}
+
+.t-line.done {
+    color: #000000 !important;
+    font-weight: 700 !important;
+}
+
+.t-line.ready {
+    color: #000000 !important;
+    font-weight: 700 !important;
+}
+
+.t-icon {
+    display: inline-block;
+    width: 18px;
+    min-width: 18px;
+    max-width: 18px;
+    margin-right: 0.5rem;
+    text-align: center;
+    background: transparent !important;
+    flex-shrink: 0;
+}
+
+.t-icon.icon-spin {
+    color: var(--accent);
+    font-weight: 900;
+}
+
+.t-icon.icon-ok {
+    color: #10B981;
+    font-weight: 800;
+}
+
+.t-icon.icon-ready {
+    color: #000000 !important;
+}
+
+@media (max-width: 480px) {
+    .terminal-text-window {
+        width: fit-content;
+        max-width: 92vw;
+        font-size: 0.82rem;
+        line-height: 24px;
+        height: 96px;       /* 4 * 24px */
+        max-height: 96px;
+    }
+    .t-line {
+        font-size: 0.82rem;
+        line-height: 24px;
+        height: 24px;
+    }
+    .t-icon, .t-line-cmd .t-prompt {
+        width: 16px;
+        min-width: 16px;
+        max-width: 16px;
+        margin-right: 0.35rem;
+    }
 }
 
 /* =============================================
