@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, forwardRef, useImperativeHandle } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 
 import './CircularCarousel.css';
 
@@ -176,7 +176,7 @@ const usePrefersReducedMotion = () => {
   return reduced;
 };
 
-const CircularCarousel = forwardRef(function CircularCarousel({
+const CircularCarousel = ({
   items = DEFAULT_ITEMS,
   preset = 'cylinder',
   intro = 'rise',
@@ -184,7 +184,6 @@ const CircularCarousel = forwardRef(function CircularCarousel({
   aspectRatio = 1,
   gap = 25,
   curve,
-  spread,
   tilt,
   perspective,
   autoplay = 'drift',
@@ -207,7 +206,7 @@ const CircularCarousel = forwardRef(function CircularCarousel({
   onItemClick,
   className = '',
   style
-}, ref) {
+}) => {
   const incoming = items && items.length ? items : DEFAULT_ITEMS;
   const [list, setList] = useState(incoming);
   const [leaving, setLeaving] = useState(null);
@@ -226,18 +225,16 @@ const CircularCarousel = forwardRef(function CircularCarousel({
 
   const radius = useMemo(() => {
     const n = Math.max(count, 3);
-    const spreadValue = spread ?? layout.spread;
-    const pitch = (along + gap) * spreadValue;
+    const pitch = (along + gap) * layout.spread;
     const chord = pitch / (2 * Math.sin(Math.PI / n));
     const arc = (n * pitch) / (2 * Math.PI);
     return Math.max(chord + (arc - chord) * curveValue, along * 0.6);
-  }, [count, along, gap, curveValue, layout.spread, spread]);
+  }, [count, along, gap, curveValue, layout.spread]);
 
   const tiles = useMemo(() => {
-    const isCustom = list.some(item => item?.content);
-    const total = isCustom || curveValue < 0.001 ? 1 : TILES;
+    const total = curveValue > 0.001 ? TILES : 1;
     const length = along / total;
-    const bend = total > 1 && curveValue > 0.001 ? radius / curveValue : 0;
+    const bend = curveValue > 0.001 ? radius / curveValue : 0;
     return Array.from({ length: total }, (_, index) => {
       const start = index * length - (index > 0 ? OVERLAP / 2 : 0);
       const end = (index + 1) * length + (index < total - 1 ? OVERLAP / 2 : 0);
@@ -253,7 +250,7 @@ const CircularCarousel = forwardRef(function CircularCarousel({
           : `translate3d(${shift}px, 0px, ${depth}px) rotateY(${turn}deg)`;
       return { index, total, start, end, size: end - start, move };
     });
-  }, [along, axis, curveValue, layout.inward, radius, list]);
+  }, [along, axis, curveValue, layout.inward, radius]);
 
   const rootRef = useRef(null);
   const stageRef = useRef(null);
@@ -345,14 +342,7 @@ const CircularCarousel = forwardRef(function CircularCarousel({
       setLeaving(null);
       setList(next);
     }
-    const sources = next.slice(0, 16).map(item => item?.src).filter(Boolean);
-    if (sources.length === 0) {
-      stateRef.current.introDone = false;
-      stateRef.current.intro = null;
-      setReady(true);
-      wakeRef.current();
-      return;
-    }
+    const sources = next.slice(0, 16).map(item => item.src);
     const load = src =>
       new Promise(resolve => {
         const image = new Image();
@@ -714,14 +704,6 @@ const CircularCarousel = forwardRef(function CircularCarousel({
     wakeRef.current();
   }, []);
 
-  useImperativeHandle(ref, () => ({
-    focusIndex,
-    stepBy,
-    next: () => stepBy(1),
-    prev: () => stepBy(-1),
-    active
-  }), [focusIndex, stepBy, active]);
-
   const updatePointer = event => {
     const rect = rootRef.current.getBoundingClientRect();
     const pointer = stateRef.current.pointer;
@@ -732,7 +714,6 @@ const CircularCarousel = forwardRef(function CircularCarousel({
   const handlePointerDown = event => {
     const state = stateRef.current;
     state.suppressClick = false;
-    if (event.target.closest('a, button, input, .dossier-action-btn, .dossier-photo-thumb, .thumb-overlay')) return;
     if (!draggable || event.button !== 0) return;
     state.press = {
       id: event.pointerId,
@@ -828,7 +809,6 @@ const CircularCarousel = forwardRef(function CircularCarousel({
       state.suppressClick = false;
       return;
     }
-    if (event.target.closest('a, button, input, .dossier-action-btn, .dossier-photo-thumb, .thumb-overlay')) return;
     const card = event.target.closest?.('[data-cc-index]');
     if (!card) return;
     const index = Number(card.getAttribute('data-cc-index'));
@@ -877,27 +857,21 @@ const CircularCarousel = forwardRef(function CircularCarousel({
         key={`${back ? 'b' : 'f'}${tile.index}`}
         className="circular-carousel__tile"
         style={{ ...box, transform: tile.move + (back ? flip : '') }}
-        aria-hidden={item.content ? undefined : 'true'}
+        aria-hidden="true"
       >
         <div
           className="circular-carousel__frame"
           style={{ height: axis === 'x' ? size : cardH, borderRadius: frameRadius }}
         >
-          {item.content ? (
-            <div className="circular-carousel__card-body" style={{ width: cardW, height: cardH }}>
-              {typeof item.content === 'function' ? item.content(index === active) : item.content}
-            </div>
-          ) : (
-            <img
-              className="circular-carousel__photo"
-              src={item.src}
-              alt=""
-              draggable={false}
-              decoding="async"
-              style={photoStyle}
-            />
-          )}
-          {gone && !item.content && (
+          <img
+            className="circular-carousel__photo"
+            src={item.src}
+            alt=""
+            draggable={false}
+            decoding="async"
+            style={photoStyle}
+          />
+          {gone && (
             <img
               key={`leaving-${leaving.id}`}
               className="circular-carousel__photo circular-carousel__photo--leaving"
@@ -909,7 +883,7 @@ const CircularCarousel = forwardRef(function CircularCarousel({
             />
           )}
           {back && <div className="circular-carousel__inner" />}
-          {!item.content && <div className="circular-carousel__shade" />}
+          <div className="circular-carousel__shade" />
         </div>
       </div>
     );
@@ -985,6 +959,6 @@ const CircularCarousel = forwardRef(function CircularCarousel({
       </div>
     </div>
   );
-});
+};
 
 export default CircularCarousel;

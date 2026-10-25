@@ -12,6 +12,7 @@ export default function ProjectsFolderApp() {
   const [folderVariant, setFolderVariant] = useState('solid'); // 'solid' | 'glass'
   const [isFolderOpen, setIsFolderOpen] = useState(false);
   const [hasScrolledNear, setHasScrolledNear] = useState(false);
+  const [inspectingProject, setInspectingProject] = useState(null);
   const [screenWidth, setScreenWidth] = useState(
     typeof window !== 'undefined' ? window.innerWidth : 1200
   );
@@ -243,13 +244,131 @@ export default function ProjectsFolderApp() {
       {/* Card Footer Hint */}
       <div className="dossier-card-footer">
         <span className="dossier-footer-hint">
-          {isForCarousel
-            ? (isCardActive ? '✦ Active in 3D Carousel' : 'Tap to focus this card')
-            : (isCardActive ? '✦ Focused in 3D · Click again to minimize' : '✦ Click to magnify in 3D · Drag to move')}
+          {isCardActive ? '✦ Focused in 3D · Click again to minimize' : '✦ Click to magnify in 3D · Drag to move'}
         </span>
       </div>
     </div>
   );
+
+  // Mobile 3D Circular Carousel Spotlight Card
+  const renderCarouselCardJSX = (proj, isCardActive) => {
+    const hasPhoto = proj.thumbs && proj.thumbs.length > 0 && proj.thumbs[0]?.img;
+    const heroImg = hasPhoto
+      ? proj.thumbs[0].img
+      : proj.id === 'mitrai'
+      ? './images/mitrai_robot.jpg'
+      : proj.id === 'gamified'
+      ? './images/nishant_sih.jpg'
+      : null;
+
+    return (
+      <div
+        className={`carousel-spotlight-card ${isCardActive ? 'is-active' : ''}`}
+        style={{
+          '--card-accent': proj.accent
+        }}
+        onClick={() => {
+          if (isCardActive) {
+            setInspectingProject(proj);
+          }
+        }}
+      >
+        {/* Top Hero Visual Banner */}
+        <div className="spotlight-hero" style={{ background: proj.accent }}>
+          {heroImg ? (
+            <div className="spotlight-hero-img-wrap">
+              <img src={heroImg} alt={proj.title} className="spotlight-hero-img" loading="lazy" />
+              <div className="spotlight-hero-gradient" />
+            </div>
+          ) : (
+            <div className="spotlight-hero-graphic">
+              <div className="spotlight-graphic-pattern" />
+              <div className="spotlight-graphic-icon">
+                <i className="material-icons">
+                  {proj.id === 'atttc'
+                    ? 'verified_user'
+                    : proj.id === 'twist-tac-toe'
+                    ? 'videogame_asset'
+                    : proj.id === 'splitkar'
+                    ? 'account_balance_wallet'
+                    : 'folder_special'}
+                </i>
+              </div>
+            </div>
+          )}
+
+          {/* Top Badges Strip */}
+          <div className="spotlight-top-strip">
+            <span className="spotlight-file-tag">FILE #{proj.index}</span>
+            <div className="spotlight-badges">
+              {proj.badges.map((b, bIdx) => (
+                <span key={bIdx} className="spotlight-status-badge">
+                  {b.text}
+                </span>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Card Body */}
+        <div className="spotlight-body">
+          <div className="spotlight-category">{proj.category}</div>
+          <h3 className="spotlight-title">{proj.title}</h3>
+          <p className="spotlight-desc">{proj.desc}</p>
+
+          {/* Key Tech Tags */}
+          <div className="spotlight-tech-row">
+            {proj.tech.slice(0, 3).map((tag, tIdx) => (
+              <span key={tIdx} className="spotlight-tech-pill">
+                {tag}
+              </span>
+            ))}
+            {proj.tech.length > 3 && (
+              <span className="spotlight-tech-more">+{proj.tech.length - 3}</span>
+            )}
+          </div>
+        </div>
+
+        {/* Card Footer Actions */}
+        <div className="spotlight-footer">
+          <div className="spotlight-actions">
+            {proj.links.slice(0, 2).map((link, lIdx) => (
+              <a
+                key={lIdx}
+                href={link.href}
+                target={link.external ? '_blank' : undefined}
+                rel={link.external ? 'noopener noreferrer' : undefined}
+                className="spotlight-btn cursor-target"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (link.dataVideo) {
+                    e.preventDefault();
+                    window.openVideoLightbox?.(link.dataVideo, link.dataTitle || proj.title);
+                  }
+                }}
+              >
+                {link.icon && <i className="material-icons">{link.icon}</i>}
+                <span>{link.text}</span>
+              </a>
+            ))}
+          </div>
+
+          <button
+            type="button"
+            className="spotlight-inspect-btn cursor-target"
+            title="Inspect project details"
+            onClick={(e) => {
+              e.stopPropagation();
+              setInspectingProject(proj);
+            }}
+          >
+            <span>Dossier</span>
+            <i className="material-icons">info_outline</i>
+          </button>
+        </div>
+      </div>
+    );
+  };
 
   // Desktop folder cards
   const folderItems = useMemo(() => {
@@ -258,16 +377,30 @@ export default function ProjectsFolderApp() {
     }));
   }, [activeIndex]);
 
-  // Phone Circular Carousel items
+  // Phone Circular Carousel items (using exact ReactBits format)
   const carouselItems = useMemo(() => {
-    return PROJECTS_DATA.map((proj, idx) => ({
-      id: proj.id,
-      title: proj.title,
-      subtitle: proj.category,
-      src: proj.thumbs?.[0]?.img || '',
-      content: (isCardActive) => renderCardJSX(proj, isCardActive, true)
-    }));
-  }, [activeIndex]);
+    return PROJECTS_DATA.map((proj) => {
+      const src =
+        proj.thumbs?.[0]?.img ||
+        (proj.id === 'mitrai'
+          ? './images/mitrai_robot.jpg'
+          : proj.id === 'gamified'
+          ? './images/nishant_sih.jpg'
+          : proj.id === 'atttc'
+          ? './images/10.jpg'
+          : proj.id === 'twist-tac-toe'
+          ? './images/112.jpg'
+          : './images/11.jpg');
+      return {
+        id: proj.id,
+        index: proj.index,
+        title: proj.title,
+        subtitle: proj.category,
+        alt: proj.title,
+        src: src
+      };
+    });
+  }, []);
 
   return (
     <div className="projects-folder-app-container">
@@ -343,31 +476,31 @@ export default function ProjectsFolderApp() {
               </div>
             </div>
           ) : (
-            /* Phone View (< 768px): ReactBits Circular Carousel with exact dossier cards */
+            /* Phone View (< 768px): Exact ReactBits 3D Circular Cylinder Carousel */
             <div className="mobile-circular-dossier-wrapper">
               <div className="mobile-carousel-container">
                 <CircularCarousel
-                  ref={carouselRef}
                   items={carouselItems}
-                  preset="orbit"
-                  cardWidth={Math.min(290, screenWidth - 64)}
-                  aspectRatio={0.68}
-                  gap={16}
-                  spread={1.22}
+                  preset="cylinder"
+                  cardWidth={210}
+                  aspectRatio={0.8}
+                  gap={20}
                   tilt={-5}
-                  curve={0}
-                  draggable={true}
-                  momentum={0.5}
-                  snap={true}
-                  depthFade={0.35}
-                  fadeColor="transparent"
-                  innerShade={0.05}
-                  cornerRadius={12}
+                  perspective={2500}
+                  depthFade={0.55}
+                  fadeColor="#000000"
+                  innerShade={0.6}
+                  cornerRadius={14}
+                  captions={true}
                   onChange={(index) => {
                     setActiveIndex(typeof index === 'number' ? index : 0);
                   }}
                   onItemClick={(item, index) => {
-                    setActiveIndex(typeof index === 'number' ? index : 0);
+                    const idx = typeof index === 'number' ? index : 0;
+                    setActiveIndex(idx);
+                    if (PROJECTS_DATA[idx]) {
+                      setInspectingProject(PROJECTS_DATA[idx]);
+                    }
                   }}
                 />
               </div>
@@ -435,8 +568,131 @@ export default function ProjectsFolderApp() {
 
               <div className="stage-interaction-hint">
                 <i className="material-icons">swipe</i>
-                <span>Swipe 3D circular carousel · Tap card to inspect project</span>
+                <span>Swipe 3D cylinder · Tap active card for full dossier & photos</span>
               </div>
+
+              {/* Bottom Sheet Modal for Detailed Project Dossier */}
+              {inspectingProject && (
+                <div
+                  className="mobile-dossier-modal-overlay"
+                  onClick={() => setInspectingProject(null)}
+                >
+                  <div
+                    className="mobile-dossier-modal-card"
+                    onClick={(e) => e.stopPropagation()}
+                    style={{ '--modal-accent': inspectingProject.accent }}
+                  >
+                    {/* Modal Header */}
+                    <div
+                      className="dossier-modal-header"
+                      style={{ background: inspectingProject.accent }}
+                    >
+                      <div className="dossier-modal-header-left">
+                        <span className="dossier-file-tag">FILE #{inspectingProject.index}</span>
+                        <span className="dossier-category-tag">{inspectingProject.category}</span>
+                      </div>
+                      <button
+                        type="button"
+                        className="dossier-modal-close-btn cursor-target"
+                        aria-label="Close dossier"
+                        onClick={() => setInspectingProject(null)}
+                      >
+                        <i className="material-icons">close</i>
+                      </button>
+                    </div>
+
+                    {/* Modal Body */}
+                    <div className="dossier-modal-content">
+                      <div className="dossier-modal-badges">
+                        {inspectingProject.badges.map((b, bIdx) => (
+                          <span key={bIdx} className={b.className}>
+                            {b.text}
+                          </span>
+                        ))}
+                      </div>
+
+                      <h2 className="dossier-modal-title">
+                        <a
+                          href={inspectingProject.titleLink}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="cursor-target"
+                        >
+                          {inspectingProject.title}
+                        </a>
+                      </h2>
+
+                      {/* Modal Action Links */}
+                      <div className="dossier-modal-links">
+                        {inspectingProject.links.map((link, lIdx) => (
+                          <a
+                            key={lIdx}
+                            href={link.href}
+                            target={link.external ? '_blank' : undefined}
+                            rel={link.external ? 'noopener noreferrer' : undefined}
+                            className="dossier-action-btn cursor-target"
+                            onClick={(e) => {
+                              if (link.dataVideo) {
+                                e.preventDefault();
+                                window.openVideoLightbox?.(
+                                  link.dataVideo,
+                                  link.dataTitle || inspectingProject.title
+                                );
+                              }
+                            }}
+                          >
+                            {link.icon && <i className="material-icons">{link.icon}</i>}
+                            <span>{link.text}</span>
+                          </a>
+                        ))}
+                      </div>
+
+                      <p className="dossier-modal-desc">{inspectingProject.desc}</p>
+
+                      {/* Photo Gallery if present */}
+                      {inspectingProject.thumbs && inspectingProject.thumbs.length > 0 && (
+                        <div className="dossier-modal-gallery">
+                          <span className="dossier-modal-gallery-title">Archival Evidence & Photos:</span>
+                          <div className="dossier-modal-thumbs-row">
+                            {inspectingProject.thumbs.map((thumb, tIdx) => (
+                              <div
+                                key={tIdx}
+                                className="dossier-modal-thumb cursor-target"
+                                title={thumb.title}
+                                onClick={() => window.openLightbox?.(thumb.img, thumb.title)}
+                              >
+                                <img src={thumb.img} alt={thumb.alt} loading="lazy" />
+                                <div className="dossier-modal-zoom">
+                                  <i className="material-icons">zoom_in</i>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Highlights */}
+                      <div className="dossier-modal-highlights">
+                        <h4>KEY ARCHITECTURAL HIGHLIGHTS</h4>
+                        <ul>
+                          {inspectingProject.highlights.map((h, hIdx) => (
+                            <li key={hIdx}>{h}</li>
+                          ))}
+                        </ul>
+                      </div>
+
+                      {/* Tech Stack */}
+                      <div className="dossier-modal-tech">
+                        {inspectingProject.tech.map((tag, tIdx) => (
+                          <span key={tIdx} className="tech-tag">
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </>

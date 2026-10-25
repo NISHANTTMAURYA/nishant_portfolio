@@ -1451,6 +1451,7 @@ const Folder = forwardRef(function Folder({
     const write = () => {
       const s = settingsRef.current;
       const { w, h, tabH, frontTop, frontH, docW, docH, scale, book: isBook } = s.g;
+      const isMobileScreen = typeof window !== 'undefined' ? window.innerWidth < 768 : scale < 1.0;
       const pivotX = w / 2;
       const pivotY = tabH + h / 2;
       const theta = state.front.value;
