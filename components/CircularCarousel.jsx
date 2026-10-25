@@ -232,9 +232,10 @@ const CircularCarousel = ({
   }, [count, along, gap, curveValue, layout.spread]);
 
   const tiles = useMemo(() => {
-    const total = curveValue > 0.001 ? TILES : 1;
+    const isCustom = list.some(item => Boolean(item.card || item.content));
+    const total = isCustom || curveValue < 0.001 ? 1 : TILES;
     const length = along / total;
-    const bend = curveValue > 0.001 ? radius / curveValue : 0;
+    const bend = total > 1 && curveValue > 0.001 ? radius / curveValue : 0;
     return Array.from({ length: total }, (_, index) => {
       const start = index * length - (index > 0 ? OVERLAP / 2 : 0);
       const end = (index + 1) * length + (index < total - 1 ? OVERLAP / 2 : 0);
@@ -250,7 +251,7 @@ const CircularCarousel = ({
           : `translate3d(${shift}px, 0px, ${depth}px) rotateY(${turn}deg)`;
       return { index, total, start, end, size: end - start, move };
     });
-  }, [along, axis, curveValue, layout.inward, radius]);
+  }, [along, axis, curveValue, layout.inward, radius, list]);
 
   const rootRef = useRef(null);
   const stageRef = useRef(null);
@@ -809,6 +810,7 @@ const CircularCarousel = ({
       state.suppressClick = false;
       return;
     }
+    if (event.target.closest('a, button, input, .spotlight-btn, .spotlight-inspect-btn')) return;
     const card = event.target.closest?.('[data-cc-index]');
     if (!card) return;
     const index = Number(card.getAttribute('data-cc-index'));
@@ -852,6 +854,7 @@ const CircularCarousel = ({
         : { left: -offset, top: 0, width: cardW, height: cardH };
     const flip = axis === 'x' ? ' rotateX(180deg)' : ' rotateY(180deg)';
     const gone = leaving?.items[index];
+    const isCustom = Boolean(item.card || item.content);
     return (
       <div
         key={`${back ? 'b' : 'f'}${tile.index}`}
@@ -863,15 +866,31 @@ const CircularCarousel = ({
           className="circular-carousel__frame"
           style={{ height: axis === 'x' ? size : cardH, borderRadius: frameRadius }}
         >
-          <img
-            className="circular-carousel__photo"
-            src={item.src}
-            alt=""
-            draggable={false}
-            decoding="async"
-            style={photoStyle}
-          />
-          {gone && (
+          {back && isCustom ? (
+            <div className="circular-carousel__card-back" style={{ width: cardW, height: cardH }}>
+              <div className="circular-carousel__back-pattern" />
+              <div className="circular-carousel__back-badge">
+                <span className="circular-carousel__back-hash">FILE #</span>
+                <span>{item.index || String(index + 1).padStart(2, '0')}</span>
+              </div>
+            </div>
+          ) : isCustom ? (
+            <div className="circular-carousel__card-body" style={{ width: cardW, height: cardH }}>
+              {typeof (item.card || item.content) === 'function'
+                ? (item.card || item.content)(index === active)
+                : (item.card || item.content)}
+            </div>
+          ) : (
+            <img
+              className="circular-carousel__photo"
+              src={item.src}
+              alt=""
+              draggable={false}
+              decoding="async"
+              style={photoStyle}
+            />
+          )}
+          {gone && !isCustom && (
             <img
               key={`leaving-${leaving.id}`}
               className="circular-carousel__photo circular-carousel__photo--leaving"

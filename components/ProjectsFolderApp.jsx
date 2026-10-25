@@ -377,30 +377,18 @@ export default function ProjectsFolderApp() {
     }));
   }, [activeIndex]);
 
-  // Phone Circular Carousel items (using exact ReactBits format)
+  // Phone Circular Carousel items with rich 3D cards
   const carouselItems = useMemo(() => {
-    return PROJECTS_DATA.map((proj) => {
-      const src =
-        proj.thumbs?.[0]?.img ||
-        (proj.id === 'mitrai'
-          ? './images/mitrai_robot.jpg'
-          : proj.id === 'gamified'
-          ? './images/nishant_sih.jpg'
-          : proj.id === 'atttc'
-          ? './images/10.jpg'
-          : proj.id === 'twist-tac-toe'
-          ? './images/112.jpg'
-          : './images/11.jpg');
-      return {
-        id: proj.id,
-        index: proj.index,
-        title: proj.title,
-        subtitle: proj.category,
-        alt: proj.title,
-        src: src
-      };
-    });
-  }, []);
+    return PROJECTS_DATA.map((proj) => ({
+      id: proj.id,
+      index: proj.index,
+      title: proj.title,
+      subtitle: proj.category,
+      alt: proj.title,
+      src: proj.thumbs?.[0]?.img || './images/mentorconnect1.jpg',
+      card: (isActive) => renderCarouselCardJSX(proj, isActive)
+    }));
+  }, [activeIndex]);
 
   return (
     <div className="projects-folder-app-container">
@@ -476,22 +464,23 @@ export default function ProjectsFolderApp() {
               </div>
             </div>
           ) : (
-            /* Phone View (< 768px): Exact ReactBits 3D Circular Cylinder Carousel */
+            /* Phone View (< 768px): 3D Circular Cylinder Carousel with Cards */
             <div className="mobile-circular-dossier-wrapper">
               <div className="mobile-carousel-container">
                 <CircularCarousel
                   items={carouselItems}
                   preset="cylinder"
-                  cardWidth={210}
-                  aspectRatio={0.8}
+                  cardWidth={230}
+                  aspectRatio={0.72}
                   gap={20}
                   tilt={-5}
-                  perspective={2500}
-                  depthFade={0.55}
-                  fadeColor="#000000"
-                  innerShade={0.6}
+                  perspective={2400}
+                  depthFade={0.45}
+                  fadeColor="rgba(24, 20, 36, 0.4)"
+                  innerShade={0.5}
                   cornerRadius={14}
-                  captions={true}
+                  captions={false}
+                  autoplay="off"
                   onChange={(index) => {
                     setActiveIndex(typeof index === 'number' ? index : 0);
                   }}
@@ -505,70 +494,9 @@ export default function ProjectsFolderApp() {
                 />
               </div>
 
-              {/* Quick Project Switcher Bar & Stepper Controls */}
-              <div className="folder-mobile-controls-wrapper">
-                <div className="folder-project-selector-bar" role="tablist" aria-label="Project Quick Select">
-                  {PROJECTS_DATA.map((proj, idx) => {
-                    const isCurrent = activeIndex === idx;
-                    return (
-                      <button
-                        key={proj.id}
-                        type="button"
-                        role="tab"
-                        aria-selected={isCurrent}
-                        className={`folder-proj-pill cursor-target ${isCurrent ? 'active' : ''}`}
-                        style={{
-                          '--pill-accent': proj.accent
-                        }}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleSelectProject(idx);
-                        }}
-                      >
-                        <span className="folder-proj-dot" style={{ background: proj.accent }} />
-                        <span className="folder-proj-pill-idx">#{proj.index}</span>
-                        <span className="folder-proj-pill-name">{proj.title.split(' ')[0]}</span>
-                      </button>
-                    );
-                  })}
-                </div>
-
-                <div className="folder-stepper-row">
-                  <button
-                    type="button"
-                    className="folder-stepper-btn cursor-target"
-                    aria-label="Previous project"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      carouselRef.current?.prev?.();
-                    }}
-                  >
-                    <i className="material-icons">arrow_back</i>
-                    <span>Prev</span>
-                  </button>
-
-                  <span className="folder-stepper-counter">
-                    Project <strong>{activeIndex + 1}</strong> of <strong>{PROJECTS_DATA.length}</strong>
-                  </span>
-
-                  <button
-                    type="button"
-                    className="folder-stepper-btn cursor-target"
-                    aria-label="Next project"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      carouselRef.current?.next?.();
-                    }}
-                  >
-                    <span>Next</span>
-                    <i className="material-icons">arrow_forward</i>
-                  </button>
-                </div>
-              </div>
-
               <div className="stage-interaction-hint">
                 <i className="material-icons">swipe</i>
-                <span>Swipe 3D cylinder · Tap active card for full dossier & photos</span>
+                <span>Swipe 3D cylinder · Tap any card to view full dossier</span>
               </div>
 
               {/* Bottom Sheet Modal for Detailed Project Dossier */}
