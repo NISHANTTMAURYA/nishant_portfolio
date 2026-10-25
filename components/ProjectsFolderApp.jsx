@@ -475,9 +475,10 @@ export default function ProjectsFolderApp() {
                   gap={20}
                   tilt={-5}
                   perspective={2400}
-                  depthFade={0.45}
-                  fadeColor="rgba(24, 20, 36, 0.4)"
-                  innerShade={0.5}
+                  depthFade={0.25}
+                  fadeColor="transparent"
+                  innerShade={0}
+                  backfaces={false}
                   cornerRadius={14}
                   captions={false}
                   autoplay="off"

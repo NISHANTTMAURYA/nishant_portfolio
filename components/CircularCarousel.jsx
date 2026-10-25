@@ -78,7 +78,7 @@ const PRESETS = {
     spread: 1,
     inward: false,
     billboard: false,
-    backfaces: true,
+    backfaces: false,
     window: 0
   },
   orbit: {
@@ -184,6 +184,7 @@ const CircularCarousel = ({
   aspectRatio = 1,
   gap = 25,
   curve,
+  spread,
   tilt,
   perspective,
   autoplay = 'drift',
@@ -200,6 +201,7 @@ const CircularCarousel = ({
   depthFade = 0.55,
   fadeColor = '#000000',
   innerShade = 0.6,
+  backfaces,
   cornerRadius = 12,
   captions = false,
   onChange,
@@ -216,6 +218,7 @@ const CircularCarousel = ({
   const axis = layout.axis;
   const tiltValue = tilt ?? layout.tilt;
   const curveValue = layout.billboard ? 0 : clamp(curve ?? layout.curve, 0, 1);
+  const backfacesValue = backfaces ?? layout.backfaces;
   const reduced = usePrefersReducedMotion();
 
   const cardW = Math.max(40, cardWidth);
@@ -225,15 +228,15 @@ const CircularCarousel = ({
 
   const radius = useMemo(() => {
     const n = Math.max(count, 3);
-    const pitch = (along + gap) * layout.spread;
+    const spreadValue = spread ?? layout.spread;
+    const pitch = (along + gap) * spreadValue;
     const chord = pitch / (2 * Math.sin(Math.PI / n));
     const arc = (n * pitch) / (2 * Math.PI);
     return Math.max(chord + (arc - chord) * curveValue, along * 0.6);
-  }, [count, along, gap, curveValue, layout.spread]);
+  }, [count, along, gap, curveValue, layout.spread, spread]);
 
   const tiles = useMemo(() => {
-    const isCustom = list.some(item => Boolean(item.card || item.content));
-    const total = isCustom || curveValue < 0.001 ? 1 : TILES;
+    const total = curveValue > 0.001 ? TILES : 1;
     const length = along / total;
     const bend = total > 1 && curveValue > 0.001 ? radius / curveValue : 0;
     return Array.from({ length: total }, (_, index) => {
@@ -251,7 +254,7 @@ const CircularCarousel = ({
           : `translate3d(${shift}px, 0px, ${depth}px) rotateY(${turn}deg)`;
       return { index, total, start, end, size: end - start, move };
     });
-  }, [along, axis, curveValue, layout.inward, radius, list]);
+  }, [along, axis, curveValue, layout.inward, radius]);
 
   const rootRef = useRef(null);
   const stageRef = useRef(null);
@@ -866,16 +869,15 @@ const CircularCarousel = ({
           className="circular-carousel__frame"
           style={{ height: axis === 'x' ? size : cardH, borderRadius: frameRadius }}
         >
-          {back && isCustom ? (
-            <div className="circular-carousel__card-back" style={{ width: cardW, height: cardH }}>
-              <div className="circular-carousel__back-pattern" />
-              <div className="circular-carousel__back-badge">
-                <span className="circular-carousel__back-hash">FILE #</span>
-                <span>{item.index || String(index + 1).padStart(2, '0')}</span>
-              </div>
-            </div>
-          ) : isCustom ? (
-            <div className="circular-carousel__card-body" style={{ width: cardW, height: cardH }}>
+          {isCustom ? (
+            <div
+              className="circular-carousel__card-slice"
+              style={{
+                position: 'absolute',
+                ...photoStyle,
+                pointerEvents: index === active ? 'auto' : 'none'
+              }}
+            >
               {typeof (item.card || item.content) === 'function'
                 ? (item.card || item.content)(index === active)
                 : (item.card || item.content)}
@@ -953,7 +955,7 @@ const CircularCarousel = ({
                   aria-label={`${item.title || item.alt || `Image ${index + 1}`}, ${index + 1} of ${count}`}
                 >
                   {tiles.map(tile => renderTile(item, tile, false, index))}
-                  {layout.backfaces && tiles.map(tile => renderTile(item, tile, true, index))}
+                  {backfacesValue && tiles.map(tile => renderTile(item, tile, true, index))}
                 </div>
               ))}
             </div>
