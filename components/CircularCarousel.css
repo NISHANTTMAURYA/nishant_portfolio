@@ -70,11 +70,22 @@
   position: relative;
 }
 
-.circular-carousel__ring,
+.circular-carousel__ring {
+  position: absolute;
+  left: 0;
+  top: 0;
+  will-change: transform;
+}
+
 .circular-carousel__card {
   position: absolute;
   left: 0;
   top: 0;
+  pointer-events: none;
+}
+
+.circular-carousel__card[data-active] {
+  pointer-events: auto;
 }
 
 .circular-carousel__tile {
@@ -90,6 +101,7 @@
   top: 0;
   width: 100%;
   overflow: hidden;
+  contain: paint;
 }
 
 .circular-carousel__card-slice {

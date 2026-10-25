@@ -117,7 +117,7 @@ const PRESETS = {
 };
 
 const INTRO_LENGTH = { assemble: 1500, rise: 1400, spin: 1800, none: 0 };
-const TILES = 8;
+const TILES = 5;
 const OVERLAP = 2.5;
 const DRAG_THRESHOLD = 5;
 const SPRING = 118;
@@ -603,9 +603,15 @@ const CircularCarousel = ({
 
       const index = ((Math.round(-state.angle / s.step) % s.count) + s.count) % s.count || 0;
       if (index !== activeRef.current) {
+        const prevCard = cardRefs.current[activeRef.current];
+        const nextCard = cardRefs.current[index];
+        if (prevCard) prevCard.removeAttribute('data-active');
+        if (nextCard) nextCard.setAttribute('data-active', 'true');
         activeRef.current = index;
-        setActive(index);
-        onChangeRef.current?.(index);
+        if (!state.drag) {
+          setActive(index);
+          onChangeRef.current?.(index);
+        }
       }
     };
 
@@ -782,6 +788,10 @@ const CircularCarousel = ({
     state.drag = false;
     setDragging(false);
     state.suppressClick = true;
+    if (activeRef.current !== active) {
+      setActive(activeRef.current);
+      onChangeRef.current?.(activeRef.current);
+    }
     const s = settingsRef.current;
     const first = press.samples[0];
     const last = press.samples[press.samples.length - 1];
@@ -875,18 +885,34 @@ const CircularCarousel = ({
           style={{ height: axis === 'x' ? size : cardH, borderRadius: frameRadius }}
         >
           {isCustom ? (
-            <div
-              className="circular-carousel__card-slice"
-              style={{
-                position: 'absolute',
-                ...photoStyle,
-                pointerEvents: index === active ? 'auto' : 'none'
-              }}
-            >
-              {typeof (item.card || item.content) === 'function'
-                ? (item.card || item.content)(index === active)
-                : (item.card || item.content)}
-            </div>
+            back ? (
+              <div
+                className="circular-carousel__card-backplate"
+                style={{
+                  position: 'absolute',
+                  ...photoStyle,
+                  background: '#FCF9F3',
+                  border: '2px solid #231E19',
+                  borderRadius: '14px',
+                  boxSizing: 'border-box',
+                  overflow: 'hidden'
+                }}
+              >
+                <div style={{ height: '32px', background: item.accent || '#705cf6', width: '100%' }} />
+              </div>
+            ) : (
+              <div
+                className="circular-carousel__card-slice"
+                style={{
+                  position: 'absolute',
+                  ...photoStyle
+                }}
+              >
+                {typeof (item.card || item.content) === 'function'
+                  ? (item.card || item.content)(index === active)
+                  : (item.card || item.content)}
+              </div>
+            )
           ) : (
             <img
               className="circular-carousel__photo"
@@ -955,6 +981,7 @@ const CircularCarousel = ({
                   }}
                   className="circular-carousel__card"
                   data-cc-index={index}
+                  data-active={index === active ? '' : undefined}
                   role="group"
                   aria-roledescription="slide"
                   aria-label={`${item.title || item.alt || `Image ${index + 1}`}, ${index + 1} of ${count}`}

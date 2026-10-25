@@ -353,7 +353,7 @@ export default function ProjectsFolderApp() {
     }));
   }, [activeIndex]);
 
-  // Phone Circular Carousel items with rich 3D cards
+  // Phone Circular Carousel items with rich 3D cards (memoized statically)
   const carouselItems = useMemo(() => {
     return PROJECTS_DATA.map((proj) => ({
       id: proj.id,
@@ -361,10 +361,11 @@ export default function ProjectsFolderApp() {
       title: proj.title,
       subtitle: proj.category,
       alt: proj.title,
+      accent: proj.accent,
       src: proj.thumbs?.[0]?.img || './images/mentorconnect1.jpg',
       card: (isActive) => renderCarouselCardJSX(proj, isActive)
     }));
-  }, [activeIndex]);
+  }, []);
 
   return (
     <div className="projects-folder-app-container">
