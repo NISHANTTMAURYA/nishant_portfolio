@@ -250,17 +250,8 @@ export default function ProjectsFolderApp() {
     </div>
   );
 
-  // Mobile 3D Circular Carousel Spotlight Card
+  // Mobile 3D Circular Carousel Spotlight Card (Clean Archival Dossier - No Image)
   const renderCarouselCardJSX = (proj, isCardActive) => {
-    const hasPhoto = proj.thumbs && proj.thumbs.length > 0 && proj.thumbs[0]?.img;
-    const heroImg = hasPhoto
-      ? proj.thumbs[0].img
-      : proj.id === 'mitrai'
-      ? './images/mitrai_robot.jpg'
-      : proj.id === 'gamified'
-      ? './images/nishant_sih.jpg'
-      : null;
-
     return (
       <div
         className={`carousel-spotlight-card ${isCardActive ? 'is-active' : ''}`}
@@ -273,48 +264,34 @@ export default function ProjectsFolderApp() {
           }
         }}
       >
-        {/* Top Hero Visual Banner */}
-        <div className="spotlight-hero" style={{ background: proj.accent }}>
-          {heroImg ? (
-            <div className="spotlight-hero-img-wrap">
-              <img src={heroImg} alt={proj.title} className="spotlight-hero-img" loading="lazy" />
-              <div className="spotlight-hero-gradient" />
-            </div>
-          ) : (
-            <div className="spotlight-hero-graphic">
-              <div className="spotlight-graphic-pattern" />
-              <div className="spotlight-graphic-icon">
-                <i className="material-icons">
-                  {proj.id === 'atttc'
-                    ? 'verified_user'
-                    : proj.id === 'twist-tac-toe'
-                    ? 'videogame_asset'
-                    : proj.id === 'splitkar'
-                    ? 'account_balance_wallet'
-                    : 'folder_special'}
-                </i>
-              </div>
-            </div>
-          )}
-
-          {/* Top Badges Strip */}
-          <div className="spotlight-top-strip">
+        {/* Top Header Strip with Brand Accent */}
+        <div className="spotlight-header-strip" style={{ background: proj.accent }}>
+          <div className="spotlight-strip-left">
             <span className="spotlight-file-tag">FILE #{proj.index}</span>
-            <div className="spotlight-badges">
-              {proj.badges.map((b, bIdx) => (
-                <span key={bIdx} className="spotlight-status-badge">
-                  {b.text}
-                </span>
-              ))}
-            </div>
+            <span className="spotlight-category-tag">{proj.category}</span>
+          </div>
+          <div className="spotlight-badges">
+            {proj.badges.map((b, bIdx) => (
+              <span key={bIdx} className="spotlight-status-badge">
+                {b.text}
+              </span>
+            ))}
           </div>
         </div>
 
         {/* Card Body */}
         <div className="spotlight-body">
-          <div className="spotlight-category">{proj.category}</div>
           <h3 className="spotlight-title">{proj.title}</h3>
           <p className="spotlight-desc">{proj.desc}</p>
+
+          {/* Key Architectural Highlights (clean, concise 3 bullets) */}
+          {proj.highlights && proj.highlights.length > 0 && (
+            <ul className="spotlight-bullets">
+              {proj.highlights.slice(0, 3).map((highlight, hIdx) => (
+                <li key={hIdx}>{highlight}</li>
+              ))}
+            </ul>
+          )}
 
           {/* Key Tech Tags */}
           <div className="spotlight-tech-row">
@@ -329,7 +306,7 @@ export default function ProjectsFolderApp() {
           </div>
         </div>
 
-        {/* Card Footer Actions */}
+        {/* Card Footer Actions & Click Hint */}
         <div className="spotlight-footer">
           <div className="spotlight-actions">
             {proj.links.slice(0, 2).map((link, lIdx) => (
@@ -353,18 +330,17 @@ export default function ProjectsFolderApp() {
             ))}
           </div>
 
-          <button
-            type="button"
-            className="spotlight-inspect-btn cursor-target"
-            title="Inspect project details"
+          <span
+            className="spotlight-click-hint cursor-target"
+            title="Click to view dossier"
             onClick={(e) => {
               e.stopPropagation();
               setInspectingProject(proj);
             }}
           >
-            <span>Dossier</span>
-            <i className="material-icons">info_outline</i>
-          </button>
+            <span>click to view</span>
+            <i className="material-icons">arrow_forward</i>
+          </span>
         </div>
       </div>
     );
@@ -470,8 +446,8 @@ export default function ProjectsFolderApp() {
                 <CircularCarousel
                   items={carouselItems}
                   preset="cylinder"
-                  cardWidth={240}
-                  aspectRatio={0.72}
+                  cardWidth={245}
+                  aspectRatio={0.88}
                   gap={20}
                   tilt={-5}
                   perspective={2200}
