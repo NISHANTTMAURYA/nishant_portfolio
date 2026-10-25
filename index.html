@@ -12,9 +12,13 @@
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Architects+Daughter&family=Caveat:wght@600;700&family=Gochi+Hand&family=Patrick+Hand&family=JetBrains+Mono:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
-    <script>window.gsap || document.write('<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"><\/script>')</script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+    <script>
+        window.gsap || document.write('<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"><\/script>');
+        window.ScrollTrigger || document.write('<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"><\/script>');
+    </script>
 </head>
-<link rel="stylesheet" href="styles.css?v=61">
+<link rel="stylesheet" href="styles.css?v=87">
 
 <body class="intro-loading">
     <div class="target-cursor-wrapper">
@@ -191,8 +195,28 @@
         </div>
 
         <!-- About Me -->
-        <section id="about" class="section">
-            <h2 class="section-title">About Me</h2>
+        <section id="about" class="section section-with-separator">
+            <div class="section-title-graphic-wrap">
+                <svg class="section-title-svg" aria-hidden="true">
+                    <path class="section-title-branch branch-left" d="" fill="none" />
+                    <path class="section-title-branch branch-right" d="" fill="none" />
+                    <circle class="section-title-node node-ring-left" cx="0" cy="0" r="5" />
+                    <circle class="section-title-node node-ring-right" cx="0" cy="0" r="5" />
+                    <circle class="section-title-node node-dot-left" cx="0" cy="0" r="4.5" />
+                    <circle class="section-title-node node-dot-right" cx="0" cy="0" r="4.5" />
+                    <g class="section-title-sparkle-anchor" transform="translate(0, 0)">
+                        <g class="section-title-sparkle-inner">
+                            <line class="sparkle-ray" x1="-9" y1="-9" x2="-16" y2="-16" stroke="#816cf8" stroke-width="2" stroke-linecap="round" />
+                            <line class="sparkle-ray" x1="9" y1="-9" x2="16" y2="-16" stroke="#816cf8" stroke-width="2" stroke-linecap="round" />
+                            <line class="sparkle-ray" x1="-9" y1="9" x2="-16" y2="16" stroke="#816cf8" stroke-width="2" stroke-linecap="round" />
+                            <line class="sparkle-ray" x1="9" y1="9" x2="16" y2="16" stroke="#816cf8" stroke-width="2" stroke-linecap="round" />
+                            <path class="sparkle-star" d="M 0 -15 C 2.5 -5.5, 5.5 -2.5, 15 0 C 5.5 2.5, 2.5 5.5, 0 15 C -2.5 5.5, -5.5 2.5, -15 0 C -5.5 -2.5, -2.5 -5.5, 0 -15 Z" fill="#705cf6" />
+                        </g>
+                    </g>
+                </svg>
+
+                <h2 class="section-title">About Me</h2>
+            </div>
             <p class="section-subtitle">A brief look into my background, my philosophy on building systems, and what
                 drives my engineering decisions.</p>
             <div class="about-container">
@@ -290,55 +314,142 @@
         </section>
 
         <!-- Experience -->
-        <section id="experience" class="section">
-            <h2 class="section-title">Experience</h2>
-            <p class="section-subtitle">A record of my professional history, freelance engineering, and collaborative
-                projects.</p>
-            <div class="experience-timeline">
-                <div class="timeline-item">
-                    <div class="timeline-header">
-                        <div>
-                            <div class="timeline-date">2025</div>
-                            <h3>Backend Developer &amp; Consultant</h3>
-                            <div class="timeline-company"><a href="http://4istudios.in/" target="_blank">4iStudios</a>
-                                &nbsp;·&nbsp; Founder &amp; Lead Backend Developer</div>
+        <section id="experience" class="section journey-timeline-section section-with-separator">
+            <div class="section-title-graphic-wrap">
+                <svg class="section-title-svg" aria-hidden="true">
+                    <path class="section-title-branch branch-left" d="" fill="none" />
+                    <path class="section-title-branch branch-right" d="" fill="none" />
+                    <circle class="section-title-node node-ring-left" cx="0" cy="0" r="5" />
+                    <circle class="section-title-node node-ring-right" cx="0" cy="0" r="5" />
+                    <circle class="section-title-node node-dot-left" cx="0" cy="0" r="4.5" />
+                    <circle class="section-title-node node-dot-right" cx="0" cy="0" r="4.5" />
+                    <g class="section-title-sparkle-anchor" transform="translate(0, 0)">
+                        <g class="section-title-sparkle-inner">
+                            <line class="sparkle-ray" x1="-9" y1="-9" x2="-16" y2="-16" stroke="#816cf8" stroke-width="2" stroke-linecap="round" />
+                            <line class="sparkle-ray" x1="9" y1="-9" x2="16" y2="-16" stroke="#816cf8" stroke-width="2" stroke-linecap="round" />
+                            <line class="sparkle-ray" x1="-9" y1="9" x2="-16" y2="16" stroke="#816cf8" stroke-width="2" stroke-linecap="round" />
+                            <line class="sparkle-ray" x1="9" y1="9" x2="16" y2="16" stroke="#816cf8" stroke-width="2" stroke-linecap="round" />
+                            <path class="sparkle-star" d="M 0 -15 C 2.5 -5.5, 5.5 -2.5, 15 0 C 5.5 2.5, 2.5 5.5, 0 15 C -2.5 5.5, -5.5 2.5, -15 0 C -5.5 -2.5, -2.5 -5.5, 0 -15 Z" fill="#705cf6" />
+                        </g>
+                    </g>
+                </svg>
+
+                <h2 class="section-title">Experience</h2>
+            </div>
+            <p class="section-subtitle">A record of my professional history, freelance engineering, and collaborative projects.</p>
+
+            <!-- 2-Column Experience Layout (Laptop/Desktop View) -->
+            <div class="journey-layout-wrapper">
+                <!-- Left Column: The Journey So Far Visual Banner (Laptop only) -->
+                <div class="journey-visual-column">
+                    <div class="journey-hero-card">
+                        <div class="journey-card-header">
+                            <h3 class="journey-col-title">The journey<br>so far</h3>
+                            <p class="journey-col-subtitle">Building, learning, shipping.</p>
                         </div>
-                        <div class="timeline-tags">
-                            <span class="tech-tag">Django</span>
-                            <span class="tech-tag">PostgreSQL</span>
-                            <span class="tech-tag">Celery</span>
-                            <span class="tech-tag">Redis</span>
+
+                        <div class="journey-avatar-container">
+                            <img src="images/nishant_pixar.png" alt="Nishant building, learning, shipping" class="journey-pixar-avatar" loading="lazy">
                         </div>
                     </div>
-                    <p>4iStudios is a company I co-founded with 3 teammates from <strong>team4i</strong>. We took up
-                        consultancy work for the Computer Science Department at Fr. CRCE, building production-ready
-                        software delivered as client projects. Our first engagement was the <strong><a
-                                href="https://atttc.cloud/" target="_blank">Agnel Trade Test &amp; Training
-                                Portal</a></strong>, now live and in active use.</p>
                 </div>
-                <div class="timeline-item">
-                    <div class="timeline-header">
-                        <div>
-                            <div class="timeline-date">2024 – 25</div>
-                            <h3>Backend Developer</h3>
-                            <div class="timeline-company">MentorConnect &nbsp;·&nbsp; Fr. CRCE</div>
+
+                <!-- Right Column: Timeline -->
+                <div class="journey-timeline">
+                    <svg class="journey-svg" aria-hidden="true">
+                        <path class="journey-line-path" d="" fill="none" />
+                    </svg>
+
+                    <!-- Milestone 1 -->
+                    <div class="journey-item" data-year="2025">
+                        <div class="journey-marker">
+                            <span class="journey-year">2025</span>
+                            <div class="journey-dot-wrap">
+                                <div class="journey-dot"></div>
+                            </div>
                         </div>
-                        <div class="timeline-tags">
-                            <span class="tech-tag">Django</span>
-                            <span class="tech-tag">PostgreSQL</span>
+                        <div class="journey-content">
+                            <h3 class="journey-title">Backend Developer &amp; Consultant</h3>
+                            <div class="journey-role"><a href="http://4istudios.in/" target="_blank" rel="noopener noreferrer" class="journey-company cursor-target">4iStudios</a> <span class="dot-sep">·</span> <span class="journey-role-text">Founder &amp; Lead Backend Developer</span></div>
+                            <p class="journey-desc">4iStudios is a company I co-founded with 3 teammates from <strong>team4i</strong>. We took up consultancy work for the Computer Science Department at Fr. CRCE, building production-ready software delivered as client projects. Our first engagement was the <strong><a href="https://atttc.cloud/" target="_blank" rel="noopener noreferrer" class="cursor-target">Agnel Trade Test &amp; Training Portal</a></strong>, now live and in active use.</p>
+                            <div class="journey-actions">
+                                <a href="https://atttc.cloud/" target="_blank" rel="noopener noreferrer" class="journey-link cursor-target">Live Portal <span class="journey-arrow">↗</span></a>
+                                <a href="http://4istudios.in/" target="_blank" rel="noopener noreferrer" class="journey-link cursor-target">4iStudios <span class="journey-arrow">↗</span></a>
+                            </div>
+                            <div class="journey-tech-list">
+                                <span class="journey-tech-pill cursor-target">Django</span>
+                                <span class="journey-tech-pill cursor-target">PostgreSQL</span>
+                                <span class="journey-tech-pill cursor-target">Celery</span>
+                                <span class="journey-tech-pill cursor-target">Redis</span>
+                            </div>
                         </div>
                     </div>
-                    <p>Built the backend for Fr. CRCE's official mentoring platform, which digitizes the entire
-                        mentoring
-                        process, eliminates offline paperwork, and provides in-depth student analytics for the
-                        Computer Engineering department.</p>
+
+                    <!-- Milestone 2 -->
+                    <div class="journey-item" data-year="2024–25">
+                        <div class="journey-marker">
+                            <span class="journey-year">2024–25</span>
+                            <div class="journey-dot-wrap">
+                                <div class="journey-dot"></div>
+                            </div>
+                        </div>
+                        <div class="journey-content">
+                            <h3 class="journey-title">Backend Developer</h3>
+                            <div class="journey-role"><span class="journey-company">MentorConnect</span> <span class="dot-sep">·</span> <span class="journey-role-text">Fr. CRCE</span></div>
+                            <p class="journey-desc">Built the backend for Fr. CRCE's official mentoring platform, which digitizes the entire mentoring process, eliminates offline paperwork, and provides in-depth student analytics for the Computer Engineering department.</p>
+                            <div class="journey-actions">
+                                <a href="https://youtu.be/K0wMbqKav3Q" target="_blank" rel="noopener noreferrer" class="journey-link cursor-target">Demo <span class="journey-arrow">↗</span></a>
+                                <a href="https://docs.google.com/presentation/d/18gZvTnmns7fKk7o_HeOOsrgzzXewCXnX/edit?usp=sharing&ouid=116282146601498084420&rtpof=true&sd=true" target="_blank" rel="noopener noreferrer" class="journey-link cursor-target">PPT <span class="journey-arrow">↗</span></a>
+                                <a href="#gallery" class="journey-link cursor-target">Photos <span class="journey-arrow">↗</span></a>
+                            </div>
+                            <div class="journey-tech-list">
+                                <span class="journey-tech-pill cursor-target">Django</span>
+                                <span class="journey-tech-pill cursor-target">PostgreSQL</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- End marker -->
+                    <div class="journey-end-marker">
+                        <div class="journey-dot-wrap">
+                            <div class="journey-end-dot"></div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>
 
         <!-- Projects -->
-        <section id="projects" class="section">
-            <h2 class="section-title">Projects</h2>
+        <section id="projects" class="section section-with-separator">
+            <div class="section-title-graphic-wrap">
+                <svg class="section-title-svg" aria-hidden="true">
+                    <!-- Left branch drawing from center dip outwards to left -->
+                    <path class="section-title-branch branch-left" d="" fill="none" />
+                    <!-- Right branch drawing from center dip outwards to right -->
+                    <path class="section-title-branch branch-right" d="" fill="none" />
+                    <!-- Left hollow ring -->
+                    <circle class="section-title-node node-ring-left" cx="0" cy="0" r="5" />
+                    <!-- Right hollow ring -->
+                    <circle class="section-title-node node-ring-right" cx="0" cy="0" r="5" />
+                    <!-- Left solid dot -->
+                    <circle class="section-title-node node-dot-left" cx="0" cy="0" r="4.5" />
+                    <!-- Right solid dot -->
+                    <circle class="section-title-node node-dot-right" cx="0" cy="0" r="4.5" />
+                    <!-- Center 4-pointed sparkle under the title -->
+                    <g class="section-title-sparkle-anchor" transform="translate(0, 0)">
+                        <g class="section-title-sparkle-inner">
+                            <line class="sparkle-ray" x1="-9" y1="-9" x2="-16" y2="-16" stroke="#9985f9" stroke-width="2" stroke-linecap="round" />
+                            <line class="sparkle-ray" x1="9" y1="-9" x2="16" y2="-16" stroke="#9985f9" stroke-width="2" stroke-linecap="round" />
+                            <line class="sparkle-ray" x1="-9" y1="9" x2="-16" y2="16" stroke="#9985f9" stroke-width="2" stroke-linecap="round" />
+                            <line class="sparkle-ray" x1="9" y1="9" x2="16" y2="16" stroke="#9985f9" stroke-width="2" stroke-linecap="round" />
+                            <path class="sparkle-star" d="M 0 -15 C 2.5 -5.5, 5.5 -2.5, 15 0 C 5.5 2.5, 2.5 5.5, 0 15 C -2.5 5.5, -5.5 2.5, -15 0 C -5.5 -2.5, -2.5 -5.5, 0 -15 Z" fill="#705cf6" />
+                        </g>
+                    </g>
+                </svg>
+
+                <h2 class="section-title">Projects</h2>
+            </div>
+
             <p class="section-subtitle">A curated collection of production-grade systems, utilities, and applications
                 built to solve real-world problems.</p>
             <div class="projects">
@@ -560,8 +671,28 @@
         </section>
 
         <!-- Vibe Coding Labs -->
-        <section id="vibe-labs" class="section">
-            <h2 class="section-title">Pure Vibe Coding Labs</h2>
+        <section id="vibe-labs" class="section section-with-separator">
+            <div class="section-title-graphic-wrap">
+                <svg class="section-title-svg" aria-hidden="true">
+                    <path class="section-title-branch branch-left" d="" fill="none" />
+                    <path class="section-title-branch branch-right" d="" fill="none" />
+                    <circle class="section-title-node node-ring-left" cx="0" cy="0" r="5" />
+                    <circle class="section-title-node node-ring-right" cx="0" cy="0" r="5" />
+                    <circle class="section-title-node node-dot-left" cx="0" cy="0" r="4.5" />
+                    <circle class="section-title-node node-dot-right" cx="0" cy="0" r="4.5" />
+                    <g class="section-title-sparkle-anchor" transform="translate(0, 0)">
+                        <g class="section-title-sparkle-inner">
+                            <line class="sparkle-ray" x1="-9" y1="-9" x2="-16" y2="-16" stroke="#816cf8" stroke-width="2" stroke-linecap="round" />
+                            <line class="sparkle-ray" x1="9" y1="-9" x2="16" y2="-16" stroke="#816cf8" stroke-width="2" stroke-linecap="round" />
+                            <line class="sparkle-ray" x1="-9" y1="9" x2="-16" y2="16" stroke="#816cf8" stroke-width="2" stroke-linecap="round" />
+                            <line class="sparkle-ray" x1="9" y1="9" x2="16" y2="16" stroke="#816cf8" stroke-width="2" stroke-linecap="round" />
+                            <path class="sparkle-star" d="M 0 -15 C 2.5 -5.5, 5.5 -2.5, 15 0 C 5.5 2.5, 2.5 5.5, 0 15 C -2.5 5.5, -5.5 2.5, -15 0 C -5.5 -2.5, -2.5 -5.5, 0 -15 Z" fill="#705cf6" />
+                        </g>
+                    </g>
+                </svg>
+
+                <h2 class="section-title">Pure Vibe Coding Labs</h2>
+            </div>
             <p class="section-subtitle">Challenging the stereotype that backend engineers can't build premium user
                 interfaces. These interactive frontends, including this very portfolio, built using AI and vibe coding,
                 prove that AI-assisted development is not lazy prototyping, but a production-ready, highly polished
@@ -570,7 +701,22 @@
             <div class="vibe-container">
                 <!-- Left Tabs Column -->
                 <div class="vibe-tabs-column">
-                    <div class="vibe-tab active" data-url="https://chairwale.4istudios.in/" data-title="Chairwale"
+                    <div class="vibe-tab active" data-url="https://mitrai.online/" data-title="Mitrai"
+                        data-desc="AI-powered mental health & companion platform with dynamic ambient themes (Rain, Sunset, Birds), real-time audio, and glassmorphic UI.">
+                        <div class="vibe-tab-header">
+                            <span class="vibe-tab-dot"></span>
+                            <h4>Mitrai</h4>
+                        </div>
+                        <p class="vibe-tab-desc">AI companion with ambient audio & dynamic themes.</p>
+                        <div class="vibe-tab-tags">
+                            <span class="vibe-tag">Django</span>
+                            <span class="vibe-tag">AI/LLM</span>
+                            <span class="vibe-tag">UI/UX</span>
+                            <span class="vibe-tag">Tailwind</span>
+                        </div>
+                    </div>
+
+                    <div class="vibe-tab" data-url="https://chairwale.4istudios.in/" data-title="Chairwale"
                         data-desc="Interactive catalog web app designed for a premium chair and office furniture store, utilizing subtle hover cues and layout presentation.">
                         <div class="vibe-tab-header">
                             <span class="vibe-tab-dot"></span>
@@ -680,9 +826,9 @@
                             </div>
                             <div class="browser-address">
                                 <i class="material-icons browser-lock">lock</i>
-                                <span id="vibe-browser-url">https://scanmymenu-info.4istudios.in/</span>
+                                <span id="vibe-browser-url">https://mitrai.online/</span>
                             </div>
-                            <a href="https://scanmymenu-info.4istudios.in/" target="_blank" id="vibe-browser-link"
+                            <a href="https://mitrai.online/" target="_blank" id="vibe-browser-link"
                                 class="browser-link-btn" title="Open live website in a new tab">
                                 <i class="material-icons">open_in_new</i>
                             </a>
@@ -707,17 +853,36 @@
                     </div>
                     <!-- Description Card -->
                     <div class="vibe-desc-card">
-                        <h3 id="vibe-desc-title">ScanMyMenu</h3>
-                        <p id="vibe-desc-text">A sleek digital menu scanner for restaurants, featuring beautiful
-                            animations, clean interactive components, and premium responsive layouts.</p>
+                        <h3 id="vibe-desc-title">Mitrai</h3>
+                        <p id="vibe-desc-text">AI-powered mental health & companion platform with dynamic ambient themes (Rain, Sunset, Birds), real-time audio, and glassmorphic UI.</p>
                     </div>
                 </div>
             </div>
         </section>
 
         <!-- Gallery -->
-        <section id="gallery" class="section animated-background-section">
-            <h2 class="section-title">Gallery</h2>
+        <section id="gallery" class="section animated-background-section section-with-separator">
+            <div class="section-title-graphic-wrap">
+                <svg class="section-title-svg" aria-hidden="true">
+                    <path class="section-title-branch branch-left" d="" fill="none" />
+                    <path class="section-title-branch branch-right" d="" fill="none" />
+                    <circle class="section-title-node node-ring-left" cx="0" cy="0" r="5" />
+                    <circle class="section-title-node node-ring-right" cx="0" cy="0" r="5" />
+                    <circle class="section-title-node node-dot-left" cx="0" cy="0" r="4.5" />
+                    <circle class="section-title-node node-dot-right" cx="0" cy="0" r="4.5" />
+                    <g class="section-title-sparkle-anchor" transform="translate(0, 0)">
+                        <g class="section-title-sparkle-inner">
+                            <line class="sparkle-ray" x1="-9" y1="-9" x2="-16" y2="-16" stroke="#816cf8" stroke-width="2" stroke-linecap="round" />
+                            <line class="sparkle-ray" x1="9" y1="-9" x2="16" y2="-16" stroke="#816cf8" stroke-width="2" stroke-linecap="round" />
+                            <line class="sparkle-ray" x1="-9" y1="9" x2="-16" y2="16" stroke="#816cf8" stroke-width="2" stroke-linecap="round" />
+                            <line class="sparkle-ray" x1="9" y1="9" x2="16" y2="16" stroke="#816cf8" stroke-width="2" stroke-linecap="round" />
+                            <path class="sparkle-star" d="M 0 -15 C 2.5 -5.5, 5.5 -2.5, 15 0 C 5.5 2.5, 2.5 5.5, 0 15 C -2.5 5.5, -5.5 2.5, -15 0 C -5.5 -2.5, -2.5 -5.5, 0 -15 Z" fill="#705cf6" />
+                        </g>
+                    </g>
+                </svg>
+
+                <h2 class="section-title">Gallery</h2>
+            </div>
             <p class="section-subtitle">Moments from hackathons, developer meetups, and engineering snapshots.</p>
             <div class="masonry-container">
                 <div id="masonry-list" class="list"></div>
@@ -725,8 +890,28 @@
         </section>
 
         <!-- Tech Stack -->
-        <section id="skills" class="section">
-            <h2 class="section-title">Tech Stack</h2>
+        <section id="skills" class="section section-with-separator">
+            <div class="section-title-graphic-wrap">
+                <svg class="section-title-svg" aria-hidden="true">
+                    <path class="section-title-branch branch-left" d="" fill="none" />
+                    <path class="section-title-branch branch-right" d="" fill="none" />
+                    <circle class="section-title-node node-ring-left" cx="0" cy="0" r="5" />
+                    <circle class="section-title-node node-ring-right" cx="0" cy="0" r="5" />
+                    <circle class="section-title-node node-dot-left" cx="0" cy="0" r="4.5" />
+                    <circle class="section-title-node node-dot-right" cx="0" cy="0" r="4.5" />
+                    <g class="section-title-sparkle-anchor" transform="translate(0, 0)">
+                        <g class="section-title-sparkle-inner">
+                            <line class="sparkle-ray" x1="-9" y1="-9" x2="-16" y2="-16" stroke="#816cf8" stroke-width="2" stroke-linecap="round" />
+                            <line class="sparkle-ray" x1="9" y1="-9" x2="16" y2="-16" stroke="#816cf8" stroke-width="2" stroke-linecap="round" />
+                            <line class="sparkle-ray" x1="-9" y1="9" x2="-16" y2="16" stroke="#816cf8" stroke-width="2" stroke-linecap="round" />
+                            <line class="sparkle-ray" x1="9" y1="9" x2="16" y2="16" stroke="#816cf8" stroke-width="2" stroke-linecap="round" />
+                            <path class="sparkle-star" d="M 0 -15 C 2.5 -5.5, 5.5 -2.5, 15 0 C 5.5 2.5, 2.5 5.5, 0 15 C -2.5 5.5, -5.5 2.5, -15 0 C -5.5 -2.5, -2.5 -5.5, 0 -15 Z" fill="#705cf6" />
+                        </g>
+                    </g>
+                </svg>
+
+                <h2 class="section-title">Tech Stack</h2>
+            </div>
             <p class="section-subtitle">The languages, frameworks, databases, and infrastructure tools I use to bring
                 ideas to life. <br><small style="opacity: 0.75; font-size: 0.8em;">Hover to explore · Click to ripple ·
                     Each cube is a technology I use</small></p>
@@ -767,8 +952,28 @@
         </section>
 
         <!-- Achievements -->
-        <section id="achievements" class="section">
-            <h2 class="section-title">Achievements</h2>
+        <section id="achievements" class="section section-with-separator">
+            <div class="section-title-graphic-wrap">
+                <svg class="section-title-svg" aria-hidden="true">
+                    <path class="section-title-branch branch-left" d="" fill="none" />
+                    <path class="section-title-branch branch-right" d="" fill="none" />
+                    <circle class="section-title-node node-ring-left" cx="0" cy="0" r="5" />
+                    <circle class="section-title-node node-ring-right" cx="0" cy="0" r="5" />
+                    <circle class="section-title-node node-dot-left" cx="0" cy="0" r="4.5" />
+                    <circle class="section-title-node node-dot-right" cx="0" cy="0" r="4.5" />
+                    <g class="section-title-sparkle-anchor" transform="translate(0, 0)">
+                        <g class="section-title-sparkle-inner">
+                            <line class="sparkle-ray" x1="-9" y1="-9" x2="-16" y2="-16" stroke="#816cf8" stroke-width="2" stroke-linecap="round" />
+                            <line class="sparkle-ray" x1="9" y1="-9" x2="16" y2="-16" stroke="#816cf8" stroke-width="2" stroke-linecap="round" />
+                            <line class="sparkle-ray" x1="-9" y1="9" x2="-16" y2="16" stroke="#816cf8" stroke-width="2" stroke-linecap="round" />
+                            <line class="sparkle-ray" x1="9" y1="9" x2="16" y2="16" stroke="#816cf8" stroke-width="2" stroke-linecap="round" />
+                            <path class="sparkle-star" d="M 0 -15 C 2.5 -5.5, 5.5 -2.5, 15 0 C 5.5 2.5, 2.5 5.5, 0 15 C -2.5 5.5, -5.5 2.5, -15 0 C -5.5 -2.5, -2.5 -5.5, 0 -15 Z" fill="#705cf6" />
+                        </g>
+                    </g>
+                </svg>
+
+                <h2 class="section-title">Achievements</h2>
+            </div>
             <p class="section-subtitle">A timeline of hackathon wins, recognitions, and personal accomplishments.</p>
             <div class="achievements-grid">
                 <div class="achievement-card">
@@ -846,8 +1051,28 @@
         </section>
 
         <!-- Education -->
-        <section id="education" class="section">
-            <h2 class="section-title">Education &amp; Academic Milestones</h2>
+        <section id="education" class="section section-with-separator">
+            <div class="section-title-graphic-wrap">
+                <svg class="section-title-svg" aria-hidden="true">
+                    <path class="section-title-branch branch-left" d="" fill="none" />
+                    <path class="section-title-branch branch-right" d="" fill="none" />
+                    <circle class="section-title-node node-ring-left" cx="0" cy="0" r="5" />
+                    <circle class="section-title-node node-ring-right" cx="0" cy="0" r="5" />
+                    <circle class="section-title-node node-dot-left" cx="0" cy="0" r="4.5" />
+                    <circle class="section-title-node node-dot-right" cx="0" cy="0" r="4.5" />
+                    <g class="section-title-sparkle-anchor" transform="translate(0, 0)">
+                        <g class="section-title-sparkle-inner">
+                            <line class="sparkle-ray" x1="-9" y1="-9" x2="-16" y2="-16" stroke="#816cf8" stroke-width="2" stroke-linecap="round" />
+                            <line class="sparkle-ray" x1="9" y1="-9" x2="16" y2="-16" stroke="#816cf8" stroke-width="2" stroke-linecap="round" />
+                            <line class="sparkle-ray" x1="-9" y1="9" x2="-16" y2="16" stroke="#816cf8" stroke-width="2" stroke-linecap="round" />
+                            <line class="sparkle-ray" x1="9" y1="9" x2="16" y2="16" stroke="#816cf8" stroke-width="2" stroke-linecap="round" />
+                            <path class="sparkle-star" d="M 0 -15 C 2.5 -5.5, 5.5 -2.5, 15 0 C 5.5 2.5, 2.5 5.5, 0 15 C -2.5 5.5, -5.5 2.5, -15 0 C -5.5 -2.5, -2.5 -5.5, 0 -15 Z" fill="#705cf6" />
+                        </g>
+                    </g>
+                </svg>
+
+                <h2 class="section-title">Education</h2>
+            </div>
             <p class="section-subtitle">Academic path, course studies, and foundational learning.</p>
             <div class="edu-roadmap">
 
@@ -931,8 +1156,28 @@
         </section>
 
         <!-- Resume -->
-        <section id="resume" class="resume-section section">
-            <h2 class="section-title">My Resume</h2>
+        <section id="resume" class="resume-section section section-with-separator">
+            <div class="section-title-graphic-wrap">
+                <svg class="section-title-svg" aria-hidden="true">
+                    <path class="section-title-branch branch-left" d="" fill="none" />
+                    <path class="section-title-branch branch-right" d="" fill="none" />
+                    <circle class="section-title-node node-ring-left" cx="0" cy="0" r="5" />
+                    <circle class="section-title-node node-ring-right" cx="0" cy="0" r="5" />
+                    <circle class="section-title-node node-dot-left" cx="0" cy="0" r="4.5" />
+                    <circle class="section-title-node node-dot-right" cx="0" cy="0" r="4.5" />
+                    <g class="section-title-sparkle-anchor" transform="translate(0, 0)">
+                        <g class="section-title-sparkle-inner">
+                            <line class="sparkle-ray" x1="-9" y1="-9" x2="-16" y2="-16" stroke="#816cf8" stroke-width="2" stroke-linecap="round" />
+                            <line class="sparkle-ray" x1="9" y1="-9" x2="16" y2="-16" stroke="#816cf8" stroke-width="2" stroke-linecap="round" />
+                            <line class="sparkle-ray" x1="-9" y1="9" x2="-16" y2="16" stroke="#816cf8" stroke-width="2" stroke-linecap="round" />
+                            <line class="sparkle-ray" x1="9" y1="9" x2="16" y2="16" stroke="#816cf8" stroke-width="2" stroke-linecap="round" />
+                            <path class="sparkle-star" d="M 0 -15 C 2.5 -5.5, 5.5 -2.5, 15 0 C 5.5 2.5, 2.5 5.5, 0 15 C -2.5 5.5, -5.5 2.5, -15 0 C -5.5 -2.5, -2.5 -5.5, 0 -15 Z" fill="#705cf6" />
+                        </g>
+                    </g>
+                </svg>
+
+                <h2 class="section-title">My Resume</h2>
+            </div>
             <p class="section-subtitle">A summary of my qualifications, experiences, and technical skill set available
                 for download.</p>
             <div class="resume-container">
@@ -945,8 +1190,28 @@
         </section>
 
         <!-- Contact -->
-        <section id="contact" class="section">
-            <h2 class="section-title">Contact Me</h2>
+        <section id="contact" class="section section-with-separator">
+            <div class="section-title-graphic-wrap">
+                <svg class="section-title-svg" aria-hidden="true">
+                    <path class="section-title-branch branch-left" d="" fill="none" />
+                    <path class="section-title-branch branch-right" d="" fill="none" />
+                    <circle class="section-title-node node-ring-left" cx="0" cy="0" r="5" />
+                    <circle class="section-title-node node-ring-right" cx="0" cy="0" r="5" />
+                    <circle class="section-title-node node-dot-left" cx="0" cy="0" r="4.5" />
+                    <circle class="section-title-node node-dot-right" cx="0" cy="0" r="4.5" />
+                    <g class="section-title-sparkle-anchor" transform="translate(0, 0)">
+                        <g class="section-title-sparkle-inner">
+                            <line class="sparkle-ray" x1="-9" y1="-9" x2="-16" y2="-16" stroke="#816cf8" stroke-width="2" stroke-linecap="round" />
+                            <line class="sparkle-ray" x1="9" y1="-9" x2="16" y2="-16" stroke="#816cf8" stroke-width="2" stroke-linecap="round" />
+                            <line class="sparkle-ray" x1="-9" y1="9" x2="-16" y2="16" stroke="#816cf8" stroke-width="2" stroke-linecap="round" />
+                            <line class="sparkle-ray" x1="9" y1="9" x2="16" y2="16" stroke="#816cf8" stroke-width="2" stroke-linecap="round" />
+                            <path class="sparkle-star" d="M 0 -15 C 2.5 -5.5, 5.5 -2.5, 15 0 C 5.5 2.5, 2.5 5.5, 0 15 C -2.5 5.5, -5.5 2.5, -15 0 C -5.5 -2.5, -2.5 -5.5, 0 -15 Z" fill="#705cf6" />
+                        </g>
+                    </g>
+                </svg>
+
+                <h2 class="section-title">Contact Me</h2>
+            </div>
             <p class="section-subtitle">Have an interesting project or opportunities? Let's connect and build something
                 solid.</p>
             <div class="contact-container">
@@ -1085,7 +1350,7 @@
             </div>
         </div>
 
-        <script src="script.js?v=60"></script>
+        <script src="script.js?v=87"></script>
 </body>
 
 </html>

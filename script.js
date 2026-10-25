@@ -1588,6 +1588,12 @@ try {
                     preloadNextIframe();
                 }
             });
+            setTimeout(() => {
+                if (currentIframe === newIframe) {
+                    loader.style.opacity = '0';
+                    loader.style.pointerEvents = 'none';
+                }
+            }, 2500);
             browserBody.insertBefore(newIframe, iframeOverlay);
             iframePool[url] = newIframe;
             return newIframe;
@@ -2067,6 +2073,8 @@ try {
             './images/21.jpg',          './images/17.jpg',
             // Resume preview
             './images/res.jpeg',
+            // Experience illustration
+            './images/nishant_pixar.png',
             // Hero / key tech icons
             './icons/python.svg',       './icons/django.svg',      './icons/postgresql.svg',
             './icons/flutter.svg',      './icons/docker.svg',      './icons/redis.svg',
@@ -2128,6 +2136,7 @@ try {
                         bodyEl.classList.remove('intro-loading');
                         // Dispatch resize event to trigger layout calculations (like Masonry)
                         window.dispatchEvent(new Event('resize'));
+                        if (window.ScrollTrigger) ScrollTrigger.refresh();
                         setTimeout(() => { if (nameAnim) nameAnim.update(); }, 400);
                         // Let CSS fade-out finish (0.6s), then kill the DotField loop
                         setTimeout(() => { if (destroyDots) destroyDots(); }, 600);
@@ -2506,6 +2515,740 @@ try {
         });
     }
 
+    /* ── Journey Timeline Curves (Unified Vertical Timeline with Sequential Reveal) ─── */
+    function initJourneyTimeline() {
+        const timeline = document.querySelector('.journey-timeline');
+        if (!timeline) return;
+
+        const path = timeline.querySelector('.journey-line-path');
+        const items = Array.from(timeline.querySelectorAll('.journey-item'));
+        const endMarker = timeline.querySelector('.journey-end-marker');
+        const endDot = timeline.querySelector('.journey-end-dot');
+
+        let isAnimated = false;
+        let animTL = null;
+
+        function getLengthAtY(targetY) {
+            if (!path) return 0;
+            const total = path.getTotalLength();
+            let low = 0;
+            let high = total;
+            for (let i = 0; i < 20; i++) {
+                const mid = (low + high) / 2;
+                const pt = path.getPointAtLength(mid);
+                if (pt.y < targetY) {
+                    low = mid;
+                } else {
+                    high = mid;
+                }
+            }
+            return (low + high) / 2;
+        }
+
+        function updatePath() {
+            const dots = timeline.querySelectorAll('.journey-dot');
+            if (!path || dots.length === 0) return;
+
+            const containerRect = timeline.getBoundingClientRect();
+            if (containerRect.width === 0 || containerRect.height === 0) return;
+
+            const points = Array.from(dots).map(dot => {
+                const r = dot.getBoundingClientRect();
+                return {
+                    x: r.left - containerRect.left + r.width / 2,
+                    y: r.top - containerRect.top + r.height / 2
+                };
+            });
+
+            if (points.length === 0) return;
+
+            let endPoint = null;
+            if (endDot) {
+                const er = endDot.getBoundingClientRect();
+                endPoint = {
+                    x: er.left - containerRect.left + er.width / 2,
+                    y: er.top - containerRect.top + er.height / 2
+                };
+            }
+
+            const x = points[0].x;
+            const topY = Math.max(0, points[0].y - 35);
+            const waveW = 8.5;
+            const curveH = 70;
+            const leadTop = 18; // curve positioned near the start of each experience
+
+            const createChicane = (yA, yB) => {
+                const h = yB - yA;
+                const cp1y = yA + h * 0.22;
+                const cp2y = yA + h * 0.32;
+                const midX = x + waveW;
+                const midY = yA + h * 0.50;
+                const cp3y = yA + h * 0.68;
+                const cp4y = yA + h * 0.78;
+
+                return ` C ${x.toFixed(1)} ${cp1y.toFixed(1)}, ${midX.toFixed(1)} ${cp2y.toFixed(1)}, ${midX.toFixed(1)} ${midY.toFixed(1)}` +
+                       ` C ${midX.toFixed(1)} ${cp3y.toFixed(1)}, ${x.toFixed(1)} ${cp4y.toFixed(1)}, ${x.toFixed(1)} ${yB.toFixed(1)}`;
+            };
+
+            let d = `M ${x.toFixed(1)} ${topY.toFixed(1)} L ${x.toFixed(1)} ${points[0].y.toFixed(1)}`;
+
+            // Experience 1: curve positioned near the start, then straight descent to dot 2
+            for (let i = 0; i < points.length - 1; i++) {
+                const p1 = points[i];
+                const p2 = points[i + 1];
+                const yA = p1.y + leadTop;
+                const yB = Math.min(p2.y - 15, yA + curveH);
+
+                d += ` L ${x.toFixed(1)} ${yA.toFixed(1)}`;
+                d += createChicane(yA, yB);
+                d += ` L ${x.toFixed(1)} ${p2.y.toFixed(1)}`;
+            }
+
+            // Experience 2: curve positioned near the start, then straight descent to hollow end dot
+            const lastPoint = points[points.length - 1];
+            if (endPoint && endPoint.y > lastPoint.y + leadTop + 20) {
+                const yA = lastPoint.y + leadTop;
+                const yB = Math.min(endPoint.y - 15, yA + curveH);
+
+                d += ` L ${x.toFixed(1)} ${yA.toFixed(1)}`;
+                d += createChicane(yA, yB);
+                d += ` L ${x.toFixed(1)} ${endPoint.y.toFixed(1)}`;
+            } else if (endPoint) {
+                d += ` L ${endPoint.x.toFixed(1)} ${endPoint.y.toFixed(1)}`;
+            }
+
+            path.setAttribute('d', d);
+
+            // If animation hasn't started yet, keep path hidden ready for animation
+            if (!isAnimated && !animTL) {
+                const len = path.getTotalLength();
+                if (len > 0) {
+                    path.style.strokeDasharray = `${len} ${len}`;
+                    path.style.strokeDashoffset = `${len}`;
+                }
+            }
+        }
+
+        // Setup checkpoint-by-checkpoint scroll-triggered animation
+        function setupAnimation() {
+            if (!window.gsap) return;
+
+            // Check reduced motion preference
+            const visualCol = document.querySelector('.journey-visual-column');
+            if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                isAnimated = true;
+                if (visualCol) gsap.set(visualCol, { opacity: 1, y: 0 });
+                return;
+            }
+
+            if (window.ScrollTrigger) {
+                gsap.registerPlugin(ScrollTrigger);
+            }
+
+            if (visualCol) gsap.set(visualCol, { opacity: 0, y: 24 });
+
+            // Set initial hidden states before animation triggers
+            items.forEach((item) => {
+                const dotWrap = item.querySelector('.journey-dot-wrap');
+                const year = item.querySelector('.journey-year');
+                const content = item.querySelector('.journey-content');
+                if (dotWrap) gsap.set(dotWrap, { opacity: 0, scale: 0 });
+                if (year) gsap.set(year, { opacity: 0, x: -14 });
+                if (content) gsap.set(content, { opacity: 0, y: 24 });
+            });
+
+            if (endMarker) {
+                const endDotWrap = endMarker.querySelector('.journey-dot-wrap');
+                if (endDotWrap) gsap.set(endDotWrap, { opacity: 0, scale: 0 });
+            }
+
+            const state = {
+                m1Done: false,
+                m2Done: false,
+                endDone: false
+            };
+
+            const runWithLoaderCheck = (fn) => {
+                if (document.body.classList.contains('intro-loading')) {
+                    const check = setInterval(() => {
+                        if (!document.body.classList.contains('intro-loading')) {
+                            clearInterval(check);
+                            setTimeout(fn, 150);
+                        }
+                    }, 60);
+                } else {
+                    fn();
+                }
+            };
+
+            const playJourneyAnimation = () => {
+                if (isAnimated) return;
+                isAnimated = true;
+
+                updatePath();
+                const totalLen = path.getTotalLength();
+                if (totalLen <= 0) {
+                    if (visualCol) gsap.set(visualCol, { opacity: 1, y: 0 });
+                    items.forEach(item => {
+                        const dotWrap = item.querySelector('.journey-dot-wrap');
+                        const year = item.querySelector('.journey-year');
+                        const content = item.querySelector('.journey-content');
+                        if (dotWrap) gsap.set(dotWrap, { opacity: 1, scale: 1 });
+                        if (year) gsap.set(year, { opacity: 1, x: 0 });
+                        if (content) gsap.set(content, { opacity: 1, y: 0 });
+                    });
+                    if (endMarker) {
+                        const endDotWrap = endMarker.querySelector('.journey-dot-wrap');
+                        if (endDotWrap) gsap.set(endDotWrap, { opacity: 1, scale: 1 });
+                    }
+                    return;
+                }
+
+                const dots = timeline.querySelectorAll('.journey-dot');
+                const containerRect = timeline.getBoundingClientRect();
+                
+                // Dot 1 offset along path
+                const cp1Y = dots[0] ? (dots[0].getBoundingClientRect().top - containerRect.top + dots[0].getBoundingClientRect().height / 2) : 0;
+                const cp1Len = cp1Y > 0 ? getLengthAtY(cp1Y) : 35;
+                const offset1 = Math.max(0, totalLen - cp1Len);
+
+                // Dot 2 offset along path
+                const cp2Y = dots[1] ? (dots[1].getBoundingClientRect().top - containerRect.top + dots[1].getBoundingClientRect().height / 2) : 0;
+                const cp2Len = cp2Y > 0 ? getLengthAtY(cp2Y) : totalLen * 0.72;
+                const offset2 = Math.max(0, totalLen - cp2Len);
+
+                const item0 = items[0];
+                const dotWrap0 = item0 ? item0.querySelector('.journey-dot-wrap') : null;
+                const year0 = item0 ? item0.querySelector('.journey-year') : null;
+                const content0 = item0 ? item0.querySelector('.journey-content') : null;
+
+                const item1 = items[1];
+                const dotWrap1 = item1 ? item1.querySelector('.journey-dot-wrap') : null;
+                const year1 = item1 ? item1.querySelector('.journey-year') : null;
+                const content1 = item1 ? item1.querySelector('.journey-content') : null;
+
+                const endDotWrap = endMarker ? endMarker.querySelector('.journey-dot-wrap') : null;
+
+                const tl = gsap.timeline({
+                    onComplete: () => {
+                        path.style.strokeDasharray = '';
+                        path.style.strokeDashoffset = '';
+                        if (visualCol) gsap.set(visualCol, { clearProps: 'all' });
+                        items.forEach(item => {
+                            const content = item.querySelector('.journey-content');
+                            if (content) gsap.set(content, { clearProps: 'all' });
+                        });
+                    }
+                });
+
+                // 1. Left visual column enters smoothly
+                if (visualCol) {
+                    tl.to(visualCol, {
+                        opacity: 1,
+                        y: 0,
+                        duration: 0.5,
+                        ease: 'power2.out'
+                    }, 0);
+                }
+
+                // 2. Stroke begins drawing immediately from top to first checkpoint dot
+                tl.to(path, {
+                    strokeDashoffset: offset1,
+                    duration: 0.35,
+                    ease: 'power2.out'
+                }, 0.05);
+
+                // 3. Dot 1 pops open & First experience card slides into place
+                if (dotWrap0) {
+                    tl.to(dotWrap0, { opacity: 1, scale: 1, duration: 0.28, ease: 'back.out(2)' }, '-=0.12');
+                }
+                if (year0) {
+                    tl.to(year0, { opacity: 1, x: 0, duration: 0.28, ease: 'power2.out' }, '<0.05');
+                }
+                if (content0) {
+                    tl.to(content0, { opacity: 1, y: 0, duration: 0.42, ease: 'power2.out' }, '-=0.15');
+                }
+
+                // 4. Line continues seamlessly without pausing through S-chicane to Dot 2
+                tl.to(path, {
+                    strokeDashoffset: offset2,
+                    duration: 0.48,
+                    ease: 'power1.inOut'
+                }, '-=0.15');
+
+                // 5. Dot 2 pops open & Second experience card slides into place
+                if (dotWrap1) {
+                    tl.to(dotWrap1, { opacity: 1, scale: 1, duration: 0.28, ease: 'back.out(2)' }, '-=0.12');
+                }
+                if (year1) {
+                    tl.to(year1, { opacity: 1, x: 0, duration: 0.28, ease: 'power2.out' }, '<0.05');
+                }
+                if (content1) {
+                    tl.to(content1, { opacity: 1, y: 0, duration: 0.42, ease: 'power2.out' }, '-=0.15');
+                }
+
+                // 6. Line finishes down to End marker
+                tl.to(path, {
+                    strokeDashoffset: 0,
+                    duration: 0.32,
+                    ease: 'power1.out'
+                }, '-=0.1');
+
+                if (endDotWrap) {
+                    tl.to(endDotWrap, { opacity: 1, scale: 1, duration: 0.28, ease: 'back.out(2)' }, '-=0.12');
+                }
+            };
+
+            const triggerTarget = document.querySelector('.journey-layout-wrapper') || timeline;
+
+            // Register scroll trigger for experience journey
+            if (window.ScrollTrigger) {
+                ScrollTrigger.create({
+                    trigger: triggerTarget,
+                    start: 'top 88%',
+                    once: true,
+                    onEnter: () => runWithLoaderCheck(playJourneyAnimation)
+                });
+            } else if (window.IntersectionObserver) {
+                const obs = new IntersectionObserver((entries) => {
+                    entries.forEach((e) => {
+                        if (e.isIntersecting) {
+                            runWithLoaderCheck(playJourneyAnimation);
+                            obs.disconnect();
+                        }
+                    });
+                }, { threshold: 0.1, rootMargin: '0px 0px -10% 0px' });
+                obs.observe(triggerTarget);
+            } else {
+                runWithLoaderCheck(playJourneyAnimation);
+            }
+        }
+
+        updatePath();
+        setupAnimation();
+
+        window.addEventListener('resize', () => {
+            if (animTL && animTL.isActive()) {
+                animTL.progress(1);
+            }
+            updatePath();
+        });
+
+        if (window.ResizeObserver) {
+            const ro = new ResizeObserver(() => updatePath());
+            ro.observe(timeline);
+        }
+
+        if (document.fonts && document.fonts.ready) {
+            document.fonts.ready.then(updatePath);
+        }
+
+        setTimeout(updatePath, 200);
+        setTimeout(updatePath, 800);
+    }
+
+    /* ── Designed Section Title Separator ─── */
+    function initSectionTitleSeparators() {
+        const SVG_TEMPLATE = `
+            <path class="section-title-branch branch-left" d="" fill="none" />
+            <path class="section-title-branch branch-right" d="" fill="none" />
+            <circle class="section-title-node node-ring-left" cx="0" cy="0" r="5" />
+            <circle class="section-title-node node-ring-right" cx="0" cy="0" r="5" />
+            <circle class="section-title-node node-dot-left" cx="0" cy="0" r="4.5" />
+            <circle class="section-title-node node-dot-right" cx="0" cy="0" r="4.5" />
+            <g class="section-title-sparkle-anchor" transform="translate(0, 0)">
+                <g class="section-title-sparkle-inner">
+                    <line class="sparkle-ray" x1="-9" y1="-9" x2="-16" y2="-16" stroke="#816cf8" stroke-width="2" stroke-linecap="round" />
+                    <line class="sparkle-ray" x1="9" y1="-9" x2="16" y2="-16" stroke="#816cf8" stroke-width="2" stroke-linecap="round" />
+                    <line class="sparkle-ray" x1="-9" y1="9" x2="-16" y2="16" stroke="#816cf8" stroke-width="2" stroke-linecap="round" />
+                    <line class="sparkle-ray" x1="9" y1="9" x2="16" y2="16" stroke="#816cf8" stroke-width="2" stroke-linecap="round" />
+                    <path class="sparkle-star" d="M 0 -15 C 2.5 -5.5, 5.5 -2.5, 15 0 C 5.5 2.5, 2.5 5.5, 0 15 C -2.5 5.5, -5.5 2.5, -15 0 C -5.5 -2.5, -2.5 -5.5, 0 -15 Z" fill="#705cf6" />
+                </g>
+            </g>
+        `;
+
+        // Auto-wrap any unwrapped section-title in section-title-graphic-wrap if needed
+        document.querySelectorAll('.section-title').forEach((titleEl) => {
+            if (!titleEl.closest('.section-title-graphic-wrap')) {
+                const wrap = document.createElement('div');
+                wrap.className = 'section-title-graphic-wrap';
+                titleEl.parentNode.insertBefore(wrap, titleEl);
+                wrap.appendChild(titleEl);
+            }
+        });
+
+        const wraps = Array.from(document.querySelectorAll('.section-title-graphic-wrap'));
+        if (wraps.length === 0) return;
+
+        wraps.forEach((wrap) => {
+            let svg = wrap.querySelector('.section-title-svg');
+            if (!svg) {
+                svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+                svg.setAttribute('class', 'section-title-svg');
+                svg.setAttribute('aria-hidden', 'true');
+                svg.innerHTML = SVG_TEMPLATE;
+                wrap.insertBefore(svg, wrap.firstChild);
+            }
+
+            const title = wrap.querySelector('.section-title');
+            const branchLeft = wrap.querySelector('.branch-left');
+            const branchRight = wrap.querySelector('.branch-right');
+            const ringLeft = wrap.querySelector('.node-ring-left');
+            const ringRight = wrap.querySelector('.node-ring-right');
+            const dotLeft = wrap.querySelector('.node-dot-left');
+            const dotRight = wrap.querySelector('.node-dot-right');
+            const sparkleAnchor = wrap.querySelector('.section-title-sparkle-anchor');
+            const sparkleInner = wrap.querySelector('.section-title-sparkle-inner');
+            const star = wrap.querySelector('.sparkle-star');
+            const rays = Array.from(wrap.querySelectorAll('.sparkle-ray'));
+            const section = wrap.closest('.section') || wrap.parentElement || wrap;
+
+            // Elements below the section title wrap that should animate sequentially after the divider
+            const belowElements = Array.from(section.children).filter(el =>
+                el !== wrap &&
+                !el.classList.contains('journey-timeline') &&
+                !el.classList.contains('journey-layout-wrapper') &&
+                !el.classList.contains('section-title-svg') &&
+                !el.classList.contains('section-title')
+            );
+
+            if (!title || !svg || !branchLeft || !branchRight) return;
+
+            let isAnimated = false;
+            let animTL = null;
+
+            function updateGeometry() {
+                const wrapRect = wrap.getBoundingClientRect();
+                const titleRect = title.getBoundingClientRect();
+                if (wrapRect.width === 0 || titleRect.width === 0) return;
+
+                const centerX = wrapRect.width / 2;
+                const isMobile = wrapRect.width < 640;
+
+                // Remove any active GSAP translateY transform so geometry is always computed on the true resting position
+                const currentTitleY = (window.gsap && gsap.getProperty(title, "y")) || 0;
+                const unshiftedTitleBottom = titleRect.bottom - currentTitleY;
+                const titleBottomRel = unshiftedTitleBottom - wrapRect.top;
+
+                // Even vertical spacing between Title, Line Divider (sparkle/dip), and Subtitle:
+                // Total space between Title bottom and Subtitle top is ~62px desktop / ~50px mobile.
+                // Center dip & sparkle are positioned at exactly half of this distance:
+                // 34px desktop / 26px mobile below Title bottom.
+                const dipY = titleBottomRel + (isMobile ? 26 : 34);
+                const cradleDepth = isMobile ? 18 : 20;
+                const baseLineY = dipY - cradleDepth;
+
+                const halfTitle = titleRect.width / 2;
+
+                // Center sparkle geometry: 30px wide star with 8.5px clean gap before lines start
+                const starTip = 14.5;
+                const starGap = 8.5;
+                const lineStartLeftX = centerX - starTip - starGap; // ~ centerX - 23
+                const lineStartRightX = centerX + starTip + starGap; // ~ centerX + 23
+
+                // Outer terminal solid dots: capped max-width so separator stays compact and never over-stretches
+                const maxLineWidth = isMobile ? wrapRect.width - 32 : Math.min(wrapRect.width - 48, 960);
+                const dotLeftX = centerX - maxLineWidth / 2;
+                const dotRightX = centerX + maxLineWidth / 2;
+
+                // Bounded cradle dip span: keeps the S-curve tight, steep, and elegant like the short titles
+                // Never allow the cradle dip to over-stretch into a flat saggy line on wide titles
+                const cradleDipSpan = isMobile ? Math.min(Math.max(halfTitle * 0.7, 85), 115) : Math.min(Math.max(halfTitle * 0.55, 105), 140);
+                const sCurveTopLeftX = centerX - cradleDipSpan;
+                const sCurveTopRightX = centerX + cradleDipSpan;
+
+                // Hollow rings placed outside the cradle curve with balanced wing clearance
+                const ringDistFromCurve = isMobile ? 18 : Math.min(38, (dotRightX - sCurveTopRightX) * 0.22);
+                const ringLeftX = Math.max(dotLeftX + 36, sCurveTopLeftX - ringDistFromCurve);
+                const ringRightX = Math.min(dotRightX - 36, sCurveTopRightX + ringDistFromCurve);
+
+                // Bottom of S-curve reaches dip level smoothly
+                const sCurveBotLeftX = Math.min(lineStartLeftX - 25, sCurveTopLeftX + (lineStartLeftX - sCurveTopLeftX) * 0.55);
+                const sCurveBotRightX = Math.max(lineStartRightX + 25, sCurveTopRightX - (sCurveTopRightX - lineStartRightX) * 0.55);
+
+                const flatLeftX = Math.min(lineStartLeftX, sCurveBotLeftX);
+                const flatRightX = Math.max(lineStartRightX, sCurveBotRightX);
+
+                // Position the circular nodes with fixed cx, cy and radial sizing
+                if (ringLeft) {
+                    ringLeft.setAttribute('cx', ringLeftX.toFixed(1));
+                    ringLeft.setAttribute('cy', baseLineY.toFixed(1));
+                    if (isAnimated) ringLeft.setAttribute('r', '5');
+                }
+                if (ringRight) {
+                    ringRight.setAttribute('cx', ringRightX.toFixed(1));
+                    ringRight.setAttribute('cy', baseLineY.toFixed(1));
+                    if (isAnimated) ringRight.setAttribute('r', '5');
+                }
+                if (dotLeft) {
+                    dotLeft.setAttribute('cx', dotLeftX.toFixed(1));
+                    dotLeft.setAttribute('cy', baseLineY.toFixed(1));
+                    if (isAnimated) dotLeft.setAttribute('r', '4.5');
+                }
+                if (dotRight) {
+                    dotRight.setAttribute('cx', dotRightX.toFixed(1));
+                    dotRight.setAttribute('cy', baseLineY.toFixed(1));
+                    if (isAnimated) dotRight.setAttribute('r', '4.5');
+                }
+
+                // Position the center sparkle anchor permanently at (centerX, dipY)
+                if (sparkleAnchor) {
+                    sparkleAnchor.setAttribute('transform', `translate(${centerX.toFixed(1)}, ${dipY.toFixed(1)})`);
+                }
+
+                // S-curve descent control points (smooth horizontal tangents at both ends)
+                const sCurveSpanL = flatLeftX - sCurveTopLeftX;
+                const cp1x = (flatLeftX - sCurveSpanL * 0.45).toFixed(1);
+                const cp1y = dipY.toFixed(1);
+                const cp2x = (sCurveTopLeftX + sCurveSpanL * 0.45).toFixed(1);
+                const cp2y = baseLineY.toFixed(1);
+
+                // Left branch: starts at (lineStartLeftX, dipY), runs horizontally through flat trough,
+                // S-curves up to (sCurveTopLeftX, baseLineY), then runs horizontally through hollow ring to dotLeftX
+                const dLeft = `M ${lineStartLeftX.toFixed(1)} ${dipY.toFixed(1)} ` +
+                              `L ${flatLeftX.toFixed(1)} ${dipY.toFixed(1)} ` +
+                              `C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${sCurveTopLeftX.toFixed(1)} ${baseLineY.toFixed(1)} ` +
+                              `L ${dotLeftX.toFixed(1)} ${baseLineY.toFixed(1)}`;
+                branchLeft.setAttribute('d', dLeft);
+
+                // Right branch: symmetrical
+                const sCurveSpanR = sCurveTopRightX - flatRightX;
+                const cp3x = (flatRightX + sCurveSpanR * 0.45).toFixed(1);
+                const cp3y = dipY.toFixed(1);
+                const cp4x = (sCurveTopRightX - sCurveSpanR * 0.45).toFixed(1);
+                const cp4y = baseLineY.toFixed(1);
+
+                const dRight = `M ${lineStartRightX.toFixed(1)} ${dipY.toFixed(1)} ` +
+                               `L ${flatRightX.toFixed(1)} ${dipY.toFixed(1)} ` +
+                               `C ${cp3x} ${cp3y}, ${cp4x} ${cp4y}, ${sCurveTopRightX.toFixed(1)} ${baseLineY.toFixed(1)} ` +
+                               `L ${dotRightX.toFixed(1)} ${baseLineY.toFixed(1)}`;
+                branchRight.setAttribute('d', dRight);
+
+                // If not yet animated, keep paths hidden ready for animation
+                if (!isAnimated && !animTL) {
+                    const lenL = branchLeft.getTotalLength();
+                    const lenR = branchRight.getTotalLength();
+                    if (lenL > 0) {
+                        branchLeft.style.strokeDasharray = `${lenL} ${lenL}`;
+                        branchLeft.style.strokeDashoffset = `${lenL}`;
+                    }
+                    if (lenR > 0) {
+                        branchRight.style.strokeDasharray = `${lenR} ${lenR}`;
+                        branchRight.style.strokeDashoffset = `${lenR}`;
+                    }
+                }
+            }
+
+            function setupAnimation() {
+                if (!window.gsap) return;
+
+                if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                    isAnimated = true;
+                    return;
+                }
+
+                // Initial hidden states: title + separator elements
+                gsap.set(title, { opacity: 0, y: 16 });
+                if (star) gsap.set(star, { opacity: 0, scale: 0, transformOrigin: '0px 0px' });
+                if (rays.length > 0) gsap.set(rays, { opacity: 0, scale: 0, transformOrigin: '0px 0px' });
+                if (ringLeft) { gsap.set(ringLeft, { opacity: 0 }); ringLeft.setAttribute('r', '0'); }
+                if (ringRight) { gsap.set(ringRight, { opacity: 0 }); ringRight.setAttribute('r', '0'); }
+                if (dotLeft) { gsap.set(dotLeft, { opacity: 0 }); dotLeft.setAttribute('r', '0'); }
+                if (dotRight) { gsap.set(dotRight, { opacity: 0 }); dotRight.setAttribute('r', '0'); }
+
+                // Initial hidden states: below elements (subtitle and section content)
+                if (belowElements.length > 0) {
+                    gsap.set(belowElements, { opacity: 0, y: 22 });
+                }
+
+                const playAnimation = () => {
+                    if (isAnimated) return;
+                    isAnimated = true;
+
+                    updateGeometry();
+
+                    const lenL = branchLeft.getTotalLength();
+                    const lenR = branchRight.getTotalLength();
+                    if (lenL <= 0 || lenR <= 0) {
+                        gsap.set([title, star], { opacity: 1, scale: 1, y: 0 });
+                        if (rays.length > 0) gsap.set(rays, { opacity: 1, scale: 1 });
+                        if (dotLeft) { dotLeft.setAttribute('r', '4.5'); gsap.set(dotLeft, { opacity: 1 }); }
+                        if (dotRight) { dotRight.setAttribute('r', '4.5'); gsap.set(dotRight, { opacity: 1 }); }
+                        if (ringLeft) { ringLeft.setAttribute('r', '5'); gsap.set(ringLeft, { opacity: 1 }); }
+                        if (ringRight) { ringRight.setAttribute('r', '5'); gsap.set(ringRight, { opacity: 1 }); }
+                        if (belowElements.length > 0) {
+                            gsap.to(belowElements, { opacity: 1, y: 0, duration: 0.5, clearProps: 'all' });
+                        }
+                        return;
+                    }
+
+                    animTL = gsap.timeline({
+                        onComplete: () => {
+                            branchLeft.style.strokeDasharray = '';
+                            branchLeft.style.strokeDashoffset = '';
+                            branchRight.style.strokeDasharray = '';
+                            branchRight.style.strokeDashoffset = '';
+                            if (dotLeft) dotLeft.setAttribute('r', '4.5');
+                            if (dotRight) dotRight.setAttribute('r', '4.5');
+                            if (ringLeft) ringLeft.setAttribute('r', '5');
+                            if (ringRight) ringRight.setAttribute('r', '5');
+                            if (belowElements.length > 0) {
+                                gsap.set(belowElements, { clearProps: 'all' });
+                            }
+                            animTL = null;
+
+                            // Dispatch resize event if gallery inside
+                            if (section.id === 'gallery' || section.querySelector('.masonry-container')) {
+                                window.dispatchEvent(new Event('resize'));
+                            }
+                        }
+                    });
+
+                    // 1. Title fades and slides up into place (snappy)
+                    animTL.to(title, {
+                        opacity: 1,
+                        y: 0,
+                        duration: 0.3,
+                        ease: 'power2.out'
+                    }, 0);
+
+                    // 2. "the star appears" - Center diamond star pops in first
+                    if (star) {
+                        animTL.to(star, {
+                            opacity: 1,
+                            scale: 1,
+                            duration: 0.24,
+                            ease: 'back.out(2)'
+                        }, 0.1);
+                    }
+
+                    // 3. "then those 4 lines" - The 4 radiating diagonal rays burst out from behind the star
+                    if (rays.length > 0) {
+                        animTL.to(rays, {
+                            opacity: 1,
+                            scale: 1,
+                            duration: 0.18,
+                            stagger: 0.02,
+                            ease: 'back.out(2)'
+                        }, 0.22);
+                    }
+
+                    // 4. "then line draws in a smooth way." - Symmetrical line branches smoothly draw outward from center dip
+                    animTL.to([branchLeft, branchRight], {
+                        strokeDashoffset: 0,
+                        duration: 0.48,
+                        ease: 'power1.out'
+                    }, 0.3);
+
+                    // 5. Hollow rings pop open cleanly without lateral jitter as lines reach them
+                    if (ringLeft && ringRight) {
+                        animTL.to([ringLeft, ringRight], {
+                            opacity: 1,
+                            attr: { r: 5 },
+                            duration: 0.2,
+                            ease: 'power2.out'
+                        }, 0.44);
+                    }
+
+                    // 6. Outer solid terminal dots pop in at ends without jitter (pure radial expansion from fixed cx, cy)
+                    if (dotLeft && dotRight) {
+                        animTL.to([dotLeft, dotRight], {
+                            opacity: 1,
+                            attr: { r: 4.5 },
+                            duration: 0.2,
+                            ease: 'power2.out'
+                        }, 0.58);
+                    }
+
+                    // 7. ANIMATION AND LOADING HAPPEN TOGETHER:
+                    // Subtitle and section content animate IN PARALLEL with the line draw!
+                    if (belowElements.length > 0) {
+                        animTL.to(belowElements, {
+                            opacity: 1,
+                            y: 0,
+                            duration: 0.42,
+                            stagger: 0.08,
+                            ease: 'power2.out',
+                            clearProps: 'all'
+                        }, 0.32);
+                    }
+                };
+
+                const triggerWhenReady = () => {
+                    if (document.body.classList.contains('intro-loading')) {
+                        const checkLoader = setInterval(() => {
+                            if (!document.body.classList.contains('intro-loading')) {
+                                clearInterval(checkLoader);
+                                setTimeout(playAnimation, 150);
+                            }
+                        }, 60);
+                    } else {
+                        playAnimation();
+                    }
+                };
+
+                // Check if already in viewport (e.g. above the fold or on hash load)
+                const checkInView = () => {
+                    const r = wrap.getBoundingClientRect();
+                    return r.top < window.innerHeight * 0.85 && r.bottom > 0;
+                };
+
+                if (window.ScrollTrigger) {
+                    ScrollTrigger.create({
+                        trigger: wrap,
+                        start: 'top 82%',
+                        once: true,
+                        onEnter: () => triggerWhenReady()
+                    });
+                } else if (window.IntersectionObserver) {
+                    const obs = new IntersectionObserver((entries) => {
+                        entries.forEach((entry) => {
+                            if (entry.isIntersecting) {
+                                triggerWhenReady();
+                                obs.disconnect();
+                            }
+                        });
+                    }, { threshold: 0.1, rootMargin: '0px 0px -15% 0px' });
+                    obs.observe(wrap);
+                } else {
+                    if (checkInView()) {
+                        triggerWhenReady();
+                    } else {
+                        const onScroll = () => {
+                            if (checkInView()) {
+                                triggerWhenReady();
+                                window.removeEventListener('scroll', onScroll);
+                            }
+                        };
+                        window.addEventListener('scroll', onScroll, { passive: true });
+                    }
+                }
+            }
+
+            updateGeometry();
+            setupAnimation();
+
+            window.addEventListener('resize', () => {
+                if (animTL && animTL.isActive()) {
+                    animTL.progress(1);
+                }
+                updateGeometry();
+            });
+
+            if (window.ResizeObserver) {
+                const ro = new ResizeObserver(() => updateGeometry());
+                ro.observe(wrap);
+            }
+
+            if (document.fonts && document.fonts.ready) {
+                document.fonts.ready.then(updateGeometry);
+            }
+
+            setTimeout(updateGeometry, 200);
+            setTimeout(updateGeometry, 800);
+        });
+    }
+
     initIntroLoader();
     initVibeLabs();
     initCardEffects();
@@ -2513,6 +3256,8 @@ try {
     initFooterSubscribe();
     initCyclistTextReveal();
     initCountUp();
+    initJourneyTimeline();
+    initSectionTitleSeparators();
 
 } catch (err) {
     console.error('Portfolio script error:', err);

@@ -93,3 +93,14 @@ This document defines critical design, layout, and implementation rules for the 
   * **Always** invoke a unified `pauseAutoMoving()` helper to reset a 3-second idle timer on any pointer, touch, scroll, or click events on both the cubes grid and the marquee line.
   * **Always** sync the auto-moving simulation trackers (`simIndex`, `simTarget`, `simPos`) with the manually highlighted item in the marquee scroll listener while `userActive` is true. This ensures the loop resumes seamlessly from where the user manually scrolled.
 
+---
+
+## 10. Section Title Designed Separator Standard
+* **Constraint:** Section titles must adhere to the designed separator standard with a smooth cradle dip, hollow framing rings, solid terminal dots, and center sparkle (✦) with radiating spark rays, without a top floating icon.
+* **Implementation Rule:**
+  * Refer to the official reference visual [`images/design_inspiration_section_title.png`](images/design_inspiration_section_title.png) and specification in [`docs/INSPIRATION_SECTION_TITLE.md`](docs/INSPIRATION_SECTION_TITLE.md).
+  * The line runs horizontally at the vertical lower-middle / baseline of the title, dips in a smooth cubic bezier S-curve cradling the title and center sparkle, and returns to the horizontal baseline.
+  * On viewport reveal, the line draws symmetrically outward from the center cradle through the hollow rings to the outer solid dots.
+  * Do NOT place floating icons above the title unless explicitly instructed.
+
+
