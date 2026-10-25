@@ -1,6 +1,7 @@
 import React, { useState, useRef, useMemo, useEffect } from 'react';
 import ReactDOM from 'react-dom/client';
 import Folder from './Folder/Folder.jsx';
+import CircularCarousel from './CircularCarousel.jsx';
 import { PROJECTS_DATA } from './projects-data.js';
 import './ProjectsFolderApp.css';
 
@@ -15,6 +16,7 @@ export default function ProjectsFolderApp() {
     typeof window !== 'undefined' ? window.innerWidth : 1200
   );
   const folderRef = useRef(null);
+  const carouselRef = useRef(null);
 
   // Monitor scroll to trigger folder entrance animation when scrolling near the projects section
   useEffect(() => {
@@ -30,7 +32,6 @@ export default function ProjectsFolderApp() {
         return true;
       }
       const rect = target.getBoundingClientRect();
-      // Trigger when the projects section is nicely in view (top is within 75% of viewport height)
       if (rect.top <= window.innerHeight * 0.75 && rect.bottom > 0) {
         setHasScrolledNear(true);
         return true;
@@ -38,232 +39,248 @@ export default function ProjectsFolderApp() {
       return false;
     };
 
-    const setupObserver = () => {
-      const target = document.getElementById('projects') || document.getElementById('projects-folder-root');
-      if (!target) {
-        setHasScrolledNear(true);
-        return;
-      }
+    if (checkPosition()) return;
 
-      if (checkPosition()) return;
-
+    const targetEl = document.getElementById('projects') || document.getElementById('projects-folder-root');
+    if (targetEl && typeof IntersectionObserver !== 'undefined') {
       observer = new IntersectionObserver(
         (entries) => {
-          if (entries.some((entry) => entry.isIntersecting)) {
-            observer?.disconnect();
-            window.removeEventListener('scroll', onScroll);
-            setHasScrolledNear(true);
-          }
+          entries.forEach((entry) => {
+            if (entry.isIntersecting || entry.boundingClientRect.top <= window.innerHeight * 0.75) {
+              setHasScrolledNear(true);
+              observer.disconnect();
+            }
+          });
         },
-        { rootMargin: '0px 0px -20% 0px', threshold: 0.05 }
+        { root: null, rootMargin: '0px 0px -20% 0px', threshold: 0.05 }
       );
-
-      observer.observe(target);
-      window.addEventListener('scroll', onScroll, { passive: true });
-    };
+      observer.observe(targetEl);
+    }
 
     const onScroll = () => {
       if (checkPosition()) {
-        observer?.disconnect();
         window.removeEventListener('scroll', onScroll);
+        window.removeEventListener('resize', onScroll);
+        if (observer) observer.disconnect();
+        if (pollInterval) clearInterval(pollInterval);
       }
     };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll, { passive: true });
 
-    if (typeof document !== 'undefined' && document.body.classList.contains('intro-loading')) {
-      pollInterval = setInterval(() => {
-        if (!document.body.classList.contains('intro-loading')) {
-          clearInterval(pollInterval);
-          setTimeout(setupObserver, 150);
-        }
-      }, 80);
-    } else {
-      setupObserver();
-    }
+    pollInterval = setInterval(() => {
+      if (checkPosition()) {
+        clearInterval(pollInterval);
+        window.removeEventListener('scroll', onScroll);
+        if (observer) observer.disconnect();
+      }
+    }, 250);
 
     return () => {
-      if (pollInterval) clearInterval(pollInterval);
-      if (observer) observer.disconnect();
       window.removeEventListener('scroll', onScroll);
+      if (observer) observer.disconnect();
+      if (pollInterval) clearInterval(pollInterval);
     };
   }, [hasScrolledNear]);
 
-  // Monitor screen width for responsive folder scaling
+  // Monitor screen width for responsive view switching
   useEffect(() => {
     const handleResize = () => setScreenWidth(window.innerWidth);
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Compute folder scale dynamically
+  const isMobile = screenWidth < 768;
+
+  // Compute folder scale dynamically for desktop/tablet view
   const folderScale = useMemo(() => {
     if (screenWidth >= 1200) return 1.45;
     if (screenWidth >= 992) return 1.25;
-    if (screenWidth >= 768) return 1.05;
-    if (screenWidth >= 480) return 0.85;
-    return 0.72;
+    return 1.05;
   }, [screenWidth]);
 
   const handleSelectProject = (index) => {
     setActiveIndex(index);
-    if (folderRef.current) {
-      folderRef.current.select(index);
+    if (!isMobile && folderRef.current) {
+      if (folderRef.current.setFocus) {
+        folderRef.current.setFocus(index);
+      } else {
+        folderRef.current.select(index);
+      }
+    } else if (isMobile && carouselRef.current) {
+      carouselRef.current.focusIndex?.(index);
     }
   };
 
-  // Build magnified, complete dossier cards for all 6 projects
-  const folderItems = useMemo(() => {
-    return PROJECTS_DATA.map((proj, idx) => {
-      const isFocused = idx === activeIndex;
-      return {
-        content: (
-          <div
-            className={`folder-full-dossier-card ${isFocused ? 'is-focused' : ''}`}
-            style={{
-              '--card-accent': proj.accent,
-              borderColor: isFocused ? proj.accent : '#151616'
-            }}
-          >
-            {/* Dossier Header Strip */}
-            <div className="dossier-strip" style={{ background: proj.accent }}>
-              <div className="dossier-strip-left">
-                <span className="dossier-file-tag">FILE #{proj.index}</span>
-                <span className="dossier-category-tag">{proj.category}</span>
-              </div>
-              <div className="dossier-strip-badges">
-                {proj.badges.map((b, bIdx) => (
-                  <span key={bIdx} className="dossier-mini-badge">
-                    {b.text}
-                  </span>
-                ))}
-                <button
-                  type="button"
-                  className="dossier-card-reset-btn cursor-target"
-                  title="Reset all cards into folder"
-                  aria-label="Reset cards"
+  // Helper to render high-fidelity Dossier Card (shared by Folder and CircularCarousel)
+  const renderCardJSX = (proj, isCardActive, isForCarousel = false) => (
+    <div
+      className={`folder-full-dossier-card ${isCardActive ? 'is-focused' : ''}`}
+      style={{
+        '--card-accent': proj.accent,
+        borderColor: isCardActive ? proj.accent : '#151616'
+      }}
+    >
+      {/* Dossier Header Strip */}
+      <div className="dossier-strip" style={{ background: proj.accent }}>
+        <div className="dossier-strip-left">
+          <span className="dossier-file-tag">FILE #{proj.index}</span>
+          <span className="dossier-category-tag">{proj.category}</span>
+        </div>
+        <div className="dossier-strip-badges">
+          {proj.badges.map((b, bIdx) => (
+            <span key={bIdx} className="dossier-mini-badge">
+              {b.text}
+            </span>
+          ))}
+          {!isForCarousel && (
+            <button
+              type="button"
+              className="dossier-card-reset-btn cursor-target"
+              title="Reset all cards into folder"
+              aria-label="Reset cards"
+              onClick={(e) => {
+                e.stopPropagation();
+                folderRef.current?.reset();
+              }}
+            >
+              <i className="material-icons">refresh</i>
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* Dossier Card Scrollable Content Area */}
+      <div className="dossier-card-content">
+        {/* Title & Action Links */}
+        <div className="dossier-title-section">
+          <h3 className="dossier-main-title">
+            <a
+              href={proj.titleLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="cursor-target"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {proj.title}
+            </a>
+          </h3>
+
+          <div className="dossier-actions-row">
+            {proj.links.map((link, lIdx) => (
+              <a
+                key={lIdx}
+                href={link.href}
+                target={link.external ? '_blank' : undefined}
+                rel={link.external ? 'noopener noreferrer' : undefined}
+                className="dossier-action-btn cursor-target"
+                data-video={link.dataVideo}
+                data-title={link.dataTitle}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (link.dataVideo) {
+                    e.preventDefault();
+                    window.openVideoLightbox?.(link.dataVideo, link.dataTitle || proj.title);
+                  }
+                }}
+              >
+                {link.icon && <i className="material-icons">{link.icon}</i>}
+                <span>{link.text}</span>
+              </a>
+            ))}
+          </div>
+        </div>
+
+        {/* Description Paragraph */}
+        <p className="dossier-paragraph">{proj.desc}</p>
+
+        {/* Photos Preview */}
+        {proj.thumbs && proj.thumbs.length > 0 && (
+          <div className="dossier-photos-block">
+            <span className="dossier-photos-label">Photos:</span>
+            <div className="dossier-photos-row">
+              {proj.thumbs.map((thumb, tIdx) => (
+                <div
+                  key={tIdx}
+                  className="dossier-photo-thumb cursor-target"
+                  data-img={thumb.img}
+                  data-title={thumb.title}
                   onClick={(e) => {
                     e.stopPropagation();
-                    folderRef.current?.reset();
+                    window.openLightbox?.(thumb.img, thumb.title);
                   }}
                 >
-                  <i className="material-icons">refresh</i>
-                </button>
-              </div>
-            </div>
-
-            {/* Dossier Card Scrollable Content Area */}
-            <div className="dossier-card-content">
-              {/* Title & Action Links */}
-              <div className="dossier-title-section">
-                <h3 className="dossier-main-title">
-                  <a
-                    href={proj.titleLink}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="cursor-target"
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    {proj.title}
-                  </a>
-                </h3>
-
-                <div className="dossier-actions-row">
-                  {proj.links.map((link, lIdx) => (
-                    <a
-                      key={lIdx}
-                      href={link.href}
-                      target={link.external ? '_blank' : undefined}
-                      rel={link.external ? 'noopener noreferrer' : undefined}
-                      className="dossier-action-btn cursor-target"
-                      data-video={link.dataVideo}
-                      data-title={link.dataTitle}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        if (link.dataVideo) {
-                          e.preventDefault();
-                          window.openVideoLightbox?.(link.dataVideo, link.dataTitle || proj.title);
-                        }
-                      }}
-                    >
-                      {link.icon && <i className="material-icons">{link.icon}</i>}
-                      <span>{link.text}</span>
-                    </a>
-                  ))}
-                </div>
-              </div>
-
-              {/* Description Paragraph */}
-              <p className="dossier-paragraph">{proj.desc}</p>
-
-              {/* Photos Preview for MentorConnect */}
-              {proj.thumbs && proj.thumbs.length > 0 && (
-                <div className="dossier-photos-block">
-                  <span className="dossier-photos-label">Photos:</span>
-                  <div className="dossier-photos-row">
-                    {proj.thumbs.map((thumb, tIdx) => (
-                      <div
-                        key={tIdx}
-                        className="dossier-photo-thumb cursor-target"
-                        data-img={thumb.img}
-                        data-title={thumb.title}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          window.openLightbox?.(thumb.img, thumb.title);
-                        }}
-                      >
-                        <img src={thumb.img} alt={thumb.alt} loading="lazy" />
-                        <div className="dossier-photo-zoom">
-                          <i className="material-icons">zoom_in</i>
-                        </div>
-                      </div>
-                    ))}
+                  <img src={thumb.img} alt={thumb.alt} loading="lazy" />
+                  <div className="dossier-photo-zoom">
+                    <i className="material-icons">zoom_in</i>
                   </div>
                 </div>
-              )}
-
-              {/* Architectural Highlights */}
-              <div className="dossier-bullets-block">
-                <div className="dossier-bullets-header">KEY ARCHITECTURAL HIGHLIGHTS</div>
-                <ul className="dossier-bullets-list">
-                  {proj.highlights.map((h, hIdx) => (
-                    <li key={hIdx}>{h}</li>
-                  ))}
-                </ul>
-              </div>
-
-              {/* Tech Stack Tags */}
-              <div className="dossier-tech-tags">
-                {proj.tech.map((t, tIdx) => (
-                  <span key={tIdx} className="dossier-tech-tag">
-                    {t}
-                  </span>
-                ))}
-              </div>
-            </div>
-
-            {/* Card Footer Hint */}
-            <div className="dossier-card-footer">
-              <span className="dossier-footer-hint">
-                {isFocused ? '✦ Focused in 3D · Click again to minimize' : '✦ Click to magnify in 3D · Drag to move'}
-              </span>
+              ))}
             </div>
           </div>
-        )
-      };
-    });
+        )}
+
+        {/* Architectural Highlights */}
+        <div className="dossier-bullets-block">
+          <div className="dossier-bullets-header">KEY ARCHITECTURAL HIGHLIGHTS</div>
+          <ul className="dossier-bullets-list">
+            {proj.highlights.map((h, hIdx) => (
+              <li key={hIdx}>{h}</li>
+            ))}
+          </ul>
+        </div>
+
+        {/* Tech Stack Tags */}
+        <div className="dossier-tech-tags">
+          {proj.tech.map((t, tIdx) => (
+            <span key={tIdx} className="dossier-tech-tag">
+              {t}
+            </span>
+          ))}
+        </div>
+      </div>
+
+      {/* Card Footer Hint */}
+      <div className="dossier-card-footer">
+        <span className="dossier-footer-hint">
+          {isForCarousel
+            ? (isCardActive ? '✦ Active in 3D Carousel' : 'Tap to focus this card')
+            : (isCardActive ? '✦ Focused in 3D · Click again to minimize' : '✦ Click to magnify in 3D · Drag to move')}
+        </span>
+      </div>
+    </div>
+  );
+
+  // Desktop folder cards
+  const folderItems = useMemo(() => {
+    return PROJECTS_DATA.map((proj, idx) => ({
+      content: renderCardJSX(proj, idx === activeIndex, false)
+    }));
+  }, [activeIndex]);
+
+  // Phone Circular Carousel items
+  const carouselItems = useMemo(() => {
+    return PROJECTS_DATA.map((proj, idx) => ({
+      id: proj.id,
+      title: proj.title,
+      subtitle: proj.category,
+      src: proj.thumbs?.[0]?.img || '',
+      content: (isCardActive) => renderCardJSX(proj, isCardActive, true)
+    }));
   }, [activeIndex]);
 
   return (
-    <div className="projects-app-container">
-      {/* View Switcher: Only Switch Buttons, No Background Card */}
-      <div className="projects-toolbar">
-        <div className="view-switch-group">
+    <div className="projects-folder-app-container">
+      {/* Top Header Switcher Controls */}
+      <div className="projects-stage-header">
+        <div className="view-toggle-pills" role="tablist" aria-label="Projects view mode">
           <button
             type="button"
             className={`view-btn cursor-target ${viewMode === 'dossier' ? 'active' : ''}`}
             onClick={() => setViewMode('dossier')}
           >
-            <i className="material-icons">folder_special</i>
-            <span>3D Magnified Archive</span>
+            <i className="material-icons">{isMobile ? 'view_carousel' : 'folder_special'}</i>
+            <span>{isMobile ? '3D Circular Carousel' : '3D Magnified Archive'}</span>
           </button>
           <button
             type="button"
@@ -276,48 +293,153 @@ export default function ProjectsFolderApp() {
         </div>
       </div>
 
-      {/* 3D Magnified Archive Mode (Full-Width Hero Centerpiece) */}
+      {/* 3D Archive View Mode */}
       {viewMode === 'dossier' && (
-        <div className="magnified-dossier-wrapper">
-          {/* Full-Width 3D Folder Stage */}
-          <div className="magnified-folder-stage">
-            <div
-              className="folder-interactive-anchor"
-              style={{ minHeight: `${folderScale * 350}px` }}
-            >
-              {hasScrolledNear && (
-                <Folder
-                  ref={folderRef}
-                  label="PROJECTS"
-                  items={folderItems}
-                  mode={folderMode}
-                  variant={folderVariant}
-                  color="#705cf6"
-                  paperColor="#FCF9F3"
-                  tabPosition="right"
-                  layout="spread"
-                  size={folderScale}
-                  open={isFolderOpen}
-                  onOpenChange={setIsFolderOpen}
-                  onItemClick={(item, index) => {
-                    setActiveIndex(index);
-                  }}
-                  draggable={true}
-                  zoomOnClick={true}
-                  peek={true}
-                  tilt={0.65}
-                  bounce={0.4}
-                  frost={0.3}
-                />
-              )}
-            </div>
+        <>
+          {/* Desktop / Tablet View (≥ 768px): 3D Magnified Archive Folder */}
+          {!isMobile ? (
+            <div className="magnified-dossier-wrapper">
+              <div className="magnified-folder-stage">
+                <div
+                  className="folder-interactive-anchor"
+                  style={{ minHeight: `${folderScale * 350}px` }}
+                >
+                  {hasScrolledNear && (
+                    <Folder
+                      ref={folderRef}
+                      label="PROJECTS"
+                      items={folderItems}
+                      mode={folderMode}
+                      variant={folderVariant}
+                      color="#705cf6"
+                      paperColor="#FCF9F3"
+                      tabPosition="right"
+                      layout="spread"
+                      size={folderScale}
+                      open={isFolderOpen}
+                      onOpenChange={setIsFolderOpen}
+                      onItemClick={(item, index) => {
+                        setActiveIndex(index);
+                      }}
+                      draggable={true}
+                      zoomOnClick={true}
+                      peek={true}
+                      tilt={0.65}
+                      bounce={0.4}
+                      frost={0.3}
+                      closeOnOutsideClick={false}
+                    />
+                  )}
+                </div>
 
-            <div className="stage-interaction-hint">
-              <i className="material-icons">touch_app</i>
-              <span>{isFolderOpen ? 'Click any card to magnify in 3D · Drag cards freely onto desk' : 'Click folder to open & explore projects · Drag cards freely onto desk'}</span>
+                <div className="stage-interaction-hint">
+                  <i className="material-icons">touch_app</i>
+                  <span>
+                    {isFolderOpen
+                      ? 'Click any card to magnify in 3D · Drag cards freely onto desk'
+                      : 'Click folder to open & explore projects · Drag cards freely onto desk'}
+                  </span>
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
+          ) : (
+            /* Phone View (< 768px): ReactBits Circular Carousel with exact dossier cards */
+            <div className="mobile-circular-dossier-wrapper">
+              <div className="mobile-carousel-container">
+                <CircularCarousel
+                  ref={carouselRef}
+                  items={carouselItems}
+                  preset="orbit"
+                  cardWidth={Math.min(290, screenWidth - 64)}
+                  aspectRatio={0.68}
+                  gap={16}
+                  spread={1.22}
+                  tilt={-5}
+                  curve={0}
+                  draggable={true}
+                  momentum={0.5}
+                  snap={true}
+                  depthFade={0.35}
+                  fadeColor="transparent"
+                  innerShade={0.05}
+                  cornerRadius={12}
+                  onChange={(index) => {
+                    setActiveIndex(typeof index === 'number' ? index : 0);
+                  }}
+                  onItemClick={(item, index) => {
+                    setActiveIndex(typeof index === 'number' ? index : 0);
+                  }}
+                />
+              </div>
+
+              {/* Quick Project Switcher Bar & Stepper Controls */}
+              <div className="folder-mobile-controls-wrapper">
+                <div className="folder-project-selector-bar" role="tablist" aria-label="Project Quick Select">
+                  {PROJECTS_DATA.map((proj, idx) => {
+                    const isCurrent = activeIndex === idx;
+                    return (
+                      <button
+                        key={proj.id}
+                        type="button"
+                        role="tab"
+                        aria-selected={isCurrent}
+                        className={`folder-proj-pill cursor-target ${isCurrent ? 'active' : ''}`}
+                        style={{
+                          '--pill-accent': proj.accent
+                        }}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleSelectProject(idx);
+                        }}
+                      >
+                        <span className="folder-proj-dot" style={{ background: proj.accent }} />
+                        <span className="folder-proj-pill-idx">#{proj.index}</span>
+                        <span className="folder-proj-pill-name">{proj.title.split(' ')[0]}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+
+                <div className="folder-stepper-row">
+                  <button
+                    type="button"
+                    className="folder-stepper-btn cursor-target"
+                    aria-label="Previous project"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      carouselRef.current?.prev?.();
+                    }}
+                  >
+                    <i className="material-icons">arrow_back</i>
+                    <span>Prev</span>
+                  </button>
+
+                  <span className="folder-stepper-counter">
+                    Project <strong>{activeIndex + 1}</strong> of <strong>{PROJECTS_DATA.length}</strong>
+                  </span>
+
+                  <button
+                    type="button"
+                    className="folder-stepper-btn cursor-target"
+                    aria-label="Next project"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      carouselRef.current?.next?.();
+                    }}
+                  >
+                    <span>Next</span>
+                    <i className="material-icons">arrow_forward</i>
+                  </button>
+                </div>
+              </div>
+
+              <div className="stage-interaction-hint">
+                <i className="material-icons">swipe</i>
+                <span>Swipe 3D circular carousel · Tap card to inspect project</span>
+              </div>
+            </div>
+          )}
+        </>
       )}
 
       {/* Grid View Mode: Complete 6-card grid with exact portfolio layout */}

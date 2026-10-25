@@ -119,9 +119,9 @@ const measureFolder = (book, scale, labelWidth, hasLabel, tabPosition) => {
         ? (w - tabW) / 2
         : w - corners[1] - 5 * scale - shoulder - tabW;
   const docW = book ? w * 0.82 : w * 0.68;
-  const frontCut = 28 * scale;
+  const frontCut = Math.max(22, 28 * scale);
   const frontShoulder = frontCut * 0.75;
-  const frontTabStartX = w * 0.52;
+  const frontTabStartX = w * 0.50;
   const frontTabX = frontTabStartX + frontShoulder;
   const frontTabW = (w - corners[1]) - frontTabX;
 
@@ -797,6 +797,8 @@ const placeFlap = (rank, count, phase, layout, g, pointer) => {
   const rest = FLAP_REST[rank] ?? FLAP_REST[FLAP_REST.length - 1];
   const floor = g.tabH + g.h - 5 * g.scale - g.docH / 2;
   const mid = (count - 1) / 2;
+  const isMobile = typeof window !== 'undefined' ? window.innerWidth < 768 : g.scale < 1.0;
+
   if (phase === 'open') {
     const lift = g.tabH - g.h * 0.02;
     if (layout === 'stack') {
@@ -811,6 +813,25 @@ const placeFlap = (rank, count, phase, layout, g, pointer) => {
         s: fit
       };
     }
+
+    if (isMobile) {
+      // Mobile vertical cascading stack:
+      // Cards overlap from bottom to top so that each card's header & title remain clearly visible
+      const stepY = Math.min(46, Math.max(38, 42 * g.scale));
+      const startY = g.tabH + g.h * 0.08;
+      const y = startY + rank * stepY;
+      const x = g.w / 2;
+      const z = rank * 6 * g.scale;
+      return {
+        x,
+        y,
+        z,
+        r: 0,
+        ry: 0,
+        s: 0.98
+      };
+    }
+
     const gap = 14 * g.scale;
     const fit = Math.min(0.96, (g.w * 2.8 - gap * (count - 1)) / (count * g.docW));
     const step = g.docW * fit + gap;
@@ -824,12 +845,19 @@ const placeFlap = (rank, count, phase, layout, g, pointer) => {
       s: fit
     };
   }
+
+  // Closed / Peek / Receive states
+  // On mobile screens, scale down resting spread and rotation so cards stay tucked inside folder
+  const spreadScale = isMobile ? 0.42 : 1.0;
+  const rotScale = isMobile ? 0.42 : 1.0;
+  const rx = rest.x * spreadScale;
+  const rr = rest.r * rotScale;
   const part = phase === 'receive' ? 1.7 : phase === 'peek' ? 1.3 : 1;
-  const x = g.w / 2 + rest.x * g.w * part;
-  if (phase === 'rest') return { x, y: floor - rest.rise * g.h, z: 0, r: rest.r, ry: 0, s: 1 };
+  const x = g.w / 2 + rx * g.w * part;
+  if (phase === 'rest') return { x, y: floor - rest.rise * g.h, z: 0, r: rr, ry: 0, s: 1 };
   const near = phase === 'peek' && pointer != null ? Math.max(0, 1 - Math.abs(pointer - x) / (g.w * 0.32)) : 0;
   const rise = rest.rise + (phase === 'receive' ? 0.03 : 0.1);
-  return { x, y: floor - rise * g.h - near * near * g.h * 0.09, z: 0, r: rest.r * 1.6, ry: 0, s: 1 };
+  return { x, y: floor - rise * g.h - near * near * g.h * 0.09, z: 0, r: rr * 1.5, ry: 0, s: 1 };
 };
 
 const Folder = forwardRef(function Folder({
@@ -1275,8 +1303,13 @@ const Folder = forwardRef(function Folder({
       const hovering = !drag && hover >= 0 && state.items[hover] ? state.items[hover] : null;
       const lead =
         hovering && hovering.place === 'inside' && phase === 'open' ? place(hovering.rank, inside, 'open', s) : null;
-      const focusScale = 1.0;
-      const focusY = geometry.book ? geometry.tabH + geometry.h / 2 : geometry.tabH + geometry.h * 0.42;
+      const isMobileScreen = typeof window !== 'undefined' ? window.innerWidth < 768 : geometry.scale < 1.0;
+      const focusScale = isMobileScreen ? 1.18 : 1.0;
+      const focusY = geometry.book
+        ? geometry.tabH + geometry.h / 2
+        : isMobileScreen
+          ? geometry.tabH + geometry.h * 0.20
+          : geometry.tabH + geometry.h * 0.42;
 
       state.items.forEach((item, index) => {
         if (item.fresh) {
@@ -1435,7 +1468,9 @@ const Folder = forwardRef(function Folder({
       );
       const folder = multiply(desk, move(shift, 0));
       const flipped = isBook && theta < -90;
-      const frontZ = flipped ? '3' : '40';
+      const frontZ = isBook
+        ? (flipped ? '3' : '40')
+        : (isMobileScreen && state.phase === 'open' && theta < -20 ? '12' : '40');
 
       if (backRef.current) {
         backRef.current.style.transform = toCss(folder);
@@ -1502,8 +1537,8 @@ const Folder = forwardRef(function Folder({
           stretch(item.s.value, item.s.value),
           move(-docW / 2, -docH / 2)
         );
-        let layer = 10 + s.count - item.rank;
-        if (item.layer === 'inside' && state.phase === 'open' && state.hoveredItem === index) layer = 30;
+        let layer = isMobileScreen && state.phase === 'open' ? 20 + item.rank : 10 + s.count - item.rank;
+        if (item.layer === 'inside' && state.phase === 'open' && state.hoveredItem === index) layer = 35;
         if (item.layer === 'out') layer = LAYERS.out + outs.indexOf(index);
         if (item.layer === 'drag') layer = LAYERS.drag;
         if (item.layer === 'focus') layer = LAYERS.focus;
@@ -1743,6 +1778,7 @@ const Folder = forwardRef(function Folder({
 
     const onDocumentDown = event => {
       if (root.contains(event.target)) return;
+      if (event.target.closest?.('.folder-mobile-controls-wrapper, .view-toggle-pills, .folder-interactive-anchor')) return;
       const s = settingsRef.current;
       if (state.focus >= 0) {
         state.focus = -1;
@@ -1804,6 +1840,10 @@ const Folder = forwardRef(function Folder({
         const s = settingsRef.current;
         if (s.zoomOnClick) state.focus = state.focus === index ? -1 : index;
         s.onItemClick?.(s.entries[index], index);
+        wake();
+      },
+      setFocus: index => {
+        state.focus = index;
         wake();
       },
       blur: () => {
@@ -1933,6 +1973,9 @@ const Folder = forwardRef(function Folder({
   useImperativeHandle(ref, () => ({
     select: (index) => {
       engineRef.current?.select(index);
+    },
+    setFocus: (index) => {
+      engineRef.current?.setFocus(index);
     },
     toggle: () => setOpen(!isOpen),
     setOpen: (val) => setOpen(val),

@@ -215,9 +215,9 @@
   padding: 0 calc(8px * var(--folder-scale));
   overflow: hidden;
   color: #ffffff;
-  font-size: calc(11px * var(--folder-scale));
-  font-weight: 700;
-  letter-spacing: 0.08em;
+  font-size: clamp(10px, calc(11.5px * var(--folder-scale)), 13px);
+  font-weight: 800;
+  letter-spacing: 0.09em;
   text-transform: uppercase;
   line-height: 1;
   text-overflow: ellipsis;
