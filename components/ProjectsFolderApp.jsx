@@ -474,11 +474,6 @@ export default function ProjectsFolderApp() {
                 />
               </div>
 
-              <div className="stage-interaction-hint">
-                <i className="material-icons">swipe</i>
-                <span>Swipe 3D cylinder · Tap any card to view full dossier</span>
-              </div>
-
               {/* Bottom Sheet Modal for Detailed Project Dossier */}
               {inspectingProject && (
                 <div
