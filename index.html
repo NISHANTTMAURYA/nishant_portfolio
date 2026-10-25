@@ -17,8 +17,8 @@
         window.gsap || document.write('<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"><\/script>');
         window.ScrollTrigger || document.write('<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"><\/script>');
     </script>
-</head>
-<link rel="stylesheet" href="styles.css?v=88">
+<link rel="stylesheet" href="styles.css?v=91">
+<link rel="stylesheet" href="projects-folder.bundle.css?v=101">
 
 <body class="intro-loading">
     <div class="target-cursor-wrapper">
@@ -452,6 +452,7 @@
 
             <p class="section-subtitle">A curated collection of production-grade systems, utilities, and applications
                 built to solve real-world problems.</p>
+            <div id="projects-folder-root">
             <div class="projects">
 
                 <div class="timeline-item project-card cursor-target">
@@ -490,7 +491,6 @@
                     <div class="project-card-top">
                         <div class="project-badges">
                             <span class="badge badge-live">🟢 Live</span>
-                            <span class="badge badge-info">Switched from mitrai.social to online</span>
                         </div>
                         <h3><a href="https://mitrai.online/" target="_blank">Mitrai</a></h3>
                         <div class="project-links">
@@ -667,6 +667,7 @@
                     </div>
                 </div>
 
+            </div>
             </div>
         </section>
 
@@ -1350,7 +1351,8 @@
             </div>
         </div>
 
-        <script src="script.js?v=88"></script>
+        <script src="projects-folder.bundle.js?v=99" defer></script>
+        <script src="script.js?v=90"></script>
 </body>
 
 </html>

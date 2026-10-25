@@ -407,14 +407,17 @@ try {
         }
     });
 
-    document.querySelectorAll('.project-thumb-item, .project-photo-item').forEach(item => {
-        item.addEventListener('click', (e) => {
+    window.openLightbox = openLightbox;
+
+    document.addEventListener('click', (e) => {
+        const item = e.target.closest('.project-thumb-item, .project-photo-item');
+        if (item) {
             e.preventDefault();
             e.stopPropagation();
             const img = item.getAttribute('data-img');
             const title = item.getAttribute('data-title');
             openLightbox(img, title);
-        });
+        }
     });
 
     const initMasonryGallery = () => {
@@ -799,7 +802,7 @@ try {
                     const elementUnderMouse = document.elementFromPoint(mouseX, mouseY);
                     const isStillOverTarget =
                         elementUnderMouse &&
-                        (elementUnderMouse === activeTarget || elementUnderMouse.closest(targetSelector) === activeTarget);
+                        (elementUnderMouse === activeTarget || elementUnderMouse.closest(targetSelector) === activeTarget || elementUnderMouse.closest('a, button') === activeTarget);
                     if (!isStillOverTarget && currentLeaveHandler) {
                         currentLeaveHandler();
                     }
@@ -823,8 +826,10 @@ try {
             const allTargets = [];
             let current = directTarget;
             while (current && current !== document.body) {
-                if (current.matches(targetSelector)) {
-                    allTargets.push(current);
+                if (current.matches(targetSelector) || current.matches('a, button, [role="button"]')) {
+                    if (!current.classList.contains('folder-stage') && !current.classList.contains('folder-item')) {
+                        allTargets.push(current);
+                    }
                 }
                 current = current.parentElement;
             }
@@ -2300,27 +2305,27 @@ try {
         const videoTriggers = document.querySelectorAll('.video-trigger');
 
         if (videoLightbox && lightboxVideo) {
-            videoTriggers.forEach(trigger => {
-                trigger.addEventListener('click', (e) => {
+            window.openVideoLightbox = (videoSrc, videoTitle) => {
+                if (!videoLightbox || !lightboxVideo) return;
+                lightboxVideo.src = videoSrc;
+                const captionEl = document.getElementById('video-lightbox-caption');
+                if (captionEl) captionEl.textContent = videoTitle || 'Video Demo';
+                videoLightbox.classList.add('active');
+                videoLightbox.setAttribute('aria-hidden', 'false');
+                lightboxVideo.load();
+                lightboxVideo.play().catch(err => {
+                    console.log("Auto-play prevented or failed:", err);
+                });
+            };
+
+            document.addEventListener('click', (e) => {
+                const trigger = e.target.closest('.video-trigger');
+                if (trigger) {
                     e.preventDefault();
                     const videoSrc = trigger.getAttribute('data-video');
                     const videoTitle = trigger.getAttribute('data-title') || 'Video Demo';
-                    
-                    // Set video source and title
-                    lightboxVideo.src = videoSrc;
-                    const captionEl = document.getElementById('video-lightbox-caption');
-                    if (captionEl) captionEl.textContent = videoTitle;
-                    
-                    // Open lightbox
-                    videoLightbox.classList.add('active');
-                    videoLightbox.setAttribute('aria-hidden', 'false');
-                    
-                    // Load and play video (using load() ensures WebKit parses the updated src)
-                    lightboxVideo.load();
-                    lightboxVideo.play().catch(err => {
-                        console.log("Auto-play prevented or failed:", err);
-                    });
-                });
+                    window.openVideoLightbox(videoSrc, videoTitle);
+                }
             });
 
             const closeVideoLightbox = () => {

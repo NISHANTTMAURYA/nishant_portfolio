@@ -1,0 +1,33 @@
+{
+  "name": "nishant_portfolio",
+  "version": "1.0.0",
+  "description": "A premium, interactive developer portfolio built with Vanilla HTML, CSS, and JS, featuring a custom 3D technology cubes grid, real-time image masonry gallery, high-DPI canvas particles, and project iframe previews.",
+  "main": "script.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "build": "esbuild components/ProjectsFolderApp.jsx --bundle --minify --jsx=automatic '--define:process.env.NODE_ENV=\"production\"' --outfile=projects-folder.bundle.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/NISHANTTMAURYA/nishant_portfolio.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/NISHANTTMAURYA/nishant_portfolio/issues"
+  },
+  "homepage": "https://github.com/NISHANTTMAURYA/nishant_portfolio#readme",
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "esbuild": "^0.28.2",
+    "jsdom": "^29.1.1"
+  }
+}
