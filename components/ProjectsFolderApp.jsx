@@ -470,11 +470,13 @@ export default function ProjectsFolderApp() {
                 <CircularCarousel
                   items={carouselItems}
                   preset="cylinder"
-                  cardWidth={230}
+                  cardWidth={240}
                   aspectRatio={0.72}
                   gap={20}
                   tilt={-5}
-                  perspective={2400}
+                  perspective={2200}
+                  fitMode="height"
+                  zoom={0.92}
                   depthFade={0.25}
                   fadeColor="transparent"
                   innerShade={0.15}

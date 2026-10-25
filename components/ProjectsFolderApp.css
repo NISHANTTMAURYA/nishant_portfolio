@@ -14,11 +14,12 @@
 /* ---------------------------------------------
    TOOLBAR: ONLY FLOATING SWITCH BUTTONS (NO BACKGROUND CARD)
 --------------------------------------------- */
-.projects-toolbar {
+.projects-toolbar,
+.projects-stage-header {
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-bottom: 2.5rem;
+  margin-bottom: 2rem;
   padding: 0;
   background: transparent;
   border: none;
@@ -26,9 +27,11 @@
   box-shadow: none;
   position: relative;
   z-index: 10;
+  width: 100%;
 }
 
-.view-switch-group {
+.view-switch-group,
+.view-toggle-pills {
   display: inline-flex;
   align-items: center;
   gap: 0.75rem;
@@ -233,20 +236,23 @@
 
 /* Mobile Circular Dossier Carousel Wrapper */
 .mobile-circular-dossier-wrapper {
-  width: 100%;
+  width: 100vw;
+  max-width: 100vw;
+  margin-left: calc(-50vw + 50%);
+  margin-right: calc(-50vw + 50%);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   position: relative;
-  overflow: visible;
-  padding: 1rem 0 2rem 0;
+  overflow-x: clip;
+  padding: 0.5rem 0 1.5rem 0;
 }
 
 .mobile-carousel-container {
-  width: 100%;
-  height: 420px;
-  max-width: 100%;
+  width: 100vw;
+  max-width: 100vw;
+  height: 430px;
   position: relative;
   overflow: visible;
   display: flex;
@@ -257,8 +263,25 @@
 }
 
 @media (max-width: 480px) {
+  .projects-stage-header {
+    margin-bottom: 1.25rem;
+  }
+  .view-toggle-pills {
+    display: flex;
+    justify-content: center;
+    gap: 0.4rem;
+    width: 100%;
+  }
+  .view-btn {
+    padding: 0.45rem 0.8rem;
+    font-size: 0.76rem;
+    gap: 0.35rem;
+  }
+  .view-btn i {
+    font-size: 0.95rem;
+  }
   .mobile-carousel-container {
-    height: 390px;
+    height: 410px;
   }
 }
 

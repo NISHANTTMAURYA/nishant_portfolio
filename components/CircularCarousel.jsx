@@ -187,6 +187,8 @@ const CircularCarousel = ({
   spread,
   tilt,
   perspective,
+  zoom = 1,
+  fitMode = 'contain',
   autoplay = 'drift',
   speed = 14,
   interval = 3,
@@ -303,6 +305,8 @@ const CircularCarousel = ({
     perspective: layout.inward ? radius : (perspective ?? layout.perspective),
     cardW,
     cardH,
+    zoom,
+    fitMode,
     intro: reduced ? 'none' : intro in INTRO_LENGTH ? intro : 'rise',
     autoplay: reduced ? 'off' : autoplay,
     speed,
@@ -449,7 +453,8 @@ const CircularCarousel = ({
       }
       const spanX = Math.max(maxX - minX, 1);
       const spanY = Math.max(maxY - minY, 1);
-      const fit = Math.min(1, width / spanX, height / spanY);
+      const baseFit = s.fitMode === 'height' ? (height / spanY) : Math.min(1, width / spanX, height / spanY);
+      const fit = baseFit * (s.zoom || 1);
       state.fit = fit;
       state.shift = -((minY + maxY) / 2) * fit - room / 2;
       state.drop = s.axis === 'x' ? (rect.width / fit) * 0.55 + s.cardW : (rect.height / fit) * 0.55 + s.cardH;
@@ -683,7 +688,7 @@ const CircularCarousel = ({
   useLayoutEffect(() => {
     measureRef.current();
     wakeRef.current();
-  }, [radius, cardW, cardH, tiltValue, perspective, preset, captions, count]);
+  }, [radius, cardW, cardH, tiltValue, perspective, preset, captions, count, zoom, fitMode]);
 
   useEffect(() => {
     wakeRef.current();
