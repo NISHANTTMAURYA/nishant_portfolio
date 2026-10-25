@@ -72,24 +72,29 @@ try {
         };
 
         const resizeCanvas = () => {
-            const dpr = window.devicePixelRatio || 1;
-            canvas.width = window.innerWidth * dpr;
-            canvas.height = window.innerHeight * dpr;
-            ctx.scale(dpr, dpr);
+            const dpr = Math.min(window.devicePixelRatio || 1, 2);
+            const w = window.innerWidth;
+            const h = window.innerHeight;
+            canvas.width = w * dpr;
+            canvas.height = h * dpr;
+            canvas.style.width = `${w}px`;
+            canvas.style.height = `${h}px`;
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
             if (sparkCanvas) {
-                sparkCanvas.width = window.innerWidth * dpr;
-                sparkCanvas.height = window.innerHeight * dpr;
-                if (sparkCtx) sparkCtx.scale(dpr, dpr);
+                sparkCanvas.width = w * dpr;
+                sparkCanvas.height = h * dpr;
+                sparkCanvas.style.width = `${w}px`;
+                sparkCanvas.style.height = `${h}px`;
+                if (sparkCtx) sparkCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
             }
         };
 
         const drawGrid = () => {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-            const dpr = window.devicePixelRatio || 1;
-            const logicalWidth = canvas.width / dpr;
-            const logicalHeight = canvas.height / dpr;
+            const dpr = Math.min(window.devicePixelRatio || 1, 2);
+            const logicalWidth = window.innerWidth;
+            const logicalHeight = window.innerHeight;
+            ctx.clearRect(0, 0, logicalWidth, logicalHeight);
 
             const cols = Math.ceil(logicalWidth / gridSpacing) + 1;
             const rows = Math.ceil(logicalHeight / gridSpacing) + 1;
@@ -1739,10 +1744,10 @@ try {
             words.forEach((word, idx) => {
                 if (isCombined || idx === index) {
                     word.classList.add('active');
-                    word.style.filter = 'blur(0px)';
+                    word.style.opacity = '1';
                 } else {
                     word.classList.remove('active');
-                    word.style.filter = 'blur(4px)';
+                    word.style.opacity = '0.75';
                 }
             });
 

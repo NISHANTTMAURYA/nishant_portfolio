@@ -108,7 +108,7 @@ const measureFolder = (book, scale, labelWidth, hasLabel, tabPosition) => {
   const tabH = 24 * scale;
   const r = 14 * scale;
   const shoulder = tabH * 0.75;
-  const frontTop = book ? tabH : tabH + h * 0.32;
+  const frontTop = book ? tabH : tabH + h * 0.28;
   const corners = book ? [0, r, r, 0] : [r, r, r, r];
   const maxTab = w - corners[0] - corners[1] - shoulder * 2 - 10 * scale;
   const tabW = clamp(hasLabel ? labelWidth + 28 * scale + shoulder : w * 0.36, Math.min(w * 0.32, maxTab), maxTab);
@@ -119,6 +119,12 @@ const measureFolder = (book, scale, labelWidth, hasLabel, tabPosition) => {
         ? (w - tabW) / 2
         : w - corners[1] - 5 * scale - shoulder - tabW;
   const docW = book ? w * 0.82 : w * 0.68;
+  const frontCut = 28 * scale;
+  const frontShoulder = frontCut * 0.75;
+  const frontTabStartX = w * 0.52;
+  const frontTabX = frontTabStartX + frontShoulder;
+  const frontTabW = (w - corners[1]) - frontTabX;
+
   return {
     book,
     scale,
@@ -130,18 +136,44 @@ const measureFolder = (book, scale, labelWidth, hasLabel, tabPosition) => {
     corners,
     tabW,
     tabX,
+    backTabW: w * 0.40,
     frontTop,
     frontH: tabH + h - frontTop,
+    frontCut,
+    frontShoulder,
+    frontTabStartX,
+    frontTabX,
+    frontTabW,
     docW,
     docH: docW * (book ? 1.34 : 1.34)
   };
 };
 
-const backPath = g => {
-  const { w, h, tabX, tabW, tabH, shoulder } = g;
+const backPath = (g, tabPosition = 'right') => {
+  const { w, h, tabH, shoulder } = g;
   const [tl, tr, br, bl] = g.corners;
   const top = tabH;
   const bottom = tabH + h;
+
+  if (tabPosition === 'right') {
+    // Back tab on the left (matching inspiration image)
+    const backTabW = g.backTabW || w * 0.40;
+    return [
+      `M 0 ${tl}`,
+      `Q 0 0 ${tl} 0`,
+      `L ${backTabW - shoulder} 0`,
+      `C ${backTabW} 0 ${backTabW} ${top} ${backTabW + shoulder} ${top}`,
+      `L ${w - tr} ${top}`,
+      `Q ${w} ${top} ${w} ${top + tr}`,
+      `L ${w} ${bottom - br}`,
+      `Q ${w} ${bottom} ${w - br} ${bottom}`,
+      `L ${bl} ${bottom}`,
+      `Q 0 ${bottom} 0 ${bottom - bl}`,
+      'Z'
+    ].join(' ');
+  }
+
+  const { tabX, tabW } = g;
   return [
     `M 0 ${top + tl}`,
     `Q 0 ${top} ${tl} ${top}`,
@@ -155,6 +187,46 @@ const backPath = g => {
     `Q ${w} ${bottom} ${w - br} ${bottom}`,
     `L ${bl} ${bottom}`,
     `Q 0 ${bottom} 0 ${bottom - bl}`,
+    'Z'
+  ].join(' ');
+};
+
+const frontPath = (g, tabPosition = 'right') => {
+  const { w, frontH, scale } = g;
+  const [tl, tr, br, bl] = g.corners;
+  const frontCut = g.frontCut || 28 * scale;
+  const frontShoulder = g.frontShoulder || frontCut * 0.75;
+
+  if (tabPosition === 'left') {
+    const tabEnd = g.w * 0.42;
+    return [
+      `M 0 ${tl}`,
+      `Q 0 0 ${tl} 0`,
+      `L ${tabEnd - frontShoulder} 0`,
+      `C ${tabEnd} 0 ${tabEnd} ${frontCut} ${tabEnd + frontShoulder} ${frontCut}`,
+      `L ${w - tr} ${frontCut}`,
+      `Q ${w} ${frontCut} ${w} ${frontCut + tr}`,
+      `L ${w} ${frontH - br}`,
+      `Q ${w} ${frontH} ${w - br} ${frontH}`,
+      `L ${bl} ${frontH}`,
+      `Q 0 ${frontH} 0 ${frontH - bl}`,
+      'Z'
+    ].join(' ');
+  }
+
+  // Right tab on front flap (exact match for inspiration image)
+  const tabStartX = g.frontTabStartX || w * 0.52;
+  return [
+    `M 0 ${frontCut + tl}`,
+    `Q 0 ${frontCut} ${tl} ${frontCut}`,
+    `L ${tabStartX - frontShoulder} ${frontCut}`,
+    `C ${tabStartX} ${frontCut} ${tabStartX} 0 ${tabStartX + frontShoulder} 0`,
+    `L ${w - tr} 0`,
+    `Q ${w} 0 ${w} ${tr}`,
+    `L ${w} ${frontH - br}`,
+    `Q ${w} ${frontH} ${w - br} ${frontH}`,
+    `L ${bl} ${frontH}`,
+    `Q 0 ${frontH} 0 ${frontH - bl}`,
     'Z'
   ].join(' ');
 };
@@ -1120,12 +1192,12 @@ const Folder = forwardRef(function Folder({
 
       const intro = state.intro;
       if (!state.ready) intro.opening = s.open;
-      if (intro.phase === 'run' && !intro.opening && (s.open || state.drag?.active)) intro.phase = 'done';
+      if (intro.phase === 'run' && state.drag?.active) intro.phase = 'done';
       const introTime = intro.phase === 'run' ? time - intro.start : 0;
-      const staged = intro.phase !== 'done' && !intro.opening;
-      const closeAt = (0.16 + inside * 0.085 + 0.3) / s.speed;
+      const staged = intro.phase !== 'done';
+      const closeAt = (0.12 + inside * 0.08 + 0.22) / s.speed;
       const holding = staged && introTime < closeAt;
-      const dropAt = rank => (0.16 + (inside - 1 - rank) * 0.085) / s.speed;
+      const dropAt = rank => (0.12 + (inside - 1 - rank) * 0.08) / s.speed;
       const introPose = (item, slot) =>
         geometry.book
           ? { ...slot, r: slot.r + (item.rank % 2 ? 7 : -6), s: slot.s * 1.12 }
@@ -1136,7 +1208,7 @@ const Folder = forwardRef(function Folder({
             };
       if (intro.phase === 'run') {
         busy = true;
-        if (introTime > (intro.opening ? 1.4 : closeAt + 1) / s.speed) intro.phase = 'done';
+        if (introTime > (closeAt + 0.9) / s.speed) intro.phase = 'done';
       }
       const appear = intro.phase === 'wait' ? 0 : intro.phase === 'run' ? clamp(introTime / (0.34 / s.speed), 0, 1) : 1;
       state.appear = 1 - (1 - appear) ** 3;
@@ -1152,15 +1224,14 @@ const Folder = forwardRef(function Folder({
 
       if (!state.ready) {
         state.ready = true;
-        const opening = intro.phase !== 'done' && intro.opening;
-        if (opening) {
+        if (staged) {
           state.phase = 'rest';
           state.previous = 'rest';
         }
-        snap(state.front, opening ? 0 : frontTarget);
+        snap(state.front, staged ? 0 : frontTarget);
         snap(state.anchor, staged ? 1 : 0);
         state.items.forEach(item => {
-          const slot = place(item.rank, inside, opening ? 'rest' : phase, s);
+          const slot = place(item.rank, inside, 'rest', s);
           const target = staged ? introPose(item, slot) : slot;
           snap(item.x, target.x);
           snap(item.y, target.y);
@@ -1710,10 +1781,11 @@ const Folder = forwardRef(function Folder({
         observer = new IntersectionObserver(
           entries => {
             if (!entries.some(entry => entry.isIntersecting)) return;
+            if (typeof document !== 'undefined' && document.body.classList.contains('intro-loading')) return;
             observer?.disconnect();
             beginIntro();
           },
-          { threshold: 0.2 }
+          { threshold: 0.05 }
         );
         observer.observe(root);
       }
@@ -1849,10 +1921,14 @@ const Folder = forwardRef(function Folder({
     '--folder-frost': `${(1.5 + clamp(frost, 0, 1) * 10) * scale}px`,
     '--folder-depth': `${settingsRef.current.depth}px`,
     '--folder-scale': scale,
+    '--folder-front-cut': `${g.frontCut}px`,
+    '--folder-front-tab-x': `${g.frontTabX}px`,
+    '--folder-front-tab-w': `${g.frontTabW}px`,
     ...style
   };
 
-  const shape = backPath(g);
+  const shape = backPath(g, tabPosition);
+  const frontShape = frontPath(g, tabPosition);
 
   useImperativeHandle(ref, () => ({
     select: (index) => {
@@ -1902,7 +1978,7 @@ const Folder = forwardRef(function Folder({
           <svg className="folder-back-rim" width={g.w} height={total} viewBox={`0 0 ${g.w} ${total}`}>
             <path className="folder-focus" d={shape} />
           </svg>
-          {label && (
+          {book && label && (
             <span className="folder-tab-text" style={{ left: g.tabX, width: g.tabW }}>
               {label}
             </span>
@@ -1937,9 +2013,36 @@ const Folder = forwardRef(function Folder({
         {book && <span ref={shadeRef} className="folder-layer folder-shade" aria-hidden="true" />}
 
         <div ref={frontRef} className="folder-layer folder-front" data-face="outer" aria-hidden="true">
-          <div className="folder-face folder-face-outer" />
+          <div
+            className="folder-face folder-face-outer"
+            style={{
+              clipPath: `path('${frontShape}')`,
+              WebkitClipPath: `path('${frontShape}')`
+            }}
+          />
+          <svg className="folder-front-rim" width={g.w} height={g.frontH} viewBox={`0 0 ${g.w} ${g.frontH}`}>
+            <path className="folder-front-outline" d={frontShape} />
+          </svg>
+          {label && (
+            <span
+              className="folder-front-tab-text"
+              style={{
+                left: g.frontTabX,
+                width: g.frontTabW,
+                height: g.frontCut
+              }}
+            >
+              {label}
+            </span>
+          )}
           {book && (
-            <div className="folder-face folder-face-inner">
+            <div
+              className="folder-face folder-face-inner"
+              style={{
+                clipPath: `path('${frontShape}')`,
+                WebkitClipPath: `path('${frontShape}')`
+              }}
+            >
               <span className="folder-inner-gutter" />
             </div>
           )}

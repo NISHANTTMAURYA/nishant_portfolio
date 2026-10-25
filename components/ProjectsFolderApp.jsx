@@ -9,11 +9,83 @@ export default function ProjectsFolderApp() {
   const [activeIndex, setActiveIndex] = useState(0);
   const [folderMode, setFolderMode] = useState('flap'); // 'flap' | 'book'
   const [folderVariant, setFolderVariant] = useState('solid'); // 'solid' | 'glass'
-  const [isFolderOpen, setIsFolderOpen] = useState(true);
+  const [isFolderOpen, setIsFolderOpen] = useState(false);
+  const [hasScrolledNear, setHasScrolledNear] = useState(false);
   const [screenWidth, setScreenWidth] = useState(
     typeof window !== 'undefined' ? window.innerWidth : 1200
   );
   const folderRef = useRef(null);
+
+  // Monitor scroll to trigger folder entrance animation when scrolling near the projects section
+  useEffect(() => {
+    if (hasScrolledNear) return;
+
+    let observer = null;
+    let pollInterval = null;
+
+    const checkPosition = () => {
+      const target = document.getElementById('projects') || document.getElementById('projects-folder-root');
+      if (!target) {
+        setHasScrolledNear(true);
+        return true;
+      }
+      const rect = target.getBoundingClientRect();
+      // Trigger when the projects section is nicely in view (top is within 75% of viewport height)
+      if (rect.top <= window.innerHeight * 0.75 && rect.bottom > 0) {
+        setHasScrolledNear(true);
+        return true;
+      }
+      return false;
+    };
+
+    const setupObserver = () => {
+      const target = document.getElementById('projects') || document.getElementById('projects-folder-root');
+      if (!target) {
+        setHasScrolledNear(true);
+        return;
+      }
+
+      if (checkPosition()) return;
+
+      observer = new IntersectionObserver(
+        (entries) => {
+          if (entries.some((entry) => entry.isIntersecting)) {
+            observer?.disconnect();
+            window.removeEventListener('scroll', onScroll);
+            setHasScrolledNear(true);
+          }
+        },
+        { rootMargin: '0px 0px -20% 0px', threshold: 0.05 }
+      );
+
+      observer.observe(target);
+      window.addEventListener('scroll', onScroll, { passive: true });
+    };
+
+    const onScroll = () => {
+      if (checkPosition()) {
+        observer?.disconnect();
+        window.removeEventListener('scroll', onScroll);
+      }
+    };
+
+    if (typeof document !== 'undefined' && document.body.classList.contains('intro-loading')) {
+      pollInterval = setInterval(() => {
+        if (!document.body.classList.contains('intro-loading')) {
+          clearInterval(pollInterval);
+          setTimeout(setupObserver, 150);
+        }
+      }, 80);
+    } else {
+      setupObserver();
+    }
+
+    return () => {
+      if (pollInterval) clearInterval(pollInterval);
+      if (observer) observer.disconnect();
+      window.removeEventListener('scroll', onScroll);
+    };
+  }, [hasScrolledNear]);
 
   // Monitor screen width for responsive folder scaling
   useEffect(() => {
@@ -209,35 +281,40 @@ export default function ProjectsFolderApp() {
         <div className="magnified-dossier-wrapper">
           {/* Full-Width 3D Folder Stage */}
           <div className="magnified-folder-stage">
-            <div className="folder-interactive-anchor">
-              <Folder
-                ref={folderRef}
-                label="PROJECTS"
-                items={folderItems}
-                mode={folderMode}
-                variant={folderVariant}
-                color="#705cf6"
-                paperColor="#FCF9F3"
-                tabPosition="right"
-                layout="spread"
-                size={folderScale}
-                open={isFolderOpen}
-                onOpenChange={setIsFolderOpen}
-                onItemClick={(item, index) => {
-                  setActiveIndex(index);
-                }}
-                draggable={true}
-                zoomOnClick={true}
-                peek={true}
-                tilt={0.65}
-                bounce={0.4}
-                frost={0.3}
-              />
+            <div
+              className="folder-interactive-anchor"
+              style={{ minHeight: `${folderScale * 350}px` }}
+            >
+              {hasScrolledNear && (
+                <Folder
+                  ref={folderRef}
+                  label="PROJECTS"
+                  items={folderItems}
+                  mode={folderMode}
+                  variant={folderVariant}
+                  color="#705cf6"
+                  paperColor="#FCF9F3"
+                  tabPosition="right"
+                  layout="spread"
+                  size={folderScale}
+                  open={isFolderOpen}
+                  onOpenChange={setIsFolderOpen}
+                  onItemClick={(item, index) => {
+                    setActiveIndex(index);
+                  }}
+                  draggable={true}
+                  zoomOnClick={true}
+                  peek={true}
+                  tilt={0.65}
+                  bounce={0.4}
+                  frost={0.3}
+                />
+              )}
             </div>
 
             <div className="stage-interaction-hint">
               <i className="material-icons">touch_app</i>
-              <span>Click any card to magnify in 3D & view full dossier · Drag cards freely onto desk</span>
+              <span>{isFolderOpen ? 'Click any card to magnify in 3D · Drag cards freely onto desk' : 'Click folder to open & explore projects · Drag cards freely onto desk'}</span>
             </div>
           </div>
         </div>
