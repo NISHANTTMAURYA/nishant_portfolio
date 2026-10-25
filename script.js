@@ -1692,19 +1692,24 @@ try {
         // Listen to window resizing to update scale proportions dynamically
         window.addEventListener('resize', updateIframeScale);
 
-        // Lazy initialize first iframe once Vibe Labs section is visible
-        const lazyObserver = new IntersectionObserver(entries => {
-            if (entries[0].isIntersecting && !firstLoadTriggered) {
-                firstLoadTriggered = true;
-                const activeTab = section.querySelector('.vibe-tab.active') || tabs[0];
-                if (activeTab) {
-                    switchProject(activeTab);
+        // ALWAYS PRELOAD: Immediately initialize & preload the active/first project iframe in the background
+        const activeTab = section.querySelector('.vibe-tab.active') || tabs[0];
+        if (activeTab) {
+            firstLoadTriggered = true;
+            switchProject(activeTab);
+            setTimeout(updateIframeScale, 150);
+            setTimeout(updateIframeScale, 800);
+        }
+
+        // Recalculate iframe scale once the intro preloader unlocks
+        if (document.body.classList.contains('intro-loading')) {
+            const checkPreload = setInterval(() => {
+                if (!document.body.classList.contains('intro-loading')) {
+                    clearInterval(checkPreload);
                     setTimeout(updateIframeScale, 100);
                 }
-                lazyObserver.disconnect();
-            }
-        }, { threshold: 0.1 });
-        lazyObserver.observe(section);
+            }, 80);
+        }
     };
 
     // Reusable Name Glitch & Focus Combo Controller
