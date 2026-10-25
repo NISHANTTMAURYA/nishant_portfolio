@@ -178,7 +178,7 @@
 }
 
 .circular-carousel__inner {
-  background: #000000;
+  background: rgba(30, 25, 45, 0.12);
   opacity: var(--cc-inner);
 }
 

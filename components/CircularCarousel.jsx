@@ -78,7 +78,7 @@ const PRESETS = {
     spread: 1,
     inward: false,
     billboard: false,
-    backfaces: false,
+    backfaces: true,
     window: 0
   },
   orbit: {

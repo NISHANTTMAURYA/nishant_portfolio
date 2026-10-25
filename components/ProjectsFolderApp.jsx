@@ -477,8 +477,8 @@ export default function ProjectsFolderApp() {
                   perspective={2400}
                   depthFade={0.25}
                   fadeColor="transparent"
-                  innerShade={0}
-                  backfaces={false}
+                  innerShade={0.15}
+                  backfaces={true}
                   cornerRadius={14}
                   captions={false}
                   autoplay="off"
