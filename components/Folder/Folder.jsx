@@ -1538,7 +1538,10 @@ const Folder = forwardRef(function Folder({
           stretch(item.s.value, item.s.value),
           move(-docW / 2, -docH / 2)
         );
-        let layer = isMobileScreen && state.phase === 'open' ? 20 + item.rank : 10 + s.count - item.rank;
+        const midRank = (s.count - 1) / 2;
+        const distFromCenter = Math.abs(item.rank - midRank);
+        const centerOutLayer = Math.round(18 - distFromCenter * 2 + (item.rank <= midRank ? 1 : 0));
+        let layer = isMobileScreen && state.phase === 'open' ? 20 + item.rank : centerOutLayer;
         if (item.layer === 'inside' && state.phase === 'open' && state.hoveredItem === index) layer = 35;
         if (item.layer === 'out') layer = LAYERS.out + outs.indexOf(index);
         if (item.layer === 'drag') layer = LAYERS.drag;

@@ -346,12 +346,18 @@ export default function ProjectsFolderApp() {
     );
   };
 
-  // Desktop folder cards
+  // Desktop 3D Folder cards arranged in center-out focal hierarchy: [5, 3, 1, 2, 4, 6]
+  // Focal center has #01 & #02, flanked symmetrically by #03 & #04, and outer wings #05 & #06
+  const desktopProjects = useMemo(() => {
+    const DESKTOP_PROJECT_INDICES = [4, 2, 0, 1, 3, 5];
+    return DESKTOP_PROJECT_INDICES.map(i => PROJECTS_DATA[i]);
+  }, []);
+
   const folderItems = useMemo(() => {
-    return PROJECTS_DATA.map((proj, idx) => ({
+    return desktopProjects.map((proj, idx) => ({
       content: renderCardJSX(proj, idx === activeIndex, false)
     }));
-  }, [activeIndex]);
+  }, [activeIndex, desktopProjects]);
 
   // Phone Circular Carousel items with rich 3D cards (memoized statically)
   const carouselItems = useMemo(() => {
