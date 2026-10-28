@@ -3264,6 +3264,69 @@ try {
         });
     }
 
+    /* -----------------------------------------------
+       MICROSOFT CLARITY TRACKING — anonymous only.
+       Section views fire once per section after it is
+       at least half visible for 1 second. No email,
+       name or form value is ever sent to Clarity.
+    ----------------------------------------------- */
+    function initClarityTracking() {
+        try {
+            if (typeof window.clarity !== 'function') return;
+
+            function track(name) {
+                try { window.clarity('event', name); } catch (e) {}
+            }
+
+            var seen = {};
+            var sections = ['about', 'experience', 'projects', 'vibe-labs', 'gallery', 'skills', 'achievements', 'education', 'resume', 'contact'];
+
+            if ('IntersectionObserver' in window) {
+                var timers = {};
+                var observer = new IntersectionObserver(function(entries) {
+                    entries.forEach(function(entry) {
+                        var id = entry.target.id;
+                        if (entry.isIntersecting && entry.intersectionRatio >= 0.5) {
+                            if (!timers[id]) {
+                                timers[id] = setTimeout(function() {
+                                    timers[id] = null;
+                                    if (!seen[id]) {
+                                        seen[id] = true;
+                                        track('section_view_' + id.replace(/-/g, '_'));
+                                    }
+                                }, 1000);
+                            }
+                        } else if (timers[id]) {
+                            clearTimeout(timers[id]);
+                            timers[id] = null;
+                        }
+                    });
+                }, { threshold: 0.5 });
+                sections.forEach(function(id) {
+                    var el = document.getElementById(id);
+                    if (el) observer.observe(el);
+                });
+            }
+
+            document.querySelectorAll('a[href*="nishant_resume.pdf"]').forEach(function(a) {
+                a.addEventListener('click', function() { track('resume_download'); });
+            });
+            document.querySelectorAll('a[href^="mailto:"]').forEach(function(a) {
+                a.addEventListener('click', function() { track('email_click'); });
+            });
+
+            var form = document.getElementById('subscribe-form');
+            if (form) {
+                form.addEventListener('submit', function() {
+                    var input = form.querySelector('.memail');
+                    if (input && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(input.value.trim())) {
+                        track('subscribe_submit');
+                    }
+                });
+            }
+        } catch (e) {}
+    }
+
     initIntroLoader();
     initVibeLabs();
     initCardEffects();
@@ -3273,6 +3336,7 @@ try {
     initCountUp();
     initJourneyTimeline();
     initSectionTitleSeparators();
+    initClarityTracking();
 
 } catch (err) {
     console.error('Portfolio script error:', err);
