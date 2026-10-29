@@ -36,3 +36,25 @@ If you are an AI assistant editing this project, you **must** read and follow th
 
 ### 5. High-DPI Canvas Scaling
 * Scale canvases by `devicePixelRatio` and draw grid lines using CSS logical units (`canvas.width / dpr`) to prevent grid blur or double-scaling on Retina screens.
+
+---
+
+## 📊 Analytics (Microsoft Clarity) & UTM Sharing Links
+
+Microsoft Clarity (free) is installed: the tracking snippet is in the `<head>` of `index.html`, and `initClarityTracking()` in `script.js` fires anonymous section-view events for all 10 sections plus resume-download, email-click and subscribe-submit events. No visitor is identified by name/email, and the footer email input is masked (`data-clarity-mask`). View sessions, recordings and heatmaps in the Clarity dashboard for the `portfolio` project.
+
+UTM tags are **not** automatic — add them to the link when sharing, so Clarity can filter sessions by where a visitor came from. Keep everything lowercase, no spaces, and keep `campaign=portfolio` the same everywhere. Format:
+
+```
+https://nishantmaurya.me/?utm_source=SOURCE&utm_medium=MEDIUM&utm_campaign=portfolio
+```
+
+Ready-to-share links:
+
+* LinkedIn post: `https://nishantmaurya.me/?utm_source=linkedin&utm_medium=social&utm_campaign=portfolio&utm_content=post`
+* LinkedIn bio: `https://nishantmaurya.me/?utm_source=linkedin&utm_medium=social&utm_campaign=portfolio&utm_content=bio`
+* Instagram bio: `https://nishantmaurya.me/?utm_source=instagram&utm_medium=social&utm_campaign=portfolio&utm_content=bio`
+* GitHub profile: `https://nishantmaurya.me/?utm_source=github&utm_medium=profile&utm_campaign=portfolio`
+* Resume: `https://nishantmaurya.me/?utm_source=resume&utm_medium=pdf&utm_campaign=portfolio`
+* WhatsApp: `https://nishantmaurya.me/?utm_source=whatsapp&utm_medium=social&utm_campaign=portfolio`
+* Email signature: `https://nishantmaurya.me/?utm_source=email&utm_medium=email&utm_campaign=portfolio`
