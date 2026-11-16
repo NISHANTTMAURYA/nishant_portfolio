@@ -268,12 +268,12 @@ h1 {
     justify-self: center;
 }
 
-.story-visual img {
+.story-illustration {
     display: block;
     width: 100%;
     height: auto;
     max-height: min(46svh, 22rem);
-    object-fit: contain;
+    overflow: visible;
 }
 
 .story-workflow {
@@ -357,7 +357,7 @@ h1 {
 }
 
 @media (prefers-reduced-motion: no-preference) {
-    .is-scroll-story .story-scene:not(.is-playing) :is(.story-line > span, .story-copy p, .story-copy a, .story-visual img, .story-workflow li) {
+    .is-scroll-story .story-scene:not(.is-playing) :is(.story-line > span, .story-copy p, .story-copy a, .story-illustration, .story-workflow li) {
         opacity: 0;
     }
 
@@ -368,13 +368,38 @@ h1 {
     .is-playing .story-line + .story-line > span { animation-delay: 145ms; }
     .is-playing .story-line mark { animation: mark-story-phrase 520ms 380ms ease-out both; }
     .is-playing .story-copy p { animation: lift-story-detail 440ms 400ms ease-out both; }
-    .is-playing .story-visual img { animation: reveal-story-art 680ms 260ms cubic-bezier(.2, .78, .25, 1) both; }
-    .is-playing .story-workflow li { animation: reveal-story-step 340ms 710ms ease-out both; }
-    .is-playing .story-workflow li:nth-child(2) { animation-delay: 890ms; }
-    .is-playing .story-workflow li:nth-child(3) { animation-delay: 1070ms; }
+    .is-playing .story-illustration { animation: reveal-story-art 680ms 260ms cubic-bezier(.2, .78, .25, 1) both; }
+    .art-first, .story-workflow li { --art-delay: 710ms; }
+    .art-second, .story-workflow li:nth-child(2) { --art-delay: 890ms; }
+    .art-third, .story-workflow li:nth-child(3) { --art-delay: 1070ms; }
+
+    .is-playing .story-workflow li { animation: reveal-story-step 340ms var(--art-delay) ease-out both; }
+
+    .is-playing .art-nod, .is-playing .art-pop {
+        transform-box: fill-box;
+        transform-origin: center;
+    }
+
+    .is-playing .art-nod {
+        transform-origin: center bottom;
+        animation: story-character-nod 520ms var(--art-delay) ease-in-out both;
+    }
+
+    .is-playing .art-pop {
+        animation: story-object-pop 370ms var(--art-delay) cubic-bezier(.2, .72, .28, 1.28) both;
+    }
+
+    .is-playing .art-draw {
+        stroke-dasharray: 1 1;
+        animation: story-stroke-draw 400ms var(--art-delay) ease-out both;
+    }
+
+    .is-playing .art-progress-line { animation-duration: 510ms; }
+    .is-playing .art-assign { animation: story-enquiry-move 440ms 730ms ease-in-out both; }
+
     .is-playing .story-copy a { display: inline-block; animation: lift-story-detail 330ms 1140ms ease-out both; }
 
-    .is-scroll-story .story-scene:focus-within :is(.story-line > span, .story-copy p, .story-copy a, .story-visual img, .story-workflow li, mark) {
+    .is-scroll-story .story-scene:focus-within :is(.story-line > span, .story-copy p, .story-copy a, .story-illustration, .story-workflow li, mark) {
         animation: none;
         opacity: 1;
     }
@@ -399,6 +424,27 @@ h1 {
         to { opacity: 1; transform: translateY(0) scale(1); }
     }
 
+    @keyframes story-character-nod {
+        0%, 100% { rotate: 0deg; }
+        40% { rotate: 8deg; }
+    }
+
+    @keyframes story-object-pop {
+        from { opacity: 0; transform: translateY(9px) scale(.8); }
+        to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    @keyframes story-stroke-draw {
+        from { stroke-dashoffset: 1; }
+        to { stroke-dashoffset: 0; }
+    }
+
+    @keyframes story-enquiry-move {
+        0% { opacity: 0; transform: translateX(-66px); }
+        30% { opacity: 1; transform: translateX(-66px); }
+        100% { opacity: 1; transform: translateX(0); }
+    }
+
     @keyframes reveal-story-step {
         from { opacity: 0; transform: translateX(-.5rem); }
         to { opacity: 1; transform: translateX(0); }
@@ -417,13 +463,13 @@ h1 {
     }
 
     .story-copy h3 { font-size: clamp(1.7rem, 7.3vw, 2.75rem); }
-    .story-visual img { width: min(100%, 20rem); max-height: 25svh; margin-inline: auto; }
+    .story-illustration { width: min(100%, 20rem); max-height: 25svh; margin-inline: auto; }
     .story-workflow, .story-workflow li { column-gap: .45rem; }
 }
 
 @media (max-width: 620px) and (max-height: 600px) {
     .story-copy p { font-size: .9rem; margin-block: .55rem; }
-    .story-visual img { max-height: 21svh; }
+    .story-illustration { max-height: 21svh; }
 }
 
 .service-card { scroll-margin-top: 1.5rem; }
