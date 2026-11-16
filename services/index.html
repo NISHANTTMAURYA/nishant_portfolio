@@ -8,10 +8,10 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="./services.css?v=5">
+    <link rel="stylesheet" href="./services.css?v=9">
     <link rel="stylesheet" href="./project-previews.css?v=2">
-    <script src="./services.js?v=4" defer></script>
-    <script src="./project-previews.js?v=2" defer></script>
+    <script src="./services.js?v=7" defer></script>
+    <script src="./project-previews.js?v=3" defer></script>
 </head>
 <body>
     <svg class="svg-library" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
@@ -35,94 +35,183 @@
         <a class="text-link" href="../">Back to portfolio <span aria-hidden="true">↗</span></a>
     </header>
 
-    <main class="shell">
-        <section class="hero" aria-labelledby="intro">
+    <main>
+        <section class="hero shell" aria-labelledby="intro">
             <div class="hero-copy">
                 <p class="eyebrow">Work with Nishant Maurya</p>
                 <h1 id="intro">Websites and tools for your business<span>.</span></h1>
-                <p class="hero-description">I can help you get your business online, spend less time on repetitive work, and keep track of customer enquiries in one place.</p>
+                <p class="hero-description">Get found online, cut repetitive work, and keep customer enquiries organised.</p>
                 <div class="actions">
-                    <a class="button" href="#pricing">See services &amp; pricing <span aria-hidden="true">↓</span></a>
+                    <a class="button" href="#business-needs">Find what you need <span aria-hidden="true">↓</span></a>
                     <a class="text-link" href="#start">Start a project <span aria-hidden="true">↗</span></a>
                 </div>
             </div>
             <img class="portrait" src="../images/nishant.jpg" alt="Nishant Maurya" width="1086" height="1448" fetchpriority="high">
         </section>
 
-        <section id="pricing" class="content-section" aria-labelledby="pricing-title">
+        <section id="business-needs" class="business-needs" aria-labelledby="needs-title">
+            <div class="story-pin">
+                <div class="section-heading">
+                    <h2 id="needs-title">What would make work easier?</h2>
+                    <svg class="title-rule" aria-hidden="true" viewBox="0 0 584 56"><use href="#title-rule"/></svg>
+                </div>
+                <div class="story-stage">
+                    <article class="story-scene story-catalogue">
+                        <div class="story-copy">
+                            <h3>
+                                <span class="story-line"><span>Can buyers browse</span></span>
+                                <span class="story-line"><span><mark>before they call</mark>?</span></span>
+                            </h3>
+                            <p>Imagine a buyer checking sizes and colours online, then asking for a quote on the exact product they want.</p>
+                            <a href="#business-website">See website pricing <span aria-hidden="true">↗</span></a>
+                        </div>
+                        <figure class="story-visual">
+                            <img src="./illustrations/catalogue.svg?v=2" alt="" width="440" height="280" decoding="async">
+                            <figcaption>
+                                <ol class="story-workflow" role="list">
+                                    <li>Browse products</li>
+                                    <li>Check details</li>
+                                    <li>Request a quote</li>
+                                </ol>
+                            </figcaption>
+                        </figure>
+                    </article>
+                    <article class="story-scene story-automation">
+                        <div class="story-copy">
+                            <h3>
+                                <span class="story-line"><span>Still chasing</span></span>
+                                <span class="story-line"><span><mark>unpaid invoices</mark>?</span></span>
+                            </h3>
+                            <p>Imagine a polite payment reminder going out on the due date while your team gets on with other work.</p>
+                            <a href="#automation">See automation pricing <span aria-hidden="true">↗</span></a>
+                        </div>
+                        <figure class="story-visual">
+                            <img src="./illustrations/automation.svg?v=2" alt="" width="440" height="280" decoding="async">
+                            <figcaption>
+                                <ol class="story-workflow" role="list">
+                                    <li>Invoice due</li>
+                                    <li>Send reminder</li>
+                                    <li>Record it</li>
+                                </ol>
+                            </figcaption>
+                        </figure>
+                    </article>
+                    <article class="story-scene story-enquiries">
+                        <div class="story-copy">
+                            <h3>
+                                <span class="story-line"><span>Who’s following up</span></span>
+                                <span class="story-line"><span><mark>on that quote</mark>?</span></span>
+                            </h3>
+                            <p>Imagine every enquiry in one shared list, with a person responsible and a date to follow up.</p>
+                            <a href="#customer-tracker">See tracking tool pricing <span aria-hidden="true">↗</span></a>
+                        </div>
+                        <figure class="story-visual">
+                            <img src="./illustrations/enquiries.svg?v=2" alt="" width="440" height="280" decoding="async">
+                            <figcaption>
+                                <ol class="story-workflow" role="list">
+                                    <li>New enquiry</li>
+                                    <li>Assign it</li>
+                                    <li>Follow up</li>
+                                </ol>
+                            </figcaption>
+                        </figure>
+                    </article>
+                    <article class="story-scene story-portal">
+                        <div class="story-copy">
+                            <h3>
+                                <span class="story-line"><span>Can customers see</span></span>
+                                <span class="story-line"><span><mark>where things stand</mark>?</span></span>
+                            </h3>
+                            <p>Imagine customers uploading documents and checking their approval status without calling your team.</p>
+                            <a href="#customer-portals">See portal pricing <span aria-hidden="true">↗</span></a>
+                        </div>
+                        <figure class="story-visual">
+                            <img src="./illustrations/portal.svg?v=2" alt="" width="440" height="280" decoding="async">
+                            <figcaption>
+                                <ol class="story-workflow" role="list">
+                                    <li>Upload documents</li>
+                                    <li>Review</li>
+                                    <li>Approve</li>
+                                </ol>
+                            </figcaption>
+                        </figure>
+                    </article>
+                </div>
+                <div class="story-footer shell" hidden>
+                    <span class="story-progress" aria-hidden="true"></span>
+                    <a class="text-link" href="#pricing">Skip to pricing <span aria-hidden="true">↓</span></a>
+                </div>
+            </div>
+        </section>
+
+        <section id="pricing" class="content-section shell" aria-labelledby="pricing-title">
             <div class="section-heading">
                 <h2 id="pricing-title">Services &amp; pricing</h2>
                 <svg class="title-rule" aria-hidden="true" viewBox="0 0 584 56"><use href="#title-rule"/></svg>
                 <p>Estimated one-time project costs in Indian rupees.</p>
             </div>
             <div class="service-grid">
-                <article class="service-card featured">
+                <article class="service-card featured" id="business-website">
                     <h3>Business website</h3>
                     <p class="price">₹11,000–₹50,000</p>
-                    <p>Show what you do and give customers an easy way to reach you.</p>
+                    <p class="service-example">Let buyers compare products online and ask for a quote on WhatsApp.</p>
                     <ul>
-                        <li>From a simple one-page site to a custom site with several pages</li>
-                        <li>Page title and description for Google and link previews</li>
-                        <li>Email or WhatsApp button and help getting the site online</li>
+                        <li>One-page or multi-page site</li>
+                        <li>Google and link preview details, plus help getting online</li>
                     </ul>
                 </article>
-                <article class="service-card">
+                <article class="service-card" id="automation">
                     <h3>Automate repetitive tasks</h3>
                     <p class="price">₹18,000–₹75,000</p>
-                    <p>Take one repetitive task off your team’s to-do list.</p>
+                    <p class="service-example">Send overdue payment reminders automatically, with a record of what went out.</p>
                     <ul>
-                        <li>One task or several linked tasks, such as reminders, reports, and certificates</li>
-                        <li>Runs on a schedule or after an action like a form submission</li>
+                        <li>Run tasks on a schedule or after an event</li>
                         <li>Setup and a short guide for your team</li>
                     </ul>
                 </article>
-                <article class="service-card">
+                <article class="service-card" id="app-integrations">
                     <h3>Connect your existing apps</h3>
                     <p class="price">₹15,000–₹60,000</p>
-                    <p>Stop copying the same information from one app to another.</p>
+                    <p class="service-example">Send each new website enquiry straight to the spreadsheet your team already checks.</p>
                     <ul>
-                        <li>One or more connections between tools you already use</li>
-                        <li>For example, send website enquiries to a spreadsheet</li>
-                        <li>A record of transfers that fail</li>
+                        <li>Connect one or more of your existing tools</li>
+                        <li>See which transfers failed</li>
                     </ul>
                 </article>
-                <article class="service-card">
+                <article class="service-card" id="customer-tracker">
                     <h3>Customer &amp; enquiry tracker (CRM)</h3>
                     <p class="price">₹40,000–₹1,00,000</p>
-                    <p>See who’s interested, who needs a follow-up, and what was last discussed.</p>
+                    <p class="service-example">Give each sales enquiry an owner and a follow-up date.</p>
                     <ul>
-                        <li>A shared list of contacts and enquiries, with team assignments as needed</li>
-                        <li>Statuses such as new, contacted, and closed, plus notes and follow-up dates</li>
-                        <li>Search and filter enquiries, or download them as a spreadsheet</li>
+                        <li>Shared contacts, notes and follow-up dates</li>
+                        <li>Team assignments and spreadsheet download</li>
                     </ul>
                 </article>
-                <article class="service-card">
+                <article class="service-card" id="customer-portals">
                     <h3>Customer portals &amp; team tools</h3>
                     <p class="price">₹55,000–₹1,50,000</p>
-                    <p>Give customers or staff a private place to submit requests and check their progress.</p>
+                    <p class="service-example">Let customers submit documents and check their approval status in one place.</p>
                     <ul>
-                        <li>Sign-in with different access for customers and staff</li>
-                        <li>From a simple request form to several steps and approvals</li>
-                        <li>A screen for managing requests and help getting it online</li>
+                        <li>Private sign-in for customers and staff</li>
+                        <li>Request tracking and approvals</li>
                     </ul>
                 </article>
-                <article class="service-card">
+                <article class="service-card" id="ai-assistants">
                     <h3>AI assistants</h3>
                     <p class="price">₹30,000–₹90,000</p>
-                    <p>Let people ask questions about your business without searching through documents.</p>
+                    <p class="service-example">Let staff ask how to request leave and get an answer from your company handbook.</p>
                     <ul>
-                        <li>One job, such as answering common staff questions</li>
-                        <li>Answers based on your documents, with extra sources priced as needed</li>
-                        <li>A chat page with example questions to try</li>
+                        <li>Answers based on your documents</li>
+                        <li>A chat page with sample questions</li>
                     </ul>
                 </article>
             </div>
-            <p class="pricing-note">The final price depends on how many pages, tasks, or apps are involved and how much custom work you need. I’ll confirm the quote before work starts. Web addresses, hosting, and paid apps cost extra.</p>
+            <p class="pricing-note">I’ll confirm your quote based on the work involved. Web addresses, hosting, and paid apps cost extra.</p>
         </section>
 
-        <section class="content-section work" aria-labelledby="work-title">
+        <section class="content-section shell work" aria-labelledby="work-title">
             <div class="section-heading">
-                <h2 id="work-title">Projects</h2>
+                <h2 id="work-title">See what I’ve built</h2>
                 <svg class="title-rule" aria-hidden="true" viewBox="0 0 584 56"><use href="#title-rule"/></svg>
             </div>
             <div class="work-list">
@@ -199,7 +288,7 @@
             </div>
         </section>
 
-        <section id="start" class="content-section" aria-labelledby="start-title">
+        <section id="start" class="content-section shell" aria-labelledby="start-title">
             <div class="section-heading">
                 <h2 id="start-title">How we’ll get started</h2>
                 <svg class="title-rule" aria-hidden="true" viewBox="0 0 584 56"><use href="#title-rule"/></svg>
@@ -209,6 +298,21 @@
                 <li><h3>Review your quote</h3><p>I’ll share what’s included, how long it will take, and what it will cost before work starts.</p></li>
                 <li><h3>Try it before launch</h3><p>You’ll get a working version to review. When it’s ready to go live, I’ll show you how to use it.</p></li>
             </ol>
+            <div class="client-faq">
+                <h3>Before you reach out</h3>
+                <details>
+                    <summary>What should I send you?</summary>
+                    <p>A few lines about your business, what you want to improve, and any deadline. A link or screenshot helps if you have one.</p>
+                </details>
+                <details>
+                    <summary>Can I start with just one thing?</summary>
+                    <p>Yes. We can begin with a single page or one repetitive task and discuss additions later.</p>
+                </details>
+                <details>
+                    <summary>What if I need changes after launch?</summary>
+                    <p>Tell me if you expect regular updates so we can include them in the quote or price them separately.</p>
+                </details>
+            </div>
             <div class="contact-panel">
                 <div>
                     <h3>Have a project in mind?</h3>

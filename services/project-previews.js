@@ -6,7 +6,8 @@ function initProjectPreviews(projectPreview) {
     const previewScreen = projectPreview.querySelector('.preview-screen');
     const usePreview = projectPreview.querySelector('.preview-interact');
     const stopPreview = projectPreview.querySelector('.preview-stop');
-    const phoneLayout = window.matchMedia('(max-width: 620px)');
+    const previewWidth = 1280;
+    const previewHeight = 800;
     let previewFrame;
     const iframePool = new Map();
     frameTemplate.remove();
@@ -24,14 +25,11 @@ function initProjectPreviews(projectPreview) {
 
     function sizePreview() {
         if (!previewFrame) return;
-        const { width, height } = phoneLayout.matches
-            ? { width: 390, height: 760 }
-            : { width: 1280, height: 800 };
-        const scale = Math.min(1, previewStage.clientWidth / width);
-        previewScreen.style.width = `${width * scale}px`;
-        previewScreen.style.height = `${height * scale}px`;
-        previewFrame.style.width = `${width}px`;
-        previewFrame.style.height = `${height}px`;
+        const scale = Math.min(1, previewStage.clientWidth / previewWidth);
+        previewScreen.style.width = `${previewWidth * scale}px`;
+        previewScreen.style.height = `${previewHeight * scale}px`;
+        previewFrame.style.width = `${previewWidth}px`;
+        previewFrame.style.height = `${previewHeight}px`;
         previewFrame.style.transform = `scale(${scale})`;
     }
 
@@ -69,7 +67,6 @@ function initProjectPreviews(projectPreview) {
             updatePreview();
         });
     }
-    phoneLayout.addEventListener('change', sizePreview);
 
     usePreview.addEventListener('click', () => {
         setPreviewInteraction(true);

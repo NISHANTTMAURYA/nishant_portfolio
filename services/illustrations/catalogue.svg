@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 440 280">
+  <ellipse cx="223" cy="248" rx="190" ry="15" fill="#7452a8" opacity=".11"/>
+  <!-- Catalogue on the shop's website -->
+  <g stroke-linecap="round" stroke-linejoin="round">
+    <rect x="177" y="38" width="226" height="153" rx="15" fill="#ab87e0" opacity=".3"/>
+    <rect x="169" y="29" width="226" height="153" rx="15" fill="#faf4ff" stroke="#6c489e" stroke-width="2.5"/>
+    <path d="M170 55h224" stroke="#bfaae1" stroke-width="2"/>
+    <g fill="#9467c8">
+      <circle cx="184" cy="42" r="3"/><circle cx="195" cy="42" r="3"/><circle cx="206" cy="42" r="3"/>
+    </g>
+    <rect x="184" y="69" width="91" height="78" rx="10" fill="#e4d0ff"/>
+    <rect x="285" y="69" width="95" height="78" rx="10" fill="#fce1ba"/>
+    <path d="M206 124v12m46-12v12m-37-24V92q0-5 6-5h17q6 0 6 5v20m-31 0h33q7 0 7 7v5h-48v-5q0-7 8-7Z" fill="#b48ae7" stroke="#573183" stroke-width="3.5"/>
+    <path d="M305 134l6-29m55 29-6-29m-55 0h61m-31 0V92m-12 0h24l-6-11h-12Z" fill="#f7b869" stroke="#814627" stroke-width="3.5"/>
+    <path d="M188 161h38m63 0h43" stroke="#a587c4" stroke-width="4"/>
+  </g>
+  <!-- Buyer seated at their laptop -->
+  <g stroke="#36264b" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M63 185h74v25H71q-15 0-17-15l-9-47q-2-10 8-12 9-2 11 8Z" fill="#a783ce"/>
+    <path d="m74 210-7 36m47-36 6 34" fill="none"/>
+    <path d="M87 174q18-11 49-1l40 26-37 4-30-12H83Z" fill="#66598b"/>
+    <path d="M115 188q17 0 27 15l22 39h-17l-26-33H89q-16 0-16-16Z" fill="#736298"/>
+    <path d="M146 241h19l14 6q2 5-4 6h-29q-6-1-4-6Z" fill="#36264b"/>
+    <path d="M93 110q13-3 25 11l17 25 27-11 5 9-32 19q-6 4-12-2l-15-16 1 31H76l1-43q0-18 16-23Z" fill="#ebae71"/>
+    <path d="m85 118 8 17 16 17" fill="none" stroke="#b96b43"/>
+    <path d="M103 89l-1 22q-5 8-17 2l3-22Z" fill="#a9634b"/>
+    <path d="M89 65q15-12 26 7l1 19q-1 15-16 13L90 95Z" fill="#c38567"/>
+    <path d="M113 75q-10-1-16-9-2 15-12 21-9-6-4-19 4-12 18-11 14 0 16 13Z" fill="#382a42"/>
+    <path d="M104 86h1m0 11q5 1 7-3" fill="none" stroke-width="1.6"/>
+    <path d="m162 136 8-5 12 2q2 5-4 7l-12 5Z" fill="#c38567"/>
+    <path d="M119 163h105l-9 10h-97" fill="#a485d1"/>
+    <path d="M168 162l16-45h57l-17 45Z" fill="#dfcaf8"/>
+    <path d="M115 175h152m-132 3-10 70m112-70 13 70" fill="none" stroke-width="3.5"/>
+  </g>
+  <g stroke-linecap="round">
+    <path d="M337 177h56q10 0 10 10v23q0 10-10 10h-49l-12 11v-12q-7-2-7-9v-23q0-10 12-10Z" fill="#c2efd5" stroke="#45836a" stroke-width="2"/>
+    <path d="M340 193h47m-47 11h29" stroke="#397760" stroke-width="3.5"/>
+    <path d="M151 61v16m-8-8h16m255 49v18m-9-9h18" stroke="#be8ec8" stroke-width="2"/>
+  </g>
+</svg>

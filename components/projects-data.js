@@ -23,6 +23,7 @@ export const PROJECTS_DATA = [
         external: true
       }
     ],
+    summary: "An online assessment portal with automatic certificates.",
     desc: "Developed a production-ready candidate assessment portal for Agnel Trade Test Centre under 4iStudios, featuring secure role-based workflows, automated certificate generation, and cloud backup automation.",
     highlights: [
       "Role-based workflow (Office, Assessor, Validator).",
@@ -59,6 +60,7 @@ export const PROJECTS_DATA = [
         external: true
       }
     ],
+    summary: "An AI companion that remembers conversations and follows up.",
     desc: "Built a proactive AI companion that remembers conversations, follows up on user goals, and initiates context-aware conversations instead of waiting for prompts. Designed to create personalized AI personas with long-term memory and natural interactions.",
     highlights: [
       "Proactive AI conversations powered by Celery scheduling.",
@@ -96,6 +98,7 @@ export const PROJECTS_DATA = [
         external: true
       }
     ],
+    summary: "Turns textbooks into quizzes and games.",
     desc: "Built an AI-powered gamified learning platform that converts uploaded textbooks into personalized games, quizzes, and interactive study experiences across six multiplayer educational games.",
     highlights: [
       "AI-powered textbook ingestion and automated learning content generation.",
@@ -140,6 +143,7 @@ export const PROJECTS_DATA = [
         external: false
       }
     ],
+    summary: "Helps college mentors track student progress online.",
     desc: "Built a mentoring platform that digitized mentor-student interactions for the Computer Engineering Department at Fr. CRCE. The system replaces manual paperwork while helping mentors track student performance.",
     highlights: [
       "Selected as Finalist for YUKTI Innovation Challenge 2025–26 & awarded AICTE Productization Fellowship.",
@@ -203,6 +207,7 @@ export const PROJECTS_DATA = [
         external: true
       }
     ],
+    summary: "A strategy game with hidden cards and live multiplayer.",
     desc: "A modern, highly strategic, and AI-powered adaptation of the classic Tic-Tac-Toe game. Built as a multi-platform Flutter application backed by an administrative Python AIOHTTP/Flask server with Google Gemini-driven personalized notifications.",
     highlights: [
       "Hidden cards, sabotage, and hand-building mechanics that resolve solved-game draws.",
@@ -240,6 +245,7 @@ export const PROJECTS_DATA = [
         external: true
       }
     ],
+    summary: "A mobile app for managing shared expenses.",
     desc: "Built a full-stack expense management platform with secure authentication, group collaboration, and scalable backend APIs for managing shared expenses. Designed as a modern Flutter application backed by Django REST Framework, with a strong foundation for future expense splitting, shared wallets, and payment integration.",
     highlights: [
       "Google Sign-In with secure JWT-based authentication and automatic session management.",

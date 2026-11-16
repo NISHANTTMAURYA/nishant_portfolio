@@ -264,83 +264,29 @@ export default function ProjectsFolderApp() {
           }
         }}
       >
-        {/* Top Header Strip with Brand Accent */}
         <div className="spotlight-header-strip" style={{ background: proj.accent }}>
-          <div className="spotlight-strip-left">
-            <span className="spotlight-file-tag">FILE #{proj.index}</span>
-            <span className="spotlight-category-tag">{proj.category}</span>
-          </div>
-          <div className="spotlight-badges">
-            {proj.badges.map((b, bIdx) => (
-              <span key={bIdx} className="spotlight-status-badge">
-                {b.text}
-              </span>
-            ))}
-          </div>
+          <span className="spotlight-category-tag">{proj.category}</span>
         </div>
 
-        {/* Card Body */}
         <div className="spotlight-body">
           <h3 className="spotlight-title">{proj.title}</h3>
-          <p className="spotlight-desc">{proj.desc}</p>
-
-          {/* Key Architectural Highlights (clean, concise 3 bullets) */}
-          {proj.highlights && proj.highlights.length > 0 && (
-            <ul className="spotlight-bullets">
-              {proj.highlights.slice(0, 3).map((highlight, hIdx) => (
-                <li key={hIdx}>{highlight}</li>
-              ))}
-            </ul>
-          )}
-
-          {/* Key Tech Tags */}
-          <div className="spotlight-tech-row">
-            {proj.tech.slice(0, 3).map((tag, tIdx) => (
-              <span key={tIdx} className="spotlight-tech-pill">
-                {tag}
-              </span>
-            ))}
-            {proj.tech.length > 3 && (
-              <span className="spotlight-tech-more">+{proj.tech.length - 3}</span>
-            )}
-          </div>
+          <p className="spotlight-desc">{proj.summary}</p>
         </div>
 
-        {/* Card Footer Actions & Click Hint */}
         <div className="spotlight-footer">
-          <div className="spotlight-actions">
-            {proj.links.slice(0, 2).map((link, lIdx) => (
-              <a
-                key={lIdx}
-                href={link.href}
-                target={link.external ? '_blank' : undefined}
-                rel={link.external ? 'noopener noreferrer' : undefined}
-                className="spotlight-btn cursor-target"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  if (link.dataVideo) {
-                    e.preventDefault();
-                    window.openVideoLightbox?.(link.dataVideo, link.dataTitle || proj.title);
-                  }
-                }}
-              >
-                {link.icon && <i className="material-icons">{link.icon}</i>}
-                <span>{link.text}</span>
-              </a>
-            ))}
-          </div>
-
-          <span
+          <button
+            type="button"
             className="spotlight-click-hint cursor-target"
-            title="Click to view dossier"
+            aria-label={`View details for ${proj.title}`}
+            tabIndex={-1}
             onClick={(e) => {
               e.stopPropagation();
               setInspectingProject(proj);
             }}
           >
-            <span>click to view</span>
-            <i className="material-icons">arrow_forward</i>
-          </span>
+            View details
+            <i className="material-icons" aria-hidden="true">arrow_forward</i>
+          </button>
         </div>
       </div>
     );
