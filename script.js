@@ -673,18 +673,7 @@ try {
        TARGET CURSOR (ReactBits)
     ----------------------------------------------- */
     const initTargetCursor = () => {
-        const isMobile = () => {
-            const hasTouchScreen = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-            const isSmallScreen = window.innerWidth <= 768;
-            const mobileRegex = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i;
-            return (hasTouchScreen && isSmallScreen) || mobileRegex.test(navigator.userAgent.toLowerCase());
-        };
-
-        if (isMobile()) {
-            const cursorEl = document.querySelector('.target-cursor-wrapper');
-            if (cursorEl) cursorEl.style.display = 'none';
-            return;
-        }
+        if (!window.matchMedia('(any-hover: hover) and (any-pointer: fine)').matches || !window.gsap?.quickTo) return;
 
         // Add target class dynamically to links, buttons, cards, gallery items, cubes grid, and website preview container
         document.querySelectorAll('a, button, [role="button"], .project-card, .contact-link, .api-btn, .item-wrapper, .lightbox-close, #cubes-wrapper, .vibe-tab, .vibe-browser-body').forEach(el => {
@@ -764,7 +753,14 @@ try {
             yTo(y - cachedOffset.y);
         };
 
-        window.addEventListener('mousemove', e => moveCursor(e.clientX, e.clientY), { passive: true });
+        window.addEventListener('pointermove', e => {
+            if (e.pointerType === 'touch') return;
+            moveCursor(e.clientX, e.clientY);
+            document.body.classList.add('target-cursor-active');
+        }, { passive: true });
+        document.addEventListener('pointerout', e => {
+            if (!e.relatedTarget) document.body.classList.remove('target-cursor-active');
+        }, { passive: true });
 
         // Pre-build quickSetters for each corner so tickerFn is allocation-free
         const cornersArr = Array.from(corners);
@@ -1994,76 +1990,7 @@ try {
     const initIntroLoader = () => {
         const loaderBar     = document.getElementById('loader-bar');
         const loaderPct     = document.getElementById('loader-percentage');
-        const terminalLines = document.getElementById('terminal-lines');
         const bodyEl        = document.body;
-
-        const INSTALL_LOGS = [
-            { status: "loading",    pkg: "hackathons (8x championship wins)" },
-            { status: "verifying",  pkg: "sih-2025-winners (gold cup)" },
-            { status: "mounting",   pkg: "client consultancy @ 4istudios" },
-            { status: "linking",    pkg: "nit raipur (b.tech comp science)" },
-            { status: "deploying",  pkg: "mentorconnect @ yukti-aicte" },
-            { status: "indexing",   pkg: "atttc.cloud + mitrai.online" },
-            { status: "ready",      pkg: "production-grade-systems initialized" }
-        ];
-
-        let currentStageIdx = -1;
-        const updateTerminalStream = (stageIdx) => {
-            if (!terminalLines) return;
-            const clamped = Math.max(0, Math.min(stageIdx, INSTALL_LOGS.length - 1));
-            if (clamped === currentStageIdx) return;
-            currentStageIdx = clamped;
-
-            // Command line is ALWAYS line index 0
-            let html = `
-                <div class="t-line t-line-cmd">
-                    <span class="t-prompt">$</span><span class="t-cmd">./nishant.sh --install</span>
-                </div>
-            `;
-
-            for (let i = 0; i <= clamped; i++) {
-                const item = INSTALL_LOGS[i];
-                const isFinal = (i === INSTALL_LOGS.length - 1);
-                const isDone = (i < clamped);
-
-                if (isFinal) {
-                    html += `
-                        <div class="t-line ready">
-                            <span class="t-icon icon-ready">✨</span>
-                            <span>${item.pkg}</span>
-                        </div>
-                    `;
-                } else if (isDone) {
-                    html += `
-                        <div class="t-line done">
-                            <span class="t-icon icon-ok">✔</span>
-                            <span>${item.pkg}</span>
-                        </div>
-                    `;
-                } else {
-                    html += `
-                        <div class="t-line active">
-                            <span class="t-icon icon-spin">›</span>
-                            <span>${item.status} ${item.pkg}...</span>
-                        </div>
-                    `;
-                }
-            }
-
-            terminalLines.innerHTML = html;
-
-            // Total lines = 1 (cmd) + (clamped + 1)
-            const totalLines = 1 + (clamped + 1);
-            const maxVisible = 4;
-            if (totalLines > maxVisible) {
-                const offsetLines = totalLines - maxVisible;
-                const isMobile = window.innerWidth <= 480;
-                const lineH = isMobile ? 24 : 28;
-                terminalLines.style.transform = `translateY(-${offsetLines * lineH}px)`;
-            } else {
-                terminalLines.style.transform = 'translateY(0px)';
-            }
-        };
 
         // Run the hero name glitch + focus animation immediately
         const nameAnim    = initNameFocus('hero-name', 'name-focus-frame');
@@ -2105,7 +2032,7 @@ try {
         const TOTAL_RESOURCES = RESOURCES.length;
         let   loadedCount     = 0;
         let   allDone         = false;
-        const MIN_MS          = 2500; // Paced to cycle through all 7 achievement lines (~350ms each)
+        const MIN_MS          = 2500;
         const startTime       = performance.now();
 
         // Kick off actual image preloading in parallel
@@ -2133,8 +2060,6 @@ try {
         const reveal = () => {
             if (revealed) return;
             revealed = true;
-            // Always lock the final ready package state
-            updateTerminalStream(INSTALL_LOGS.length - 1);
 
             // Snap remaining gap to 100% with a quick GSAP tween
             const snapObj = { v: displayed };
@@ -2166,13 +2091,6 @@ try {
             const elapsed      = performance.now() - startTime;
             const timeProgress = Math.min(elapsed / MIN_MS, 1); // 0.0 -> 1.0
 
-            // Step through all 9 stages sequentially based on elapsed time so NONE are skipped
-            const stageIndex = Math.min(
-                Math.floor(timeProgress * INSTALL_LOGS.length),
-                INSTALL_LOGS.length - 1
-            );
-            updateTerminalStream(stageIndex);
-
             const resourceRatio = (loadedCount / TOTAL_RESOURCES);
             // Smooth target percentage: climbs steadily with time even on cached assets
             const target = (allDone && elapsed >= MIN_MS)
@@ -2202,13 +2120,6 @@ try {
     /* -----------------------------------------------
        CARD INTERACTION EFFECTS (MagicBento)
     ----------------------------------------------- */
-    function isMobileDevice() {
-        const hasTouchScreen = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-        const isSmallScreen = window.innerWidth <= 768;
-        const mobileRegex = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i;
-        return (hasTouchScreen && isSmallScreen) || mobileRegex.test(navigator.userAgent.toLowerCase());
-    }
-
     function initSingleCardEffect(card) {
         if (!card) return;
 
@@ -2235,8 +2146,10 @@ try {
             }
         }
 
-        const handleMouseLeave = () => {
-            if (isMobileDevice()) return;
+        const stopTracking = () => {
+            if (!spotlight.classList.contains('is-tracking')) return;
+            spotlight.classList.remove('is-tracking');
+            if (!window.gsap) return;
 
             // Reset tilt & magnetism on the interactiveTarget
             gsap.to(interactiveTarget, {
@@ -2250,16 +2163,18 @@ try {
             });
         };
 
-        const handleMouseMove = (e) => {
-            if (isMobileDevice()) return;
+        const trackPointer = (e) => {
+            if (e.pointerType === 'touch') return;
 
             const rect = interactiveTarget.getBoundingClientRect();
+            if (!rect.width || !rect.height) return;
             const x = e.clientX - rect.left;
             const y = e.clientY - rect.top;
 
-            // Update spotlight coordinates inside interactiveTarget (using CSS variables)
-            interactiveTarget.style.setProperty('--glow-x', `${(x / rect.width) * 100}%`);
-            interactiveTarget.style.setProperty('--glow-y', `${(y / rect.height) * 100}%`);
+            spotlight.style.setProperty('--glow-x', `${(x / rect.width) * 100}%`);
+            spotlight.style.setProperty('--glow-y', `${(y / rect.height) * 100}%`);
+            spotlight.classList.add('is-tracking');
+            if (!window.gsap) return;
 
             // 3D Tilt calculation
             const centerX = rect.width / 2;
@@ -2289,8 +2204,10 @@ try {
             });
         };
 
-        card.addEventListener('mouseleave', handleMouseLeave);
-        card.addEventListener('mousemove', handleMouseMove);
+        card.addEventListener('pointerenter', trackPointer, { passive: true });
+        card.addEventListener('pointermove', trackPointer, { passive: true });
+        card.addEventListener('pointerleave', stopTracking, { passive: true });
+        card.addEventListener('pointercancel', stopTracking, { passive: true });
     }
 
     function initCardEffects() {
@@ -2864,73 +2781,56 @@ try {
 
     /* ── Designed Section Title Separator ─── */
     function initSectionTitleSeparators() {
-        const SVG_TEMPLATE = `
-            <path class="section-title-branch branch-left" d="" fill="none" />
-            <path class="section-title-branch branch-right" d="" fill="none" />
-            <circle class="section-title-node node-ring-left" cx="0" cy="0" r="5" />
-            <circle class="section-title-node node-ring-right" cx="0" cy="0" r="5" />
-            <circle class="section-title-node node-dot-left" cx="0" cy="0" r="4.5" />
-            <circle class="section-title-node node-dot-right" cx="0" cy="0" r="4.5" />
-            <g class="section-title-sparkle-anchor" transform="translate(0, 0)">
-                <g class="section-title-sparkle-inner">
-                    <line class="sparkle-ray" x1="-9" y1="-9" x2="-16" y2="-16" stroke="#816cf8" stroke-width="2" stroke-linecap="round" />
-                    <line class="sparkle-ray" x1="9" y1="-9" x2="16" y2="-16" stroke="#816cf8" stroke-width="2" stroke-linecap="round" />
-                    <line class="sparkle-ray" x1="-9" y1="9" x2="-16" y2="16" stroke="#816cf8" stroke-width="2" stroke-linecap="round" />
-                    <line class="sparkle-ray" x1="9" y1="9" x2="16" y2="16" stroke="#816cf8" stroke-width="2" stroke-linecap="round" />
-                    <path class="sparkle-star" d="M 0 -15 C 2.5 -5.5, 5.5 -2.5, 15 0 C 5.5 2.5, 2.5 5.5, 0 15 C -2.5 5.5, -5.5 2.5, -15 0 C -5.5 -2.5, -2.5 -5.5, 0 -15 Z" fill="#705cf6" />
-                </g>
+        const svgTemplate = `
+            <path class="section-title-branch branch-left" />
+            <path class="section-title-branch branch-right" />
+            <circle class="section-title-node node-ring-left" r="5" />
+            <circle class="section-title-node node-ring-right" r="5" />
+            <circle class="section-title-node node-dot-left" r="4.5" />
+            <circle class="section-title-node node-dot-right" r="4.5" />
+            <g class="section-title-sparkle-anchor">
+                <path class="sparkle-ray" d="m-15-15 4.5 4.5m21 21 4.5 4.5m0-30-4.5 4.5m-21 21-4.5 4.5" />
+                <path class="sparkle-star" d="M0-15q0 15 15 15-15 0-15 15 0-15-15-15 15 0 15-15Z" />
             </g>
         `;
 
-        // Auto-wrap any unwrapped section-title in section-title-graphic-wrap if needed
-        document.querySelectorAll('.section-title').forEach((titleEl) => {
-            if (!titleEl.closest('.section-title-graphic-wrap')) {
-                const wrap = document.createElement('div');
+        const revealContentByWrap = new Map();
+        const observer = window.IntersectionObserver && !window.matchMedia('(prefers-reduced-motion: reduce)').matches
+            ? new IntersectionObserver(entries => {
+                for (const entry of entries) {
+                    if (!entry.isIntersecting) continue;
+                    const wrap = entry.target;
+                    wrap.querySelector('.section-title-svg').classList.replace('is-awaiting-reveal', 'is-revealing');
+                    revealContentByWrap.get(wrap)?.();
+                    revealContentByWrap.delete(wrap);
+                    observer.unobserve(wrap);
+                }
+            }, { threshold: 0.35 })
+            : null;
+
+        for (const title of document.querySelectorAll('.section-title')) {
+            let wrap = title.closest('.section-title-graphic-wrap');
+            if (!wrap) {
+                wrap = document.createElement('div');
                 wrap.className = 'section-title-graphic-wrap';
-                titleEl.parentNode.insertBefore(wrap, titleEl);
-                wrap.appendChild(titleEl);
-            }
-        });
-
-        const wraps = Array.from(document.querySelectorAll('.section-title-graphic-wrap'));
-        if (wraps.length === 0) return;
-
-        wraps.forEach((wrap) => {
-            let svg = wrap.querySelector('.section-title-svg');
-            if (!svg) {
-                svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-                svg.setAttribute('class', 'section-title-svg');
-                svg.setAttribute('aria-hidden', 'true');
-                svg.innerHTML = SVG_TEMPLATE;
-                wrap.insertBefore(svg, wrap.firstChild);
+                title.before(wrap);
+                wrap.append(title);
             }
 
-            const title = wrap.querySelector('.section-title');
-            const branchLeft = wrap.querySelector('.branch-left');
-            const branchRight = wrap.querySelector('.branch-right');
-            const ringLeft = wrap.querySelector('.node-ring-left');
-            const ringRight = wrap.querySelector('.node-ring-right');
-            const dotLeft = wrap.querySelector('.node-dot-left');
-            const dotRight = wrap.querySelector('.node-dot-right');
-            const sparkleAnchor = wrap.querySelector('.section-title-sparkle-anchor');
-            const sparkleInner = wrap.querySelector('.section-title-sparkle-inner');
-            const star = wrap.querySelector('.sparkle-star');
-            const rays = Array.from(wrap.querySelectorAll('.sparkle-ray'));
-            const section = wrap.closest('.section') || wrap.parentElement || wrap;
+            const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+            svg.setAttribute('class', 'section-title-svg');
+            svg.setAttribute('aria-hidden', 'true');
+            svg.innerHTML = svgTemplate;
+            wrap.prepend(svg);
 
-            // Elements below the section title wrap that should animate sequentially after the divider
-            const belowElements = Array.from(section.children).filter(el =>
-                el !== wrap &&
-                !el.classList.contains('journey-timeline') &&
-                !el.classList.contains('journey-layout-wrapper') &&
-                !el.classList.contains('section-title-svg') &&
-                !el.classList.contains('section-title')
-            );
-
-            if (!title || !svg || !branchLeft || !branchRight) return;
-
-            let isAnimated = false;
-            let animTL = null;
+            const branchLeft = svg.querySelector('.branch-left');
+            const branchRight = svg.querySelector('.branch-right');
+            const ringLeft = svg.querySelector('.node-ring-left');
+            const ringRight = svg.querySelector('.node-ring-right');
+            const dotLeft = svg.querySelector('.node-dot-left');
+            const dotRight = svg.querySelector('.node-dot-right');
+            const sparkleAnchor = svg.querySelector('.section-title-sparkle-anchor');
+            const section = wrap.closest('.section');
 
             function updateGeometry() {
                 const wrapRect = wrap.getBoundingClientRect();
@@ -2940,10 +2840,7 @@ try {
                 const centerX = wrapRect.width / 2;
                 const isMobile = wrapRect.width < 640;
 
-                // Remove any active GSAP translateY transform so geometry is always computed on the true resting position
-                const currentTitleY = (window.gsap && gsap.getProperty(title, "y")) || 0;
-                const unshiftedTitleBottom = titleRect.bottom - currentTitleY;
-                const titleBottomRel = unshiftedTitleBottom - wrapRect.top;
+                const titleBottomRel = title.offsetTop + title.offsetHeight;
 
                 // Even vertical spacing between Title, Line Divider (sparkle/dip), and Subtitle:
                 // Total space between Title bottom and Subtitle top is ~62px desktop / ~50px mobile.
@@ -2988,22 +2885,18 @@ try {
                 if (ringLeft) {
                     ringLeft.setAttribute('cx', ringLeftX.toFixed(1));
                     ringLeft.setAttribute('cy', baseLineY.toFixed(1));
-                    if (isAnimated) ringLeft.setAttribute('r', '5');
                 }
                 if (ringRight) {
                     ringRight.setAttribute('cx', ringRightX.toFixed(1));
                     ringRight.setAttribute('cy', baseLineY.toFixed(1));
-                    if (isAnimated) ringRight.setAttribute('r', '5');
                 }
                 if (dotLeft) {
                     dotLeft.setAttribute('cx', dotLeftX.toFixed(1));
                     dotLeft.setAttribute('cy', baseLineY.toFixed(1));
-                    if (isAnimated) dotLeft.setAttribute('r', '4.5');
                 }
                 if (dotRight) {
                     dotRight.setAttribute('cx', dotRightX.toFixed(1));
                     dotRight.setAttribute('cy', baseLineY.toFixed(1));
-                    if (isAnimated) dotRight.setAttribute('r', '4.5');
                 }
 
                 // Position the center sparkle anchor permanently at (centerX, dipY)
@@ -3039,229 +2932,52 @@ try {
                                `L ${dotRightX.toFixed(1)} ${baseLineY.toFixed(1)}`;
                 branchRight.setAttribute('d', dRight);
 
-                // If not yet animated, keep paths hidden ready for animation
-                if (!isAnimated && !animTL) {
-                    const lenL = branchLeft.getTotalLength();
-                    const lenR = branchRight.getTotalLength();
-                    if (lenL > 0) {
-                        branchLeft.style.strokeDasharray = `${lenL} ${lenL}`;
-                        branchLeft.style.strokeDashoffset = `${lenL}`;
-                    }
-                    if (lenR > 0) {
-                        branchRight.style.strokeDasharray = `${lenR} ${lenR}`;
-                        branchRight.style.strokeDashoffset = `${lenR}`;
-                    }
-                }
             }
 
-            function setupAnimation() {
-                if (!window.gsap) return;
+            updateGeometry();
+            if (window.ResizeObserver) {
+                new ResizeObserver(updateGeometry).observe(wrap);
+            } else {
+                window.addEventListener('resize', updateGeometry);
+            }
+            document.fonts?.ready.then(updateGeometry);
 
-                if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-                    isAnimated = true;
-                    return;
-                }
-
-                // Initial hidden states: title + separator elements
+            if (!observer) continue;
+            svg.classList.add('is-awaiting-reveal');
+            if (window.gsap && section) {
+                const belowElements = Array.from(section.children).filter(element =>
+                    element !== wrap && !element.matches('.journey-timeline, .journey-layout-wrapper, .section-title-svg, .section-title')
+                );
                 gsap.set(title, { opacity: 0, y: 16 });
-                if (star) gsap.set(star, { opacity: 0, scale: 0, transformOrigin: '0px 0px' });
-                if (rays.length > 0) gsap.set(rays, { opacity: 0, scale: 0, transformOrigin: '0px 0px' });
-                if (ringLeft) { gsap.set(ringLeft, { opacity: 0 }); ringLeft.setAttribute('r', '0'); }
-                if (ringRight) { gsap.set(ringRight, { opacity: 0 }); ringRight.setAttribute('r', '0'); }
-                if (dotLeft) { gsap.set(dotLeft, { opacity: 0 }); dotLeft.setAttribute('r', '0'); }
-                if (dotRight) { gsap.set(dotRight, { opacity: 0 }); dotRight.setAttribute('r', '0'); }
-
-                // Initial hidden states: below elements (subtitle and section content)
-                if (belowElements.length > 0) {
-                    gsap.set(belowElements, { opacity: 0, y: 22 });
-                }
-
-                const playAnimation = () => {
-                    if (isAnimated) return;
-                    isAnimated = true;
-
-                    updateGeometry();
-
-                    const lenL = branchLeft.getTotalLength();
-                    const lenR = branchRight.getTotalLength();
-                    if (lenL <= 0 || lenR <= 0) {
-                        gsap.set([title, star], { opacity: 1, scale: 1, y: 0 });
-                        if (rays.length > 0) gsap.set(rays, { opacity: 1, scale: 1 });
-                        if (dotLeft) { dotLeft.setAttribute('r', '4.5'); gsap.set(dotLeft, { opacity: 1 }); }
-                        if (dotRight) { dotRight.setAttribute('r', '4.5'); gsap.set(dotRight, { opacity: 1 }); }
-                        if (ringLeft) { ringLeft.setAttribute('r', '5'); gsap.set(ringLeft, { opacity: 1 }); }
-                        if (ringRight) { ringRight.setAttribute('r', '5'); gsap.set(ringRight, { opacity: 1 }); }
-                        if (belowElements.length > 0) {
-                            gsap.to(belowElements, { opacity: 1, y: 0, duration: 0.5, clearProps: 'all' });
-                        }
-                        return;
-                    }
-
-                    animTL = gsap.timeline({
+                gsap.set(belowElements, { opacity: 0, y: 22 });
+                revealContentByWrap.set(wrap, () => {
+                    gsap.timeline({
                         onComplete: () => {
-                            branchLeft.style.strokeDasharray = '';
-                            branchLeft.style.strokeDashoffset = '';
-                            branchRight.style.strokeDasharray = '';
-                            branchRight.style.strokeDashoffset = '';
-                            if (dotLeft) dotLeft.setAttribute('r', '4.5');
-                            if (dotRight) dotRight.setAttribute('r', '4.5');
-                            if (ringLeft) ringLeft.setAttribute('r', '5');
-                            if (ringRight) ringRight.setAttribute('r', '5');
-                            if (belowElements.length > 0) {
-                                gsap.set(belowElements, { clearProps: 'all' });
-                            }
-                            animTL = null;
-
-                            // Dispatch resize event if gallery inside
                             if (section.id === 'gallery' || section.querySelector('.masonry-container')) {
                                 window.dispatchEvent(new Event('resize'));
                             }
                         }
-                    });
-
-                    // 1. Title fades and slides up into place (snappy)
-                    animTL.to(title, {
-                        opacity: 1,
-                        y: 0,
-                        duration: 0.3,
-                        ease: 'power2.out'
-                    }, 0);
-
-                    // 2. "the star appears" - Center diamond star pops in first
-                    if (star) {
-                        animTL.to(star, {
-                            opacity: 1,
-                            scale: 1,
-                            duration: 0.24,
-                            ease: 'back.out(2)'
-                        }, 0.1);
-                    }
-
-                    // 3. "then those 4 lines" - The 4 radiating diagonal rays burst out from behind the star
-                    if (rays.length > 0) {
-                        animTL.to(rays, {
-                            opacity: 1,
-                            scale: 1,
-                            duration: 0.18,
-                            stagger: 0.02,
-                            ease: 'back.out(2)'
-                        }, 0.22);
-                    }
-
-                    // 4. "then line draws in a smooth way." - Symmetrical line branches smoothly draw outward from center dip
-                    animTL.to([branchLeft, branchRight], {
-                        strokeDashoffset: 0,
-                        duration: 0.48,
-                        ease: 'power1.out'
-                    }, 0.3);
-
-                    // 5. Hollow rings pop open cleanly without lateral jitter as lines reach them
-                    if (ringLeft && ringRight) {
-                        animTL.to([ringLeft, ringRight], {
-                            opacity: 1,
-                            attr: { r: 5 },
-                            duration: 0.2,
-                            ease: 'power2.out'
-                        }, 0.44);
-                    }
-
-                    // 6. Outer solid terminal dots pop in at ends without jitter (pure radial expansion from fixed cx, cy)
-                    if (dotLeft && dotRight) {
-                        animTL.to([dotLeft, dotRight], {
-                            opacity: 1,
-                            attr: { r: 4.5 },
-                            duration: 0.2,
-                            ease: 'power2.out'
-                        }, 0.58);
-                    }
-
-                    // 7. ANIMATION AND LOADING HAPPEN TOGETHER:
-                    // Subtitle and section content animate IN PARALLEL with the line draw!
-                    if (belowElements.length > 0) {
-                        animTL.to(belowElements, {
-                            opacity: 1,
-                            y: 0,
-                            duration: 0.42,
-                            stagger: 0.08,
-                            ease: 'power2.out',
-                            clearProps: 'all'
-                        }, 0.32);
-                    }
-                };
-
-                const triggerWhenReady = () => {
-                    if (document.body.classList.contains('intro-loading')) {
-                        const checkLoader = setInterval(() => {
-                            if (!document.body.classList.contains('intro-loading')) {
-                                clearInterval(checkLoader);
-                                setTimeout(playAnimation, 150);
-                            }
-                        }, 60);
-                    } else {
-                        playAnimation();
-                    }
-                };
-
-                // Check if already in viewport (e.g. above the fold or on hash load)
-                const checkInView = () => {
-                    const r = wrap.getBoundingClientRect();
-                    return r.top < window.innerHeight * 0.85 && r.bottom > 0;
-                };
-
-                if (window.ScrollTrigger) {
-                    ScrollTrigger.create({
-                        trigger: wrap,
-                        start: 'top 82%',
-                        once: true,
-                        onEnter: () => triggerWhenReady()
-                    });
-                } else if (window.IntersectionObserver) {
-                    const obs = new IntersectionObserver((entries) => {
-                        entries.forEach((entry) => {
-                            if (entry.isIntersecting) {
-                                triggerWhenReady();
-                                obs.disconnect();
-                            }
-                        });
-                    }, { threshold: 0.1, rootMargin: '0px 0px -15% 0px' });
-                    obs.observe(wrap);
-                } else {
-                    if (checkInView()) {
-                        triggerWhenReady();
-                    } else {
-                        const onScroll = () => {
-                            if (checkInView()) {
-                                triggerWhenReady();
-                                window.removeEventListener('scroll', onScroll);
-                            }
-                        };
-                        window.addEventListener('scroll', onScroll, { passive: true });
-                    }
-                }
+                    })
+                        .to(title, { opacity: 1, y: 0, duration: 0.3, ease: 'power2.out' }, 0)
+                        .to(belowElements, { opacity: 1, y: 0, duration: 0.42, stagger: 0.08, ease: 'power2.out', clearProps: 'all' }, 0.32);
+                });
             }
+        }
 
-            updateGeometry();
-            setupAnimation();
-
-            window.addEventListener('resize', () => {
-                if (animTL && animTL.isActive()) {
-                    animTL.progress(1);
-                }
-                updateGeometry();
-            });
-
-            if (window.ResizeObserver) {
-                const ro = new ResizeObserver(() => updateGeometry());
-                ro.observe(wrap);
-            }
-
-            if (document.fonts && document.fonts.ready) {
-                document.fonts.ready.then(updateGeometry);
-            }
-
-            setTimeout(updateGeometry, 200);
-            setTimeout(updateGeometry, 800);
+        if (!observer) return;
+        const observeDividers = () => {
+            document.querySelectorAll('.section-title-graphic-wrap').forEach(wrap => observer.observe(wrap));
+        };
+        if (!document.body.classList.contains('intro-loading')) {
+            observeDividers();
+            return;
+        }
+        const loaderObserver = new MutationObserver(() => {
+            if (document.body.classList.contains('intro-loading')) return;
+            loaderObserver.disconnect();
+            observeDividers();
         });
+        loaderObserver.observe(document.body, { attributes: true, attributeFilter: ['class'] });
     }
 
     /* -----------------------------------------------

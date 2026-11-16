@@ -8,6 +8,7 @@
     --background-color: #FAF5FF;
     --card-background: #FFFFFF;
     --accent: #8b5cf6;
+    --divider-color: #7855d3;
     --accent-light: #DDD6FE;
     --shadow-sm: drop-shadow(3.5px 3.5px 0px rgba(21, 22, 22, 1));
     --shadow-hover: drop-shadow(5.5px 5.5px 0px rgba(21, 22, 22, 1));
@@ -141,29 +142,26 @@ a:hover {
     pointer-events: none;
     z-index: 1;
     overflow: visible;
+    color: var(--divider-color);
 }
 
 .section-title-branch {
-    stroke: #816cf8;
+    stroke: currentColor;
     stroke-width: 2px;
     fill: none;
     stroke-linecap: round;
 }
 
-.section-title-node {
-    transform-origin: center center;
-}
-
 .node-ring-left,
 .node-ring-right {
-    fill: #faf5ff;
-    stroke: #816cf8;
+    fill: var(--background-color);
+    stroke: currentColor;
     stroke-width: 2px;
 }
 
 .node-dot-left,
 .node-dot-right {
-    fill: #816cf8;
+    fill: currentColor;
     stroke: none;
 }
 
@@ -171,18 +169,25 @@ a:hover {
     pointer-events: none;
 }
 
-.section-title-sparkle-inner {
-    transform-origin: 0 0;
-    pointer-events: none;
-}
-
 .sparkle-ray {
-    stroke: #816cf8;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2px;
+    stroke-linecap: round;
 }
 
 .sparkle-star {
-    fill: #705cf6;
-    filter: drop-shadow(0 0 6px rgba(112, 92, 246, 0.45));
+    fill: currentColor;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    .section-title-svg.is-awaiting-reveal { clip-path: inset(0 49%); opacity: 0; }
+    .section-title-svg.is-revealing { animation: draw-title-rule 750ms ease-out both; }
+
+    @keyframes draw-title-rule {
+        from { clip-path: inset(0 49%); opacity: .45; }
+        to { clip-path: inset(-15px 0); opacity: 1; }
+    }
 }
 
 .section-with-separator .section-subtitle {
@@ -1605,7 +1610,7 @@ a:hover {
 }
 
 .journey-line-path {
-    stroke: #816cf8;
+    stroke: var(--divider-color);
     stroke-width: 2.5px;
     fill: none;
     stroke-linecap: round;
@@ -1657,14 +1662,14 @@ a:hover {
     width: 10px;
     height: 10px;
     border-radius: 50%;
-    background: #4f46e5;
-    box-shadow: 0 0 0 5px rgba(79, 70, 229, 0.25);
+    background: var(--divider-color);
+    box-shadow: 0 0 0 5px #7855d340;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .journey-item:hover .journey-dot {
     transform: scale(1.15);
-    box-shadow: 0 0 0 7px rgba(79, 70, 229, 0.35);
+    box-shadow: 0 0 0 7px #7855d359;
 }
 
 .journey-end-marker {
@@ -1682,7 +1687,7 @@ a:hover {
     width: 9px;
     height: 9px;
     border-radius: 50%;
-    border: 2px solid #816cf8;
+    border: 2px solid var(--divider-color);
     background: transparent;
 }
 
@@ -3320,6 +3325,7 @@ a:hover {
    TARGET CURSOR (ReactBits)
    ============================================= */
 .target-cursor-wrapper {
+  visibility: hidden;
   position: fixed;
   top: 0;
   left: 0;
@@ -3329,6 +3335,10 @@ a:hover {
   z-index: 999999 !important;
   mix-blend-mode: difference;
   transform: translate(-50%, -50%);
+}
+
+.target-cursor-active .target-cursor-wrapper {
+  visibility: visible;
 }
 
 .target-cursor-dot {
@@ -3614,7 +3624,7 @@ a:hover {
     height: 100%;
     z-index: 10;
     background: transparent;
-    cursor: none; /* Hide default cursor so custom cursor shows */
+    cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -3678,7 +3688,7 @@ a:hover {
 }
 
 /* Hide target cursor when active inside the iframe */
-body:has(.vibe-browser.interacting) .target-cursor-wrapper {
+body:has(.vibe-browser.interacting iframe:hover) .target-cursor-wrapper {
     opacity: 0 !important;
     visibility: hidden !important;
 }
@@ -3845,10 +3855,9 @@ body:has(.vibe-browser.interacting) .target-cursor-wrapper {
     }
 }
 
-@media (hover: hover) and (pointer: fine) {
-  body, a, button, [role="button"], .project-card, .cursor-target, .nav-link, .contact-link, .api-btn, .item-wrapper, .item-img, .item-caption-overlay, #gallery, .lightbox, .vibe-tab, .browser-link-btn {
-    cursor: none !important;
-  }
+body.target-cursor-active:not(:has(.vibe-browser.interacting iframe:hover)),
+body.target-cursor-active:not(:has(.vibe-browser.interacting iframe:hover)) :is(a, button, [role="button"], .cursor-target, .item-img, .item-caption-overlay, #gallery, .lightbox, .browser-link-btn, .vibe-iframe-overlay) {
+  cursor: none !important;
 }
 
 /* =============================================
@@ -4195,142 +4204,6 @@ body.intro-loading .api-window-body {
     text-align: center;
 }
 
-.terminal-text-window {
-    flex-shrink: 0;       /* prevent collapsing in height:0 parent flexbox (AGENTS.md Rule 1) */
-    width: fit-content;
-    max-width: 92vw;
-    height: 112px;        /* exactly 4 lines (4 * 28px) */
-    max-height: 112px;
-    overflow: hidden;
-    margin-top: 0.75rem;
-    margin-left: auto;
-    margin-right: auto;
-    background: transparent !important;
-    background-color: transparent !important;
-    border: none !important;
-    box-shadow: none !important;
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
-    text-align: left !important;
-    pointer-events: none;
-    position: relative;
-    font-family: var(--font-mono);
-    font-size: 0.95rem;
-    line-height: 28px;
-}
-
-.terminal-lines {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start !important;
-    width: 100%;
-    background: transparent !important;
-    transition: transform 0.22s cubic-bezier(0.2, 0.8, 0.2, 1);
-    will-change: transform;
-}
-
-.t-line {
-    font-family: inherit;
-    font-size: 0.95rem;
-    font-weight: 700 !important; /* Constant font-weight across all states: NO size jump */
-    line-height: 28px;
-    height: 28px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    background: transparent !important;
-    background-color: transparent !important;
-    color: #000000 !important;
-    text-align: left !important;
-    display: flex;
-    align-items: center;
-    justify-content: flex-start !important;
-    letter-spacing: 0.2px;
-}
-
-.t-line-cmd {
-    color: #000000 !important;
-    font-weight: 700 !important;
-}
-
-.t-line-cmd .t-prompt {
-    color: var(--accent);
-    font-weight: 900;
-    width: 18px;
-    min-width: 18px;
-    max-width: 18px;
-    margin-right: 0.5rem;
-    display: inline-block;
-    text-align: center;
-    flex-shrink: 0;
-}
-
-.t-line-cmd .t-cmd {
-    color: #000000 !important;
-}
-
-.t-line.active {
-    color: #000000 !important;
-    font-weight: 700 !important;
-}
-
-.t-line.done {
-    color: #000000 !important;
-    font-weight: 700 !important;
-}
-
-.t-line.ready {
-    color: #000000 !important;
-    font-weight: 700 !important;
-}
-
-.t-icon {
-    display: inline-block;
-    width: 18px;
-    min-width: 18px;
-    max-width: 18px;
-    margin-right: 0.5rem;
-    text-align: center;
-    background: transparent !important;
-    flex-shrink: 0;
-}
-
-.t-icon.icon-spin {
-    color: var(--accent);
-    font-weight: 900;
-}
-
-.t-icon.icon-ok {
-    color: #10B981;
-    font-weight: 800;
-}
-
-.t-icon.icon-ready {
-    color: #000000 !important;
-}
-
-@media (max-width: 480px) {
-    .terminal-text-window {
-        width: fit-content;
-        max-width: 92vw;
-        font-size: 0.82rem;
-        line-height: 24px;
-        height: 96px;       /* 4 * 24px */
-        max-height: 96px;
-    }
-    .t-line {
-        font-size: 0.82rem;
-        line-height: 24px;
-        height: 24px;
-    }
-    .t-icon, .t-line-cmd .t-prompt {
-        width: 16px;
-        min-width: 16px;
-        max-width: 16px;
-        margin-right: 0.35rem;
-    }
-}
-
 /* =============================================
    CARD INTERACTION EFFECTS (MagicBento)
    ============================================= */
@@ -4431,15 +4304,7 @@ body.intro-loading .api-window-body {
     border-radius: 20px;
 }
 
-.project-card:hover .card-spotlight,
-.edu-card:hover .card-spotlight,
-.achievement-card:hover .card-spotlight,
-.vibe-tab:hover .card-spotlight,
-.item-wrapper:hover .card-spotlight,
-.stat-card:hover .card-spotlight,
-.about-card:hover .card-spotlight,
-.timeline-item:hover .card-spotlight,
-.api-playground:hover .card-spotlight {
+.card-spotlight.is-tracking {
     opacity: 1;
 }
 .new_footer_area {
