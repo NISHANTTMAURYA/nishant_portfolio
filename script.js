@@ -351,7 +351,6 @@ try {
             '.timeline-item',
             '.edu-item',
             '.skill-category',
-            '.achievement-card',
             '.about-card',
             '.resume-container',
             '.achievements-summary',
@@ -430,6 +429,7 @@ try {
         if (!containerRef) return;
 
         const GALLERY_ITEMS = [
+            { id: "29", img: "./images/bit-n-build-2026.webp", title: "Bit-N-Build — Domain Winners at Fr. CRCE", height: 520 },
             { id: "1", img: "./images/nishant_sih.jpg", title: "team4i — SIH 2025 Winners", height: 550 },
             { id: "2", img: "./images/14.jpg", title: "SIH 2025 — Winner Placard & Trophies", height: 420 },
             { id: "3", img: "./images/3.jpeg", title: "Code Odyssey 3.0 — 2nd Runner Up, ₹8,000", height: 600 },
@@ -2014,7 +2014,7 @@ try {
             './images/23.jpg',          './images/13.jpg',   './images/25.jpg',
             './images/21.jpg',          './images/17.jpg',
             // Resume preview
-            './images/res.jpeg',
+            './images/resume-preview-v2.webp',
             // Experience illustration
             './images/nishant_pixar.png',
             // Hero / key tech icons
@@ -2211,7 +2211,7 @@ try {
     }
 
     function initCardEffects() {
-        const cards = document.querySelectorAll('.project-card, .edu-card, .achievement-card, .vibe-tab, .stat-card, .about-card, .timeline-item, .api-playground');
+        const cards = document.querySelectorAll('.project-card, .edu-card, .vibe-tab, .stat-card, .about-card, .timeline-item, .api-playground');
         if (!cards.length) return;
 
         cards.forEach(card => initSingleCardEffect(card));
@@ -3043,6 +3043,138 @@ try {
         } catch (e) {}
     }
 
+    function initAchievementJourney() {
+        const grid = document.querySelector('#achievements .achievements-grid');
+        if (!grid) return;
+        const cards = Array.from(grid.querySelectorAll('.achievement-card'));
+        if (!cards.length) return;
+        cards.forEach(card => {
+            card.dataset.year ||= card.textContent.match(/20\d{2}/)?.[0] || 'Highlight';
+            const mobileYear = document.createElement('span');
+            mobileYear.className = 'achievement-year-mobile';
+            mobileYear.textContent = card.dataset.year;
+            card.appendChild(mobileYear);
+        });
+        cards.sort((a, b) => Number(a.dataset.order) - Number(b.dataset.order));
+        const landscape = grid.parentElement;
+        const route = landscape.querySelector('.achievement-route');
+        const ns = 'http://www.w3.org/2000/svg';
+        const points = [];
+        cards.forEach((card, index) => {
+            card.style.setProperty('--milestone-index', index);
+            grid.appendChild(card);
+            const progress = cards.length === 1 ? .5 : index / (cards.length - 1);
+            const summit = cards.length > 2 && index === cards.length - 1;
+            // The route ends at the flag, while the final card sits just to its right.
+            const x = 80 + progress * 800;
+            const cardX = summit ? 890 : x;
+            const y = summit ? 150 : 505 - progress * 320 + (index % 2 ? 34 : -12);
+            const below = summit || index % 2 === 1;
+            const beforeSummit = cards.length > 4 && cards.length % 2 === 1 && index === cards.length - 2;
+            card.style.setProperty('--milestone-x', `${cardX / 10}%`);
+            card.style.setProperty('--milestone-y', `${y / 7}%`);
+            card.style.setProperty('--card-offset', beforeSummit ? '90px' : below ? '30px' : '-125px');
+            points.push({ x, y, below, cardX, connectorOffset: beforeSummit ? 84 : below ? 24 : -24 });
+        });
+        const columns = Math.min(5, Math.ceil(cards.length / 2));
+        grid.style.setProperty('--milestone-columns', columns);
+        landscape.style.setProperty('--milestone-rows', Math.ceil(cards.length / columns));
+        landscape.classList.toggle('achievement-dense', cards.length > 12);
+        const mobileSpine = document.createElementNS(ns, 'svg');
+        mobileSpine.setAttribute('class', 'achievement-mobile-spine');
+        mobileSpine.setAttribute('aria-hidden', 'true');
+        mobileSpine.setAttribute('preserveAspectRatio', 'none');
+        const mobileSpinePath = document.createElementNS(ns, 'path');
+        mobileSpine.appendChild(mobileSpinePath);
+        grid.appendChild(mobileSpine);
+        const mobileNodes = cards.map((card, index) => {
+            const node = document.createElement('span');
+            node.className = `achievement-mobile-node ${index % 2 ? 'is-right' : 'is-left'}`;
+            node.setAttribute('aria-hidden', 'true');
+            grid.appendChild(node);
+            return node;
+        });
+        const positionMobileNodes = () => {
+            const gridTop = grid.getBoundingClientRect().top;
+            const centerX = grid.clientWidth / 2;
+            const positions = cards.map((card, index) => {
+                const rect = card.getBoundingClientRect();
+                const y = rect.top - gridTop + rect.height / 2;
+                mobileNodes[index].style.top = `${y}px`;
+                return y;
+            });
+            mobileSpine.setAttribute('viewBox', `0 0 ${grid.clientWidth} ${grid.clientHeight}`);
+            let d = `M ${centerX} 0`;
+            positions.forEach((y, index) => {
+                d += ` L ${centerX} ${y}`;
+                if (index < positions.length - 1) {
+                    const waveEnd = Math.min(y + 70, positions[index + 1] - 18);
+                    const waveHeight = waveEnd - y;
+                    const bendX = centerX + (index % 2 ? 14 : -14);
+                    d += ` C ${centerX} ${y + waveHeight * .18}, ${bendX} ${y + waveHeight * .27}, ${bendX} ${y + waveHeight * .48}`;
+                    d += ` C ${bendX} ${y + waveHeight * .7}, ${centerX} ${y + waveHeight * .82}, ${centerX} ${waveEnd}`;
+                }
+            });
+            d += ` L ${centerX} ${grid.clientHeight}`;
+            mobileSpinePath.setAttribute('d', d);
+        };
+        positionMobileNodes();
+        if ('ResizeObserver' in window) {
+            const mobileNodeObserver = new ResizeObserver(positionMobileNodes);
+            mobileNodeObserver.observe(grid);
+            cards.forEach(card => mobileNodeObserver.observe(card));
+        }
+        if (route) {
+            const drawRoute = () => {
+                const width = landscape.clientWidth;
+                const height = landscape.clientHeight;
+                route.setAttribute('viewBox', `0 0 ${width} ${height}`);
+                const scaled = points.map(({ x, y, below, cardX, connectorOffset }) => ({ x: x * width / 1000, y: y * height / 700, below, cardX: cardX * width / 1000, connectorOffset }));
+                const path = document.createElementNS(ns, 'path');
+                path.setAttribute('class', 'achievement-route-path');
+                path.setAttribute('d', `M ${scaled.map(({ x, y }) => `${x} ${y}`).join(' L ')}`);
+                route.replaceChildren(path);
+                scaled.forEach(({ x, y, cardX, connectorOffset }, index) => {
+                    const connector = document.createElementNS(ns, 'line');
+                    connector.setAttribute('class', 'achievement-route-connector');
+                    connector.style.transitionDelay = `${1.45 + index * .14}s`;
+                    connector.setAttribute('x1', x);
+                    connector.setAttribute('x2', cardX);
+                    connector.setAttribute('y1', y);
+                    connector.setAttribute('y2', y + connectorOffset);
+                    route.appendChild(connector);
+                    const dot = document.createElementNS(ns, 'circle');
+                    dot.setAttribute('class', 'achievement-route-dot');
+                    dot.style.transitionDelay = `${1.45 + index * .14}s`;
+                    dot.setAttribute('cx', x);
+                    dot.setAttribute('cy', y);
+                    dot.setAttribute('r', 6);
+                    route.appendChild(dot);
+                });
+            };
+            drawRoute();
+            if ('ResizeObserver' in window) new ResizeObserver(drawRoute).observe(landscape);
+        }
+        // Wait until the mountain itself is in view, so its entrance plays while visible.
+        const checkJourneyReveal = () => {
+            if (document.body.classList.contains('intro-loading')) return;
+            const rect = landscape.getBoundingClientRect();
+            const phone = window.matchMedia('(max-width: 700px)').matches;
+            const triggerY = window.innerHeight * (phone ? .82 : .25);
+            if (rect.top > triggerY || rect.bottom < window.innerHeight * .25) return;
+            landscape.classList.add('is-visible');
+            window.removeEventListener('scroll', checkJourneyReveal);
+            window.removeEventListener('resize', checkJourneyReveal);
+            loaderObserver?.disconnect();
+        };
+        const loaderObserver = new MutationObserver(checkJourneyReveal);
+        loaderObserver.observe(document.body, { attributes: true, attributeFilter: ['class'] });
+        window.addEventListener('scroll', checkJourneyReveal, { passive: true });
+        window.addEventListener('resize', checkJourneyReveal);
+        checkJourneyReveal();
+    }
+
+    initAchievementJourney();
     initIntroLoader();
     initVibeLabs();
     initCardEffects();
