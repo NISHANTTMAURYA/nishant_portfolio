@@ -5248,6 +5248,13 @@ body.intro-loading .api-window-body {
     clip-path: inset(0 0 0 0);
     transform: translateY(0) scale(1);
 }
+/* Feather the landscape into the page grid on laptop/desktop only. */
+@media (min-width: 701px) {
+    #achievements .achievements-landscape::before {
+        -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 86%, transparent 100%);
+        mask-image: linear-gradient(to bottom, #000 0%, #000 86%, transparent 100%);
+    }
+}
 #achievements .achievement-route-path { transition-delay: 1.12s; }
 #achievements .achievements-landscape .achievement-card,
 #achievements .achievements-landscape .achievement-card:last-child:nth-child(odd),
