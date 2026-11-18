@@ -17,7 +17,7 @@ export const PROJECTS_DATA = [
       },
       {
         text: "4iStudios",
-        href: "http://4istudios.in/",
+        href: "https://www.linkedin.com/company/4istudios",
         icon: "business",
         className: "project-link",
         external: true
